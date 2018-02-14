@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
@@ -73,10 +75,10 @@ public class NumericOpMethodResolver implements UDFMethodResolver {
 
       // Default is double, but if one of the sides is already in decimal we
       // complete the operation in that type.
-      if (argTypeInfos.get(0).equals(TypeInfoFactory.decimalTypeInfo)
-          || argTypeInfos.get(1).equals(TypeInfoFactory.decimalTypeInfo)) {
-        modArgTypeInfos.add(TypeInfoFactory.decimalTypeInfo);
-        modArgTypeInfos.add(TypeInfoFactory.decimalTypeInfo);
+      if (argTypeInfos.get(0).equals(PrimitiveObjectInspectorFactory.decimalTypeInfo)
+          || argTypeInfos.get(1).equals(PrimitiveObjectInspectorFactory.decimalTypeInfo)) {
+        modArgTypeInfos.add(PrimitiveObjectInspectorFactory.decimalTypeInfo);
+        modArgTypeInfos.add(PrimitiveObjectInspectorFactory.decimalTypeInfo);
       } else {
         modArgTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
         modArgTypeInfos.add(TypeInfoFactory.doubleTypeInfo);

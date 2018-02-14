@@ -35,10 +35,12 @@ import org.apache.hadoop.hive.ql.udf.ptf.BasePartitionEvaluator;
 import org.apache.hadoop.hive.ql.util.JavaDataModel;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorObject;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
@@ -69,7 +71,7 @@ public class GenericUDAFSum extends AbstractGenericUDAFResolver {
           "Exactly one argument is expected.");
     }
 
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
           "Only primitive type arguments are accepted but "
               + parameters[0].getTypeName() + " is passed.");
@@ -110,8 +112,8 @@ public class GenericUDAFSum extends AbstractGenericUDAFResolver {
     return eval;
   }
 
-  public static PrimitiveObjectInspector.PrimitiveCategory getReturnType(TypeInfo type) {
-    if (type.getCategory() != ObjectInspector.Category.PRIMITIVE) {
+  public static PrimitiveCategory getReturnType(TypeInfo type) {
+    if (type.getCategory() != Category.PRIMITIVE) {
       return null;
     }
     switch (((PrimitiveTypeInfo) type).getPrimitiveCategory()) {
@@ -119,16 +121,16 @@ public class GenericUDAFSum extends AbstractGenericUDAFResolver {
       case SHORT:
       case INT:
       case LONG:
-        return PrimitiveObjectInspector.PrimitiveCategory.LONG;
+        return PrimitiveCategory.LONG;
       case TIMESTAMP:
       case FLOAT:
       case DOUBLE:
       case STRING:
       case VARCHAR:
       case CHAR:
-        return PrimitiveObjectInspector.PrimitiveCategory.DOUBLE;
+        return PrimitiveCategory.DOUBLE;
       case DECIMAL:
-        return PrimitiveObjectInspector.PrimitiveCategory.DECIMAL;
+        return PrimitiveCategory.DECIMAL;
     }
     return null;
   }

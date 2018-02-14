@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.hadoop.hive.serde2.SerDeException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
@@ -403,7 +403,7 @@ public class TestAvroObjectInspectorGenerator {
     // Column types
     assertEquals(1, aoig.getColumnTypes().size());
     TypeInfo typeInfo = aoig.getColumnTypes().get(0);
-    assertEquals(ObjectInspector.Category.MAP, typeInfo.getCategory());
+    assertEquals(Category.MAP, typeInfo.getCategory());
     assertTrue(typeInfo instanceof MapTypeInfo);
     MapTypeInfo mapTypeInfo = (MapTypeInfo)typeInfo;
 
@@ -423,7 +423,7 @@ public class TestAvroObjectInspectorGenerator {
     // Column types
     assertEquals(1, aoig.getColumnTypes().size());
     TypeInfo typeInfo = aoig.getColumnTypes().get(0);
-    assertEquals(ObjectInspector.Category.LIST, typeInfo.getCategory());
+    assertEquals(Category.LIST, typeInfo.getCategory());
     assertTrue(typeInfo instanceof ListTypeInfo);
     ListTypeInfo listTypeInfo = (ListTypeInfo)typeInfo;
 
@@ -442,7 +442,7 @@ public class TestAvroObjectInspectorGenerator {
     // Column types
     assertEquals(1, aoig.getColumnTypes().size());
     TypeInfo typeInfo = aoig.getColumnTypes().get(0);
-    assertEquals(ObjectInspector.Category.STRUCT, typeInfo.getCategory());
+    assertEquals(Category.STRUCT, typeInfo.getCategory());
     assertTrue(typeInfo instanceof StructTypeInfo);
     StructTypeInfo structTypeInfo = (StructTypeInfo)typeInfo;
 
@@ -546,7 +546,7 @@ public class TestAvroObjectInspectorGenerator {
     assertTrue(typeInfo instanceof PrimitiveTypeInfo);
     PrimitiveTypeInfo pti = (PrimitiveTypeInfo) typeInfo;
     // Verify the union has been hidden and just the main type has been returned.
-    assertEquals(PrimitiveObjectInspector.PrimitiveCategory.STRING, pti.getPrimitiveCategory());
+    assertEquals(PrimitiveCategory.STRING, pti.getPrimitiveCategory());
   }
 
   @Test // That Union[T, NULL] is converted to just T, within a Map
@@ -570,7 +570,7 @@ public class TestAvroObjectInspectorGenerator {
     assertTrue(typeInfo instanceof PrimitiveTypeInfo);
     PrimitiveTypeInfo pti = (PrimitiveTypeInfo) typeInfo;
     // Verify the union has been hidden and just the main type has been returned.
-    assertEquals(PrimitiveObjectInspector.PrimitiveCategory.STRING, pti.getPrimitiveCategory());
+    assertEquals(PrimitiveCategory.STRING, pti.getPrimitiveCategory());
   }
 
   @Test

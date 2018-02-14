@@ -50,7 +50,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPNotNull;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPNull;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPOr;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public class ConvertAstToSearchArg {
    */
   private static BoxType getType(ExprNodeDesc expr) {
     TypeInfo type = expr.getTypeInfo();
-    if (type.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (type.getCategory() == Category.PRIMITIVE) {
       switch (((PrimitiveTypeInfo) type).getPrimitiveCategory()) {
         case BYTE:
         case SHORT:

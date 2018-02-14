@@ -34,6 +34,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -243,7 +244,7 @@ public class TestOrcSerDeStats {
     // check the inspectors
     StructObjectInspector readerInspector =
         (StructObjectInspector) reader.getObjectInspector();
-    assertEquals(ObjectInspector.Category.STRUCT,
+    assertEquals(Category.STRUCT,
         readerInspector.getCategory());
     assertEquals("struct<bytes1:binary,string1:string>",
         readerInspector.getTypeName());

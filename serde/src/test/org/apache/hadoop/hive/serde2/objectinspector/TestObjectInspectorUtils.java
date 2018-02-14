@@ -23,7 +23,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.thrift.test.Complex;
 import org.apache.hadoop.hive.serde2.thrift.test.IntString;
@@ -36,7 +35,7 @@ public class TestObjectInspectorUtils extends TestCase {
 
   public void testCompareFloatingNumberSignedZero() {
     PrimitiveObjectInspector doubleOI = PrimitiveObjectInspectorFactory
-        .getPrimitiveJavaObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.DOUBLE);
+        .getPrimitiveJavaObjectInspector(PrimitiveCategory.DOUBLE);
 
     Double d1 = Double.valueOf("0.0");
     Double d2 = Double.valueOf("-0.0");
@@ -46,7 +45,7 @@ public class TestObjectInspectorUtils extends TestCase {
     assertEquals(0, ObjectInspectorUtils.compare(d2, doubleOI, d2, doubleOI));
 
     PrimitiveObjectInspector floatOI = PrimitiveObjectInspectorFactory
-        .getPrimitiveJavaObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.FLOAT);
+        .getPrimitiveJavaObjectInspector(PrimitiveCategory.FLOAT);
 
     Float f1 = Float.valueOf("0.0");
     Float f2 = Float.valueOf("-0.0");

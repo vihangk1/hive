@@ -44,12 +44,14 @@ import org.apache.hadoop.hive.ql.plan.PTFDesc;
 import org.apache.hadoop.hive.ql.plan.ptf.PTFExpressionDef;
 import org.apache.hadoop.hive.ql.plan.ptf.PTFInputDef;
 import org.apache.hadoop.hive.ql.plan.ptf.PartitionedTableFunctionDef;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -219,9 +221,9 @@ public class MatchPath extends TableFunctionEvaluator
       ObjectInspector symbolPatternArgOI = symboPatternArg.getOI();
 
       if ( !ObjectInspectorUtils.isConstantObjectInspector(symbolPatternArgOI) ||
-          (symbolPatternArgOI.getCategory() != ObjectInspector.Category.PRIMITIVE) ||
+          (symbolPatternArgOI.getCategory() != Category.PRIMITIVE) ||
           ((PrimitiveObjectInspector)symbolPatternArgOI).getPrimitiveCategory() !=
-          PrimitiveObjectInspector.PrimitiveCategory.STRING )
+          PrimitiveCategory.STRING )
       {
         throwErrorWithSignature("Currently the symbol Pattern must be a Constant String.");
       }
@@ -250,9 +252,9 @@ public class MatchPath extends TableFunctionEvaluator
         ObjectInspector symbolNameArgOI = symbolNameArg.getOI();
 
         if ( !ObjectInspectorUtils.isConstantObjectInspector(symbolNameArgOI) ||
-            (symbolNameArgOI.getCategory() != ObjectInspector.Category.PRIMITIVE) ||
+            (symbolNameArgOI.getCategory() != Category.PRIMITIVE) ||
             ((PrimitiveObjectInspector)symbolNameArgOI).getPrimitiveCategory() !=
-            PrimitiveObjectInspector.PrimitiveCategory.STRING )
+            PrimitiveCategory.STRING )
         {
           throwErrorWithSignature(
               String.format("Currently a Symbol Name(%s) must be a Constant String",
@@ -263,9 +265,9 @@ public class MatchPath extends TableFunctionEvaluator
 
         PTFExpressionDef symolExprArg = args.get(i+1);
         ObjectInspector symolExprArgOI = symolExprArg.getOI();
-        if ( (symolExprArgOI.getCategory() != ObjectInspector.Category.PRIMITIVE) ||
+        if ( (symolExprArgOI.getCategory() != Category.PRIMITIVE) ||
               ((PrimitiveObjectInspector)symolExprArgOI).getPrimitiveCategory() !=
-              PrimitiveObjectInspector.PrimitiveCategory.BOOLEAN )
+              PrimitiveCategory.BOOLEAN )
         {
           throwErrorWithSignature(String.format("Currently a Symbol Expression(%s) " +
               "must be a boolean expression", symolExprArg.getExpressionTreeString()));
@@ -284,9 +286,9 @@ public class MatchPath extends TableFunctionEvaluator
       ObjectInspector resultExprArgOI = resultExprArg.getOI();
 
       if ( !ObjectInspectorUtils.isConstantObjectInspector(resultExprArgOI) ||
-            (resultExprArgOI.getCategory() != ObjectInspector.Category.PRIMITIVE) ||
+            (resultExprArgOI.getCategory() != Category.PRIMITIVE) ||
             ((PrimitiveObjectInspector)resultExprArgOI).getPrimitiveCategory() !=
-            PrimitiveObjectInspector.PrimitiveCategory.STRING )
+            PrimitiveCategory.STRING )
       {
         throwErrorWithSignature("Currently the result Expr parameter must be a Constant String.");
       }

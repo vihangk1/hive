@@ -30,7 +30,8 @@ import org.apache.hadoop.hive.serde2.lazy.LazySerDeParameters;
 import org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryFactory;
 import org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -107,9 +108,9 @@ public class LazyBinaryColumnarSerDe extends ColumnarSerDeBase {
       Object f = (list == null ? null : list.get(i));
       //empty strings are marked by an invalid utf single byte sequence. A valid utf stream cannot
       //produce this sequence
-      if ((f != null) && (foi.getCategory().equals(ObjectInspector.Category.PRIMITIVE))
+      if ((f != null) && (foi.getCategory().equals(Category.PRIMITIVE))
           && ((PrimitiveObjectInspector) foi).getPrimitiveCategory().equals(
-              PrimitiveObjectInspector.PrimitiveCategory.STRING)
+              PrimitiveCategory.STRING)
           && ((StringObjectInspector) foi).getPrimitiveJavaObject(f).length() == 0) {
         serializeStream.write(INVALID_UTF__SINGLE_BYTE, 0, 1);
       } else {

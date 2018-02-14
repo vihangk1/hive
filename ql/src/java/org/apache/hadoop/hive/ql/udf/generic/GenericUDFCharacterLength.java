@@ -23,7 +23,9 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedExpressions;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.StringLength;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorConverter;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
@@ -48,14 +50,14 @@ public class GenericUDFCharacterLength extends GenericUDF {
           "CHARACTER_LENGTH requires 1 argument, got " + arguments.length);
     }
 
-    if (arguments[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentException(
           "CHARACTER_LENGTH only takes primitive types, got " + argumentOI.getTypeName());
     }
     argumentOI = (PrimitiveObjectInspector) arguments[0];
 
     stringConverter = new PrimitiveObjectInspectorConverter.StringConverter(argumentOI);
-    PrimitiveObjectInspector.PrimitiveCategory inputType = argumentOI.getPrimitiveCategory();
+    PrimitiveCategory inputType = argumentOI.getPrimitiveCategory();
     ObjectInspector outputOI = null;
     switch (inputType) {
       case CHAR:

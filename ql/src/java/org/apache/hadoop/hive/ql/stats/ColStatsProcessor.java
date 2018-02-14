@@ -40,9 +40,8 @@ import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.plan.ColumnStatsDesc;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
-import org.apache.hadoop.hive.ql.stats.ColumnStatisticsObjTranslator;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.InspectableObject;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -96,7 +95,7 @@ public class ColStatsProcessor implements IStatsProcessor {
     List<ColumnStatistics> stats = new ArrayList<ColumnStatistics>();
     InspectableObject packedRow;
     while ((packedRow = ftOp.getNextRow()) != null) {
-      if (packedRow.oi.getCategory() != ObjectInspector.Category.STRUCT) {
+      if (packedRow.oi.getCategory() != Category.STRUCT) {
         throw new HiveException("Unexpected object type encountered while unpacking row");
       }
 

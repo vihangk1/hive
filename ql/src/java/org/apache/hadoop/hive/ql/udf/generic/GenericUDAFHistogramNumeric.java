@@ -20,6 +20,8 @@ package org.apache.hadoop.hive.ql.udf.generic;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -69,7 +71,7 @@ public class GenericUDAFHistogramNumeric extends AbstractGenericUDAFResolver {
     }
 
     // validate the first parameter, which is the expression to compute over
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
           "Only primitive type arguments are accepted but "
           + parameters[0].getTypeName() + " was passed as parameter 1.");
@@ -94,13 +96,13 @@ public class GenericUDAFHistogramNumeric extends AbstractGenericUDAFResolver {
     }
 
     // validate the second parameter, which is the number of histogram bins
-    if (parameters[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[1].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(1,
           "Only primitive type arguments are accepted but "
           + parameters[1].getTypeName() + " was passed as parameter 2.");
     }
     if( ((PrimitiveTypeInfo) parameters[1]).getPrimitiveCategory()
-        != PrimitiveObjectInspector.PrimitiveCategory.INT) {
+        != PrimitiveCategory.INT) {
       throw new UDFArgumentTypeException(1,
           "Only an integer argument is accepted as parameter 2, but "
           + parameters[1].getTypeName() + " was passed instead.");

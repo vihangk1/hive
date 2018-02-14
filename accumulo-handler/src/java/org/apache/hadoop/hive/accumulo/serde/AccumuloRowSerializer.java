@@ -32,11 +32,12 @@ import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeUtils;
 import org.apache.hadoop.hive.serde2.lazy.LazyUtils;
 import org.apache.hadoop.hive.serde2.lazy.LazySerDeParameters;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
@@ -77,7 +78,7 @@ public class AccumuloRowSerializer {
 
   public Mutation serialize(Object obj, ObjectInspector objInspector) throws SerDeException,
       IOException {
-    if (objInspector.getCategory() != ObjectInspector.Category.STRUCT) {
+    if (objInspector.getCategory() != Category.STRUCT) {
       throw new SerDeException(getClass().toString()
           + " can only serialize struct types, but we got: " + objInspector.getTypeName());
     }
@@ -207,8 +208,8 @@ public class AccumuloRowSerializer {
     String rowIdMappingType = rowIdMapping.getColumnType();
     TypeInfo rowIdTypeInfo = TypeInfoUtils.getTypeInfoFromTypeString(rowIdMappingType);
 
-    if (!rowIdFieldOI.getCategory().equals(ObjectInspector.Category.PRIMITIVE)
-        && rowIdTypeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (!rowIdFieldOI.getCategory().equals(Category.PRIMITIVE)
+        && rowIdTypeInfo.getCategory() == Category.PRIMITIVE) {
       // we always serialize the String type using the escaped algorithm for LazyString
       writeString(output, SerDeUtils.getJSONString(rowId, rowIdFieldOI),
           PrimitiveObjectInspectorFactory.javaStringObjectInspector);
@@ -242,7 +243,7 @@ public class AccumuloRowSerializer {
     output.reset();
 
     // Start by only serializing primitives as-is
-    if (fieldObjectInspector.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (fieldObjectInspector.getCategory() == Category.PRIMITIVE) {
       writeSerializedPrimitive((PrimitiveObjectInspector) fieldObjectInspector, output, value,
           mapping.getEncoding());
     } else {

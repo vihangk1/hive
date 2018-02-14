@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -49,7 +50,7 @@ public class TestSerdeWithFieldComments extends TestCase {
 
   public void testFieldComments() throws MetaException, SerDeException {
     StructObjectInspector mockSOI = mock(StructObjectInspector.class);
-    when(mockSOI.getCategory()).thenReturn(ObjectInspector.Category.STRUCT);
+    when(mockSOI.getCategory()).thenReturn(Category.STRUCT);
     List fieldRefs = new ArrayList<StructField>();
     // Add field with a comment...
     fieldRefs.add(mockedStructField("first", "type name 1", "this is a comment"));

@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.sql.Date;
-import java.util.TimeZone;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -34,11 +33,12 @@ import org.apache.hadoop.hive.ql.exec.vector.expressions.VectorUDFDateDiffScalar
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorConverter.TimestampConverter;
 import org.apache.hadoop.io.IntWritable;
@@ -134,7 +134,7 @@ public class GenericUDFDateDiff extends GenericUDF {
   }
 
   private Converter checkArguments(ObjectInspector[] arguments, int i) throws UDFArgumentException {
-    if (arguments[i].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[i].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
         "Only primitive type arguments are accepted but "
         + arguments[i].getTypeName() + " is passed. as first arguments");

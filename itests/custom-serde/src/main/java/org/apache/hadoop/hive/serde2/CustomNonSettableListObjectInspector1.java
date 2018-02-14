@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.serde2;
 
 import java.util.List;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 

@@ -33,8 +33,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.SerDeException;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -121,9 +121,9 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
       colMap.columnType = columnTypes.get(i);
       if (colMap.qualifierName == null && !colMap.hbaseRowKey && !colMap.hbaseTimestamp) {
         TypeInfo typeInfo = columnTypes.get(i);
-        if ((typeInfo.getCategory() != ObjectInspector.Category.MAP) ||
+        if ((typeInfo.getCategory() != Category.MAP) ||
             (((MapTypeInfo) typeInfo).getMapKeyTypeInfo().getCategory()
-                != ObjectInspector.Category.PRIMITIVE)) {
+                != Category.PRIMITIVE)) {
 
           throw new SerDeException(
               serdeName + ": hbase column family '" + colMap.familyName
@@ -192,24 +192,24 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
       if (storageInfo == null) {
 
         // use the table default storage specification
-        if (colType.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+        if (colType.getCategory() == Category.PRIMITIVE) {
           if (!colType.getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
             colMap.binaryStorage.add(tableBinaryStorage);
           } else {
             colMap.binaryStorage.add(false);
           }
-        } else if (colType.getCategory() == ObjectInspector.Category.MAP) {
+        } else if (colType.getCategory() == Category.MAP) {
           TypeInfo keyTypeInfo = ((MapTypeInfo) colType).getMapKeyTypeInfo();
           TypeInfo valueTypeInfo = ((MapTypeInfo) colType).getMapValueTypeInfo();
 
-          if (keyTypeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE &&
+          if (keyTypeInfo.getCategory() == Category.PRIMITIVE &&
               !keyTypeInfo.getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
             colMap.binaryStorage.add(tableBinaryStorage);
           } else {
             colMap.binaryStorage.add(false);
           }
 
-          if (valueTypeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE &&
+          if (valueTypeInfo.getCategory() == Category.PRIMITIVE &&
               !valueTypeInfo.getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
             colMap.binaryStorage.add(tableBinaryStorage);
           } else {
@@ -223,7 +223,7 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
         // we have a storage specification for a primitive column type
         String storageOption = storageInfo[0];
 
-        if ((colType.getCategory() == ObjectInspector.Category.MAP) ||
+        if ((colType.getCategory() == Category.MAP) ||
             !(storageOption.equals("-") || "string".startsWith(storageOption) ||
                 "binary".startsWith(storageOption))) {
           throw new SerDeException("Error: A column storage specification is one of the following:"
@@ -232,7 +232,7 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
               + colMap.columnName);
         }
 
-        if (colType.getCategory() == ObjectInspector.Category.PRIMITIVE &&
+        if (colType.getCategory() == Category.PRIMITIVE &&
             !colType.getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
 
           if ("-".equals(storageOption)) {
@@ -252,7 +252,7 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
         String keyStorage = storageInfo[0];
         String valStorage = storageInfo[1];
 
-        if ((colType.getCategory() != ObjectInspector.Category.MAP) ||
+        if ((colType.getCategory() != Category.MAP) ||
             !(keyStorage.equals("-") || "string".startsWith(keyStorage) ||
                 "binary".startsWith(keyStorage)) ||
             !(valStorage.equals("-") || "string".startsWith(valStorage) ||
@@ -270,7 +270,7 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
         TypeInfo keyTypeInfo = ((MapTypeInfo) colType).getMapKeyTypeInfo();
         TypeInfo valueTypeInfo = ((MapTypeInfo) colType).getMapValueTypeInfo();
 
-        if (keyTypeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE &&
+        if (keyTypeInfo.getCategory() == Category.PRIMITIVE &&
             !keyTypeInfo.getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
 
           if (keyStorage.equals("-")) {
@@ -284,7 +284,7 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
           colMap.binaryStorage.add(false);
         }
 
-        if (valueTypeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE &&
+        if (valueTypeInfo.getCategory() == Category.PRIMITIVE &&
             !valueTypeInfo.getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
           if (valStorage.equals("-")) {
             colMap.binaryStorage.add(tableBinaryStorage);
@@ -404,12 +404,12 @@ public class ColumnMappings implements Iterable<ColumnMappings.ColumnMapping> {
       return doPrefixCut;
     }
 
-    public boolean isCategory(ObjectInspector.Category category) {
+    public boolean isCategory(Category category) {
       return columnType.getCategory() == category;
     }
 
     public boolean isCategory(PrimitiveCategory category) {
-      return columnType.getCategory() == ObjectInspector.Category.PRIMITIVE &&
+      return columnType.getCategory() == Category.PRIMITIVE &&
           ((PrimitiveTypeInfo)columnType).getPrimitiveCategory() == category;
     }
 

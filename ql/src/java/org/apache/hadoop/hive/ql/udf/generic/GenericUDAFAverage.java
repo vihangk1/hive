@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
@@ -76,7 +77,7 @@ public class GenericUDAFAverage extends AbstractGenericUDAFResolver {
           "Exactly one argument is expected.");
     }
 
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
           "Only primitive type arguments are accepted but "
               + parameters[0].getTypeName() + " is passed.");

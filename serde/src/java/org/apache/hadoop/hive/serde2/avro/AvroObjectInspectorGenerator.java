@@ -22,9 +22,10 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.hadoop.hive.serde2.SerDeException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
@@ -50,7 +51,11 @@ public class AvroObjectInspectorGenerator {
     verifySchemaIsARecord(schema);
 
     this.columnNames = AvroObjectInspectorGenerator.generateColumnNames(schema);
-    this.columnTypes = SchemaToTypeInfo.generateColumnTypes(schema);
+    try {
+      this.columnTypes = SchemaToTypeInfo.generateColumnTypes(schema);
+    } catch (Exception e) {
+      throw new SerDeException(e);
+    }
     this.columnComments = AvroObjectInspectorGenerator.generateColumnComments(schema);
     assert columnNames.size() == columnTypes.size();
     this.oi = createObjectInspector();
@@ -112,7 +117,7 @@ public class AvroObjectInspectorGenerator {
         MapTypeInfo mti = (MapTypeInfo)ti;
         result = ObjectInspectorFactory.getStandardMapObjectInspector(
             PrimitiveObjectInspectorFactory
-                    .getPrimitiveJavaObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.STRING),
+                    .getPrimitiveJavaObjectInspector(PrimitiveCategory.STRING),
             createObjectInspectorWorker(mti.getMapValueTypeInfo()));
         break;
       case LIST:
@@ -139,12 +144,12 @@ public class AvroObjectInspectorGenerator {
   }
 
   private boolean supportedCategories(TypeInfo ti) {
-    final ObjectInspector.Category c = ti.getCategory();
-    return c.equals(ObjectInspector.Category.PRIMITIVE) ||
-           c.equals(ObjectInspector.Category.MAP)       ||
-           c.equals(ObjectInspector.Category.LIST)      ||
-           c.equals(ObjectInspector.Category.STRUCT)    ||
-           c.equals(ObjectInspector.Category.UNION);
+    final Category c = ti.getCategory();
+    return c.equals(Category.PRIMITIVE) ||
+           c.equals(Category.MAP)       ||
+           c.equals(Category.LIST)      ||
+           c.equals(Category.STRUCT)    ||
+           c.equals(Category.UNION);
   }
 
   public static List<String> generateColumnNames(Schema schema) {

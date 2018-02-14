@@ -20,9 +20,10 @@ package org.apache.hadoop.hive.serde2.typeinfo;
 
 import java.io.Serializable;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hadoop.hive.common.classification.InterfaceStability;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.classification.InterfaceAudience;
+import org.apache.hadoop.classification.InterfaceStability;
+import org.apache.hadoop.hive.metastore.ColumnType;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 
 /**
  * A List Type has homogeneous elements. All elements of the List has the same
@@ -46,7 +47,7 @@ public final class ListTypeInfo extends TypeInfo implements Serializable {
 
   @Override
   public String getTypeName() {
-    return org.apache.hadoop.hive.serde.serdeConstants.LIST_TYPE_NAME + "<"
+    return ColumnType.LIST_TYPE_NAME + "<"
         + listElementTypeInfo.getTypeName() + ">";
   }
 

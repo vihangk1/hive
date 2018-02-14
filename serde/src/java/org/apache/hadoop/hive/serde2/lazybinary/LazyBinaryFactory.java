@@ -24,10 +24,11 @@ import org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryListOb
 import org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryMapObjectInspector;
 import org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryStructObjectInspector;
 import org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryUnionObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableHiveCharObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableHiveIntervalDayTimeObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableHiveIntervalYearMonthObjectInspector;
@@ -106,7 +107,7 @@ public final class LazyBinaryFactory {
    * Create a hierarchical LazyBinaryObject based on the given typeInfo.
    */
   public static LazyBinaryObject createLazyBinaryObject(ObjectInspector oi) {
-    ObjectInspector.Category c = oi.getCategory();
+    Category c = oi.getCategory();
     switch (c) {
     case PRIMITIVE:
       return createLazyBinaryPrimitiveClass((PrimitiveObjectInspector) oi);

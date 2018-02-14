@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFUtils.ReturnObjectInspectorResolver;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
@@ -35,8 +36,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.BooleanWritable;
-
-import com.esotericsoftware.minlog.Log;
 
 /**
  * GenericUDFIn
@@ -121,7 +120,7 @@ public class GenericUDFIn extends GenericUDF {
   // (and those from IN(...) follow it)
   private void prepareInSet(DeferredObject[] arguments) throws HiveException {
     constantInSet = new HashSet<Object>();
-    if (compareOI.getCategory().equals(ObjectInspector.Category.PRIMITIVE)) {
+    if (compareOI.getCategory().equals(Category.PRIMITIVE)) {
       for (int i = 1; i < arguments.length; ++i) {
         constantInSet.add(((PrimitiveObjectInspector) compareOI)
             .getPrimitiveJavaObject(conversionHelper

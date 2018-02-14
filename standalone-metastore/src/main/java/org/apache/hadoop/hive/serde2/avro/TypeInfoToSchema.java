@@ -15,18 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.hadoop.hive.metastore.avro.utils;
+package org.apache.hadoop.hive.serde2.avro;
 
 import org.apache.avro.Schema;
-import org.apache.hadoop.hive.metastore.type.CharMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.DecimalMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.ListMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.MapMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.PrimitiveMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.StructMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.UnionMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.VarcharMetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfo;
+import org.apache.hadoop.hive.metastore.ColumnType;
+import org.apache.hadoop.hive.metastore.avro.utils.AvroSchemaUtils;
+import org.apache.hadoop.hive.metastore.avro.utils.AvroSerDeConstants;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.UnionTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 
@@ -34,13 +38,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.hadoop.hive.metastore.type.MetastorePrimitiveTypeCategory.STRING;
-
 /**
- * This class contains util methods to convert TypeInfo to Avro schema and vice-versa. This class
- * is copied from MetastoreTypeInfoToSchema from Hive source code.
+ * Convert Hive TypeInfo to an Avro Schema
  */
-public class MetastoreTypeInfoToSchema {
+public class TypeInfoToSchema {
 
   private long recordCounter = 0;
 
@@ -54,7 +55,7 @@ public class MetastoreTypeInfoToSchema {
    * @param doc         Avro schema doc
    * @return Avro Schema
    */
-  public Schema convert(List<String> columnNames, List<MetastoreTypeInfo> columnTypes,
+  public Schema convert(List<String> columnNames, List<TypeInfo> columnTypes,
                         List<String> columnComments, String namespace, String name, String doc) {
 
     List<Schema.Field> fields = new ArrayList<Schema.Field>();
@@ -74,11 +75,11 @@ public class MetastoreTypeInfoToSchema {
     return avroSchema;
   }
 
-  private Schema.Field createAvroField(String name, MetastoreTypeInfo typeInfo, String comment) {
+  private Schema.Field createAvroField(String name, TypeInfo typeInfo, String comment) {
     return new Schema.Field(name, createAvroSchema(typeInfo), comment, null);
   }
 
-  private Schema createAvroSchema(MetastoreTypeInfo typeInfo) {
+  private Schema createAvroSchema(TypeInfo typeInfo) {
     Schema schema = null;
     switch (typeInfo.getCategory()) {
       case PRIMITIVE:
@@ -101,8 +102,8 @@ public class MetastoreTypeInfoToSchema {
     return wrapInUnionWithNull(schema);
   }
 
-  private Schema createAvroPrimitive(MetastoreTypeInfo typeInfo) {
-    PrimitiveMetastoreTypeInfo primitiveTypeInfo = (PrimitiveMetastoreTypeInfo) typeInfo;
+  private Schema createAvroPrimitive(TypeInfo typeInfo) {
+    PrimitiveTypeInfo primitiveTypeInfo = (PrimitiveTypeInfo) typeInfo;
     Schema schema;
     switch (primitiveTypeInfo.getPrimitiveCategory()) {
       case STRING:
@@ -112,13 +113,13 @@ public class MetastoreTypeInfoToSchema {
         schema = AvroSchemaUtils.getSchemaFor("{" +
             "\"type\":\"" + AvroSerDeConstants.AVRO_STRING_TYPE_NAME + "\"," +
             "\"logicalType\":\"" + AvroSerDeConstants.CHAR_TYPE_NAME + "\"," +
-            "\"maxLength\":" + ((CharMetastoreTypeInfo) typeInfo).getLength() + "}");
+            "\"maxLength\":" + ((CharTypeInfo) typeInfo).getLength() + "}");
         break;
       case VARCHAR:
         schema = AvroSchemaUtils.getSchemaFor("{" +
             "\"type\":\"" + AvroSerDeConstants.AVRO_STRING_TYPE_NAME + "\"," +
             "\"logicalType\":\"" + AvroSerDeConstants.VARCHAR_TYPE_NAME + "\"," +
-            "\"maxLength\":" + ((VarcharMetastoreTypeInfo) typeInfo).getLength() + "}");
+            "\"maxLength\":" + ((VarcharTypeInfo) typeInfo).getLength() + "}");
         break;
       case BINARY:
         schema = Schema.create(Schema.Type.BYTES);
@@ -145,7 +146,7 @@ public class MetastoreTypeInfoToSchema {
         schema = Schema.create(Schema.Type.BOOLEAN);
         break;
       case DECIMAL:
-        DecimalMetastoreTypeInfo decimalTypeInfo = (DecimalMetastoreTypeInfo) typeInfo;
+        DecimalTypeInfo decimalTypeInfo = (DecimalTypeInfo) typeInfo;
         String precision = String.valueOf(decimalTypeInfo.precision());
         String scale = String.valueOf(decimalTypeInfo.scale());
         schema = AvroSchemaUtils.getSchemaFor("{" +
@@ -173,9 +174,9 @@ public class MetastoreTypeInfoToSchema {
     return schema;
   }
 
-  private Schema createAvroUnion(MetastoreTypeInfo typeInfo) {
+  private Schema createAvroUnion(TypeInfo typeInfo) {
     List<Schema> childSchemas = new ArrayList<Schema>();
-    for (MetastoreTypeInfo childTypeInfo : ((UnionMetastoreTypeInfo) typeInfo).getAllUnionObjectTypeInfos()) {
+    for (TypeInfo childTypeInfo : ((UnionTypeInfo) typeInfo).getAllUnionObjectTypeInfos()) {
       final Schema childSchema = createAvroSchema(childTypeInfo);
       if (childSchema.getType() == Schema.Type.UNION) {
         childSchemas.addAll(childSchema.getTypes());
@@ -187,13 +188,13 @@ public class MetastoreTypeInfoToSchema {
     return Schema.createUnion(removeDuplicateNullSchemas(childSchemas));
   }
 
-  private Schema createAvroRecord(MetastoreTypeInfo typeInfo) {
+  private Schema createAvroRecord(TypeInfo typeInfo) {
     List<Schema.Field> childFields = new ArrayList<Schema.Field>();
 
     final List<String> allStructFieldNames =
-        ((StructMetastoreTypeInfo) typeInfo).getAllStructFieldNames();
-    final List<MetastoreTypeInfo> allStructFieldTypeInfos =
-        ((StructMetastoreTypeInfo) typeInfo).getAllStructFieldTypeInfos();
+        ((StructTypeInfo) typeInfo).getAllStructFieldNames();
+    final List<TypeInfo> allStructFieldTypeInfos =
+        ((StructTypeInfo) typeInfo).getAllStructFieldTypeInfos();
     if (allStructFieldNames.size() != allStructFieldTypeInfos.size()) {
       throw new IllegalArgumentException("Failed to generate avro schema from hive schema. " +
           "name and column type differs. names = " + allStructFieldNames + ", types = " +
@@ -201,7 +202,7 @@ public class MetastoreTypeInfoToSchema {
     }
 
     for (int i = 0; i < allStructFieldNames.size(); ++i) {
-      final MetastoreTypeInfo childTypeInfo = allStructFieldTypeInfos.get(i);
+      final TypeInfo childTypeInfo = allStructFieldTypeInfos.get(i);
       final Schema.Field grandChildSchemaField = createAvroField(allStructFieldNames.get(i),
           childTypeInfo, childTypeInfo.toString());
       final List<Schema.Field> grandChildFields = getFields(grandChildSchemaField);
@@ -215,21 +216,21 @@ public class MetastoreTypeInfoToSchema {
     return recordSchema;
   }
 
-  private Schema createAvroMap(MetastoreTypeInfo typeInfo) {
-    MetastoreTypeInfo keyTypeInfo = ((MapMetastoreTypeInfo) typeInfo).getMapKeyTypeInfo();
-    if (((PrimitiveMetastoreTypeInfo) keyTypeInfo).getPrimitiveCategory()
-        != STRING) {
+  private Schema createAvroMap(TypeInfo typeInfo) {
+    TypeInfo keyTypeInfo = ((MapTypeInfo) typeInfo).getMapKeyTypeInfo();
+    if (((PrimitiveTypeInfo) keyTypeInfo).getPrimitiveCategory()
+        != PrimitiveCategory.STRING) {
       throw new UnsupportedOperationException("Key of Map can only be a String");
     }
 
-    MetastoreTypeInfo valueTypeInfo = ((MapMetastoreTypeInfo) typeInfo).getMapValueTypeInfo();
+    TypeInfo valueTypeInfo = ((MapTypeInfo) typeInfo).getMapValueTypeInfo();
     Schema valueSchema = createAvroSchema(valueTypeInfo);
 
     return Schema.createMap(valueSchema);
   }
 
-  private Schema createAvroArray(MetastoreTypeInfo typeInfo) {
-    ListMetastoreTypeInfo listTypeInfo = (ListMetastoreTypeInfo) typeInfo;
+  private Schema createAvroArray(TypeInfo typeInfo) {
+    ListTypeInfo listTypeInfo = (ListTypeInfo) typeInfo;
     Schema listSchema = createAvroSchema(listTypeInfo.getListElementTypeInfo());
     return Schema.createArray(listSchema);
   }

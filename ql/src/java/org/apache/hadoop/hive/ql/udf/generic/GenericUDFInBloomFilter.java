@@ -28,7 +28,9 @@ import org.apache.hadoop.hive.ql.exec.vector.expressions.VectorInBloomFilterColD
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.*;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
@@ -37,7 +39,6 @@ import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hive.common.util.BloomKFilter;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -62,13 +63,13 @@ public class GenericUDFInBloomFilter extends GenericUDF {
     }
 
     // Verify individual arguments
-    if (arguments[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "The 1st argument must be a primitive type but "
       + arguments[0].getTypeName() + " was passed");
     }
 
     if (((PrimitiveObjectInspector) arguments[1]).getPrimitiveCategory() !=
-            PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
+            PrimitiveCategory.BINARY) {
       throw new UDFArgumentTypeException(1, "The 2nd argument must be a binary type but " +
       arguments[1].getTypeName() + " was passed");
     }

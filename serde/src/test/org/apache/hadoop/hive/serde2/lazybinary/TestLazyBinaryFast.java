@@ -18,7 +18,6 @@
 package org.apache.hadoop.hive.serde2.lazybinary;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -32,13 +31,12 @@ import org.apache.hadoop.hive.serde2.binarysortable.MyTestClass;
 import org.apache.hadoop.hive.serde2.lazy.VerifyLazy;
 import org.apache.hadoop.hive.serde2.lazybinary.fast.LazyBinaryDeserializeRead;
 import org.apache.hadoop.hive.serde2.lazybinary.fast.LazyBinarySerializeWrite;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.Writable;
 
 public class TestLazyBinaryFast extends TestCase {
 
@@ -211,7 +209,7 @@ public class TestLazyBinaryFast extends TestCase {
 
   private void verifyRead(LazyBinaryDeserializeRead lazyBinaryDeserializeRead,
       TypeInfo typeInfo, Object expectedObject) throws IOException {
-    if (typeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (typeInfo.getCategory() == Category.PRIMITIVE) {
       VerifyFast.verifyDeserializeRead(lazyBinaryDeserializeRead, typeInfo, expectedObject);
     } else {
       Object complexFieldObj = VerifyFast.deserializeReadComplexType(lazyBinaryDeserializeRead, typeInfo);

@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.IOUtils;
@@ -71,7 +72,7 @@ public class GenericUDFInFile extends GenericUDF {
     }
 
     if (((PrimitiveObjectInspector) fileObjectInspector).getPrimitiveCategory() !=
-          PrimitiveObjectInspector.PrimitiveCategory.STRING ||
+          PrimitiveCategory.STRING ||
       !ObjectInspectorUtils.isConstantObjectInspector(fileObjectInspector)) {
       throw new UDFArgumentTypeException(1, "The second " +
         "argument of IN_FILE() must be a constant string but " +
@@ -84,10 +85,10 @@ public class GenericUDFInFile extends GenericUDF {
   private boolean isTypeCompatible(ObjectInspector argument) {
     PrimitiveObjectInspector poi = ((PrimitiveObjectInspector) argument);
     return
-      poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.STRING ||
-      poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.CHAR ||
-      poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.VARCHAR ||
-      poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.VOID;
+      poi.getPrimitiveCategory() == PrimitiveCategory.STRING ||
+      poi.getPrimitiveCategory() == PrimitiveCategory.CHAR ||
+      poi.getPrimitiveCategory() == PrimitiveCategory.VARCHAR ||
+      poi.getPrimitiveCategory() == PrimitiveCategory.VOID;
   }
 
   @Override

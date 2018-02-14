@@ -28,12 +28,10 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
-import org.apache.avro.generic.GenericArray;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericData.Fixed;
 import org.apache.avro.generic.GenericEnumSymbol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.common.type.HiveChar;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.common.type.HiveVarchar;
@@ -276,7 +274,7 @@ class AvroSerializer {
     return mapKeyObjectInspector instanceof PrimitiveObjectInspector &&
         ((PrimitiveObjectInspector) mapKeyObjectInspector)
             .getPrimitiveCategory()
-            .equals(PrimitiveObjectInspector.PrimitiveCategory.STRING);
+            .equals(PrimitiveCategory.STRING);
   }
 
   /**

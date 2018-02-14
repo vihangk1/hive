@@ -50,6 +50,7 @@ import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.HiveVarcharWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampLocalTZWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -446,7 +447,7 @@ public class DruidSerDe extends AbstractSerDe {
 
   @Override
   public Writable serialize(Object o, ObjectInspector objectInspector) throws SerDeException {
-    if (objectInspector.getCategory() != ObjectInspector.Category.STRUCT) {
+    if (objectInspector.getCategory() != Category.STRUCT) {
       throw new SerDeException(getClass().toString()
               + " can only serialize struct types, but we got: "
               + objectInspector.getTypeName());

@@ -18,19 +18,24 @@
 
 package org.apache.hadoop.hive.serde2.typeinfo;
 
-import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.metastore.ColumnType;
 
-public class VarcharTypeInfo extends BaseCharTypeInfo {
+public class CharTypeInfo  extends BaseCharTypeInfo {
   private static final long serialVersionUID = 1L;
 
   // no-arg constructor to make kyro happy.
-  public VarcharTypeInfo() {
-    super(serdeConstants.VARCHAR_TYPE_NAME);
+  public CharTypeInfo() {
+    super(ColumnType.CHAR_TYPE_NAME);
   }
 
-  public VarcharTypeInfo(int length) {
-    super(serdeConstants.VARCHAR_TYPE_NAME, length);
-    BaseCharUtils.validateVarcharParameter(length);
+  public CharTypeInfo(int length) {
+    super(ColumnType.CHAR_TYPE_NAME, length);
+    //TODO should this be < 1 instead of < 0?
+    if (length < 0) {
+      throw new IllegalArgumentException("Char length " + length + " cannot be negative");
+    }
+    //TODO need to handle validateCharParameter outside standalone-metastore
+    //BaseCharUtils.validateCharParameter(length);
   }
 
   @Override
@@ -47,9 +52,9 @@ public class VarcharTypeInfo extends BaseCharTypeInfo {
       return false;
     }
 
-    VarcharTypeInfo pti = (VarcharTypeInfo) other;
+    CharTypeInfo pti = (CharTypeInfo) other;
 
-    return this.getLength() == pti.getLength();
+    return this.typeName.equals(pti.typeName) && this.getLength() == pti.getLength();
   }
 
   /**
@@ -57,7 +62,7 @@ public class VarcharTypeInfo extends BaseCharTypeInfo {
    */
   @Override
   public int hashCode() {
-    return getLength();
+    return getQualifiedName().hashCode();
   }
 
   @Override

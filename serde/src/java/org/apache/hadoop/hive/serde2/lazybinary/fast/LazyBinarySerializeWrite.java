@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.hive.serde2.ByteStream;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.common.type.HiveChar;
@@ -45,10 +45,10 @@ import org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe;
 import org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryUtils;
 import org.apache.hadoop.hive.serde2.fast.SerializeWrite;
 
-import static org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category.LIST;
-import static org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category.MAP;
-import static org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category.STRUCT;
-import static org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category.UNION;
+import static org.apache.hadoop.hive.serde2.objectinspector.Category.LIST;
+import static org.apache.hadoop.hive.serde2.objectinspector.Category.MAP;
+import static org.apache.hadoop.hive.serde2.objectinspector.Category.STRUCT;
+import static org.apache.hadoop.hive.serde2.objectinspector.Category.UNION;
 
 /*
  * Directly serialize, field-by-field, the LazyBinary format.

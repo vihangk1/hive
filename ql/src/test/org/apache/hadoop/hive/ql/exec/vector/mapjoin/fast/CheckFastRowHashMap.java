@@ -38,7 +38,7 @@ import org.apache.hadoop.hive.serde2.io.ByteWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.lazy.VerifyLazy;
 import org.apache.hadoop.hive.serde2.lazybinary.fast.LazyBinaryDeserializeRead;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.BooleanWritable;
@@ -176,7 +176,7 @@ public class CheckFastRowHashMap extends CheckFastHashTable {
 
   private static void verifyRead(LazyBinaryDeserializeRead lazyBinaryDeserializeRead,
       TypeInfo typeInfo, Object expectedObject) throws IOException {
-    if (typeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (typeInfo.getCategory() == Category.PRIMITIVE) {
       VerifyFastRow.verifyDeserializeRead(lazyBinaryDeserializeRead, typeInfo, expectedObject);
     } else {
       final Object complexFieldObj =

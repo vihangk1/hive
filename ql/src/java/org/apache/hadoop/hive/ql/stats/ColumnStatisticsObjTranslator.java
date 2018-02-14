@@ -35,6 +35,7 @@ import org.apache.hadoop.hive.metastore.columnstats.cache.LongColumnStatsDataIns
 import org.apache.hadoop.hive.metastore.columnstats.cache.StringColumnStatsDataInspector;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -269,7 +270,7 @@ public class ColumnStatisticsObjTranslator {
   }
 
   private static void unpackStructObject(ObjectInspector oi, Object o, String fName, ColumnStatisticsObj cStatsObj) throws UnsupportedDoubleException {
-    if (oi.getCategory() != ObjectInspector.Category.STRUCT) {
+    if (oi.getCategory() != Category.STRUCT) {
       throw new RuntimeException("Invalid object datatype : " + oi.getCategory().toString());
     }
 
@@ -283,7 +284,7 @@ public class ColumnStatisticsObjTranslator {
       Object f = (list == null ? null : list.get(i));
       String fieldName = fields.get(i).getFieldName();
 
-      if (foi.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+      if (foi.getCategory() == Category.PRIMITIVE) {
         unpackPrimitiveObject(foi, f, fieldName, cStatsObj);
       } else {
         unpackStructObject(foi, f, fieldName, cStatsObj);

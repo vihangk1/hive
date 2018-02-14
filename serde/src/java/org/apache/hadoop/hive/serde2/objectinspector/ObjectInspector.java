@@ -42,13 +42,7 @@ import org.apache.hadoop.hive.common.classification.InterfaceStability;
 @InterfaceStability.Stable
 public interface ObjectInspector extends Cloneable {
 
-  /**
-   * Category.
-   *
-   */
-  public static enum Category {
-    PRIMITIVE, LIST, MAP, STRUCT, UNION
-  };
+  ;
 
   /**
    * Returns the name of the data type that is inspected by this

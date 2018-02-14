@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.util.JavaDataModel;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
@@ -82,13 +83,13 @@ public class GenericUDAFCorrelation extends AbstractGenericUDAFResolver {
           "Exactly two arguments are expected.");
     }
 
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
           "Only primitive type arguments are accepted but "
           + parameters[0].getTypeName() + " is passed.");
     }
 
-    if (parameters[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[1].getCategory() != Category.PRIMITIVE) {
         throw new UDFArgumentTypeException(1,
             "Only primitive type arguments are accepted but "
             + parameters[1].getTypeName() + " is passed.");

@@ -76,7 +76,7 @@ import org.apache.hadoop.hive.ql.util.JavaDataModel;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardConstantListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardConstantMapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardConstantStructObjectInspector;
@@ -1270,7 +1270,7 @@ public class StatsUtils {
 
         // check if list elements are primitive or Objects
         ObjectInspector leoi = scloi.getListElementObjectInspector();
-        if (leoi.getCategory().equals(ObjectInspector.Category.PRIMITIVE)) {
+        if (leoi.getCategory().equals(Category.PRIMITIVE)) {
           result += getSizeOfPrimitiveTypeArraysFromType(leoi.getTypeName(), length, conf);
         } else {
           result += JavaDataModel.get().lengthForObjectArrayOfSize(length);

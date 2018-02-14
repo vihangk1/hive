@@ -24,11 +24,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.serde2.AbstractSerDe;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -166,7 +167,7 @@ public final class SerDeUtils {
    * This method is kept consistent with HiveResultSetMetaData#hiveTypeToSqlType .
    */
   public static Object toThriftPayload(Object val, ObjectInspector valOI, int version) {
-    if (valOI.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (valOI.getCategory() == Category.PRIMITIVE) {
       if (val == null) {
         return null;
       }
@@ -174,7 +175,7 @@ public final class SerDeUtils {
           ObjectInspectorUtils.ObjectInspectorCopyOption.JAVA);
       // uses string type for binary before HIVE_CLI_SERVICE_PROTOCOL_V6
       if (version < 5 && ((PrimitiveObjectInspector)valOI).getPrimitiveCategory() ==
-          PrimitiveObjectInspector.PrimitiveCategory.BINARY) {
+          PrimitiveCategory.BINARY) {
         // todo HIVE-5269
         return new String((byte[])obj);
       }

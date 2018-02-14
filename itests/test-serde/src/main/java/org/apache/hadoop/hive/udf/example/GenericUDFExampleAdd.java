@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.DoubleObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorConverter;
@@ -40,7 +41,7 @@ public class GenericUDFExampleAdd extends GenericUDF {
   public ObjectInspector initialize(ObjectInspector[] arguments)
       throws UDFArgumentException {
     ObjectInspector doubleOI = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableObjectInspector(PrimitiveObjectInspector.PrimitiveCategory.DOUBLE);
+        .getPrimitiveWritableObjectInspector(PrimitiveCategory.DOUBLE);
     converter0 = (Converter) ObjectInspectorConverters.getConverter(arguments[0], doubleOI);
     converter1 = (Converter) ObjectInspectorConverters.getConverter(arguments[1], doubleOI);
     return doubleOI;

@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hive.ql.udf.generic;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -50,19 +52,19 @@ public class GenericUDAFSumList extends AbstractGenericUDAFResolver {
           "Exactly one argument is expected.");
     }
 
-    if (inspectors[0].getCategory() != ObjectInspector.Category.LIST) {
+    if (inspectors[0].getCategory() != Category.LIST) {
       throw new UDFArgumentTypeException(0, "Argument should be a list type");
     }
 
     ListObjectInspector listOI = (ListObjectInspector) inspectors[0];
     ObjectInspector elementOI = listOI.getListElementObjectInspector();
 
-    if (elementOI.getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (elementOI.getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
           "Only primitive type arguments are accepted but "
           + elementOI.getTypeName() + " is passed.");
     }
-    PrimitiveObjectInspector.PrimitiveCategory pcat =
+    PrimitiveCategory pcat =
         ((PrimitiveObjectInspector)elementOI).getPrimitiveCategory();
     return new GenericUDAFSumLong();
   }

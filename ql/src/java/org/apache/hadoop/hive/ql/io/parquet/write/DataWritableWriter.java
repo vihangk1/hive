@@ -13,6 +13,7 @@
  */
 package org.apache.hadoop.hive.ql.io.parquet.write;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
@@ -105,7 +106,7 @@ public class DataWritableWriter {
    */
   private DataWriter createWriter(ObjectInspector inspector, Type type) {
     if (type.isPrimitive()) {
-      checkInspectorCategory(inspector, ObjectInspector.Category.PRIMITIVE);
+      checkInspectorCategory(inspector, Category.PRIMITIVE);
       PrimitiveObjectInspector primitiveInspector = (PrimitiveObjectInspector)inspector;
       switch (primitiveInspector.getPrimitiveCategory()) {
         case BOOLEAN:
@@ -144,13 +145,13 @@ public class DataWritableWriter {
       OriginalType originalType = type.getOriginalType();
 
       if (originalType != null && originalType.equals(OriginalType.LIST)) {
-        checkInspectorCategory(inspector, ObjectInspector.Category.LIST);
+        checkInspectorCategory(inspector, Category.LIST);
         return new ListDataWriter((ListObjectInspector)inspector, groupType);
       } else if (originalType != null && originalType.equals(OriginalType.MAP)) {
-        checkInspectorCategory(inspector, ObjectInspector.Category.MAP);
+        checkInspectorCategory(inspector, Category.MAP);
         return new MapDataWriter((MapObjectInspector)inspector, groupType);
       } else {
-        checkInspectorCategory(inspector, ObjectInspector.Category.STRUCT);
+        checkInspectorCategory(inspector, Category.STRUCT);
         return new StructDataWriter((StructObjectInspector)inspector, groupType);
       }
     }
@@ -162,7 +163,7 @@ public class DataWritableWriter {
    * @param category The category to match
    * @throws IllegalArgumentException if inspector does not match the category
    */
-  private void checkInspectorCategory(ObjectInspector inspector, ObjectInspector.Category category) {
+  private void checkInspectorCategory(ObjectInspector inspector, Category category) {
     if (!inspector.getCategory().equals(category)) {
       throw new IllegalArgumentException("Invalid data type: expected " + category
           + " type, but found: " + inspector.getCategory());

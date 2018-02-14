@@ -37,6 +37,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.HiveChar;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.common.type.HiveVarchar;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
@@ -241,7 +242,7 @@ abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata {
       if(hcatFieldSchema != null && hcatFieldSchema.getTypeInfo() != null) {
         return new HCatFieldSchema(fSchema.alias, hcatFieldSchema.getTypeInfo(), null);
       }
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.decimalTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, PrimitiveObjectInspectorFactory.decimalTypeInfo, null);
     case DataType.BAG:
       Schema bagSchema = fSchema.schema;
       List<HCatFieldSchema> arrFields = new ArrayList<HCatFieldSchema>(1);

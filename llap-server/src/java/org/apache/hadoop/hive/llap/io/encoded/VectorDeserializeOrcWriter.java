@@ -53,7 +53,7 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazySimpleStructObject
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.InputFormat;

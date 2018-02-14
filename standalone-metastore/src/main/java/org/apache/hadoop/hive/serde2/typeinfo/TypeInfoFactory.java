@@ -23,12 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.hadoop.hive.common.type.HiveChar;
-import org.apache.hadoop.hive.common.type.HiveDecimal;
-import org.apache.hadoop.hive.common.type.HiveVarchar;
-import org.apache.hadoop.hive.serde.serdeConstants;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveTypeEntry;
+import org.apache.hadoop.hive.metastore.ColumnType;
+import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfoUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveTypeEntry;
 
 /**
  * TypeInfoFactory can be used to create the TypeInfo object for any types.
@@ -43,28 +40,33 @@ public final class TypeInfoFactory {
     // prevent instantiation
   }
 
-  public static final PrimitiveTypeInfo voidTypeInfo = new PrimitiveTypeInfo(serdeConstants.VOID_TYPE_NAME);
-  public static final PrimitiveTypeInfo booleanTypeInfo = new PrimitiveTypeInfo(serdeConstants.BOOLEAN_TYPE_NAME);
-  public static final PrimitiveTypeInfo intTypeInfo = new PrimitiveTypeInfo(serdeConstants.INT_TYPE_NAME);
-  public static final PrimitiveTypeInfo longTypeInfo = new PrimitiveTypeInfo(serdeConstants.BIGINT_TYPE_NAME);
-  public static final PrimitiveTypeInfo stringTypeInfo = new PrimitiveTypeInfo(serdeConstants.STRING_TYPE_NAME);
-  public static final PrimitiveTypeInfo charTypeInfo = new CharTypeInfo(HiveChar.MAX_CHAR_LENGTH);
-  public static final PrimitiveTypeInfo varcharTypeInfo = new VarcharTypeInfo(HiveVarchar.MAX_VARCHAR_LENGTH);
-  public static final PrimitiveTypeInfo floatTypeInfo = new PrimitiveTypeInfo(serdeConstants.FLOAT_TYPE_NAME);
-  public static final PrimitiveTypeInfo doubleTypeInfo = new PrimitiveTypeInfo(serdeConstants.DOUBLE_TYPE_NAME);
-  public static final PrimitiveTypeInfo byteTypeInfo = new PrimitiveTypeInfo(serdeConstants.TINYINT_TYPE_NAME);
-  public static final PrimitiveTypeInfo shortTypeInfo = new PrimitiveTypeInfo(serdeConstants.SMALLINT_TYPE_NAME);
-  public static final PrimitiveTypeInfo dateTypeInfo = new PrimitiveTypeInfo(serdeConstants.DATE_TYPE_NAME);
-  public static final PrimitiveTypeInfo timestampTypeInfo = new PrimitiveTypeInfo(serdeConstants.TIMESTAMP_TYPE_NAME);
-  public static final PrimitiveTypeInfo intervalYearMonthTypeInfo = new PrimitiveTypeInfo(serdeConstants.INTERVAL_YEAR_MONTH_TYPE_NAME);
-  public static final PrimitiveTypeInfo intervalDayTimeTypeInfo = new PrimitiveTypeInfo(serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME);
-  public static final PrimitiveTypeInfo binaryTypeInfo = new PrimitiveTypeInfo(serdeConstants.BINARY_TYPE_NAME);
+  public static final PrimitiveTypeInfo voidTypeInfo = new PrimitiveTypeInfo(ColumnType.VOID_TYPE_NAME);
+  public static final PrimitiveTypeInfo booleanTypeInfo = new PrimitiveTypeInfo(ColumnType.BOOLEAN_TYPE_NAME);
+  public static final PrimitiveTypeInfo intTypeInfo = new PrimitiveTypeInfo(ColumnType.INT_TYPE_NAME);
+  public static final PrimitiveTypeInfo longTypeInfo = new PrimitiveTypeInfo(ColumnType.BIGINT_TYPE_NAME);
+  public static final PrimitiveTypeInfo stringTypeInfo = new PrimitiveTypeInfo(ColumnType.STRING_TYPE_NAME);
+  //this doesn't really need to be cached here since the cache will be populated after the first put
+  //we don't want to depend on the Type implementations in standalone-metastore
+  //public static final PrimitiveTypeInfo charTypeInfo = new CharTypeInfo(HiveChar.MAX_CHAR_LENGTH);
+  //public static final PrimitiveTypeInfo varcharTypeInfo = new VarcharTypeInfo(HiveVarchar.MAX_VARCHAR_LENGTH);
+  public static final PrimitiveTypeInfo floatTypeInfo = new PrimitiveTypeInfo(ColumnType.FLOAT_TYPE_NAME);
+  public static final PrimitiveTypeInfo doubleTypeInfo = new PrimitiveTypeInfo(ColumnType.DOUBLE_TYPE_NAME);
+  public static final PrimitiveTypeInfo byteTypeInfo = new PrimitiveTypeInfo(ColumnType.TINYINT_TYPE_NAME);
+  public static final PrimitiveTypeInfo shortTypeInfo = new PrimitiveTypeInfo(ColumnType.SMALLINT_TYPE_NAME);
+  public static final PrimitiveTypeInfo dateTypeInfo = new PrimitiveTypeInfo(ColumnType.DATE_TYPE_NAME);
+  public static final PrimitiveTypeInfo timestampTypeInfo = new PrimitiveTypeInfo(ColumnType.TIMESTAMP_TYPE_NAME);
+  public static final PrimitiveTypeInfo intervalYearMonthTypeInfo = new PrimitiveTypeInfo(ColumnType.INTERVAL_YEAR_MONTH_TYPE_NAME);
+  public static final PrimitiveTypeInfo intervalDayTimeTypeInfo = new PrimitiveTypeInfo(ColumnType.INTERVAL_DAY_TIME_TYPE_NAME);
+  public static final PrimitiveTypeInfo binaryTypeInfo = new PrimitiveTypeInfo(ColumnType.BINARY_TYPE_NAME);
 
   /**
    * A DecimalTypeInfo instance that has max precision and max scale.
    */
-  public static final DecimalTypeInfo decimalTypeInfo = new DecimalTypeInfo(HiveDecimal.SYSTEM_DEFAULT_PRECISION,
-      HiveDecimal.SYSTEM_DEFAULT_SCALE);
+  //TODO this just works because HiveDecimal is in storage-api which standalone-metastore can access
+  //Ideally standalone-metastore should not depend on type implementations. We can remove this from cache
+  //since it automatically gets populated in the runtime the first time its created
+  //public static final DecimalTypeInfo decimalTypeInfo = new DecimalTypeInfo(HiveDecimal.SYSTEM_DEFAULT_PRECISION,
+  //    HiveDecimal.SYSTEM_DEFAULT_SCALE);
 
   /**
    * A TimestampTZTypeInfo with system default time zone.
@@ -79,24 +81,22 @@ public final class TypeInfoFactory {
   private static ConcurrentHashMap<String, PrimitiveTypeInfo> cachedPrimitiveTypeInfo =
       new ConcurrentHashMap<String, PrimitiveTypeInfo>();
   static {
-    cachedPrimitiveTypeInfo.put(serdeConstants.VOID_TYPE_NAME, voidTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.BOOLEAN_TYPE_NAME, booleanTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.INT_TYPE_NAME, intTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.BIGINT_TYPE_NAME, longTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.STRING_TYPE_NAME, stringTypeInfo);
-    cachedPrimitiveTypeInfo.put(charTypeInfo.getQualifiedName(), charTypeInfo);
-    cachedPrimitiveTypeInfo.put(varcharTypeInfo.getQualifiedName(), varcharTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.FLOAT_TYPE_NAME, floatTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.DOUBLE_TYPE_NAME, doubleTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.TINYINT_TYPE_NAME, byteTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.SMALLINT_TYPE_NAME, shortTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.DATE_TYPE_NAME, dateTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.TIMESTAMP_TYPE_NAME, timestampTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME, timestampLocalTZTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.INTERVAL_YEAR_MONTH_TYPE_NAME, intervalYearMonthTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME, intervalDayTimeTypeInfo);
-    cachedPrimitiveTypeInfo.put(serdeConstants.BINARY_TYPE_NAME, binaryTypeInfo);
-    cachedPrimitiveTypeInfo.put(decimalTypeInfo.getQualifiedName(), decimalTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.VOID_TYPE_NAME, voidTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.BOOLEAN_TYPE_NAME, booleanTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.INT_TYPE_NAME, intTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.BIGINT_TYPE_NAME, longTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.STRING_TYPE_NAME, stringTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.FLOAT_TYPE_NAME, floatTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.DOUBLE_TYPE_NAME, doubleTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.TINYINT_TYPE_NAME, byteTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.SMALLINT_TYPE_NAME, shortTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.DATE_TYPE_NAME, dateTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.TIMESTAMP_TYPE_NAME, timestampTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.TIMESTAMPLOCALTZ_TYPE_NAME, timestampLocalTZTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.INTERVAL_YEAR_MONTH_TYPE_NAME, intervalYearMonthTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.INTERVAL_DAY_TIME_TYPE_NAME, intervalDayTimeTypeInfo);
+    cachedPrimitiveTypeInfo.put(ColumnType.BINARY_TYPE_NAME, binaryTypeInfo);
+    //cachedPrimitiveTypeInfo.put(decimalTypeInfo.getQualifiedName(), decimalTypeInfo);
     cachedPrimitiveTypeInfo.put("unknown", unknownTypeInfo);
   }
 
@@ -134,14 +134,14 @@ public final class TypeInfoFactory {
    * @return PrimitiveTypeInfo instance
    */
   private static PrimitiveTypeInfo createPrimitiveTypeInfo(String fullName) {
-    String baseName = TypeInfoUtils.getBaseName(fullName);
+    String baseName = MetastoreTypeInfoUtils.getBaseName(fullName);
     PrimitiveTypeEntry typeEntry =
-        PrimitiveObjectInspectorUtils.getTypeEntryFromTypeName(baseName);
+        PrimitiveTypeInfo.getPrimitiveTypeEntryFromTypeName(baseName);
     if (null == typeEntry) {
       throw new RuntimeException("Unknown type " + fullName);
     }
 
-    TypeInfoUtils.PrimitiveParts parts = TypeInfoUtils.parsePrimitiveParts(fullName);
+    MetastoreTypeInfoUtils.PrimitiveParts parts = MetastoreTypeInfoUtils.parsePrimitiveParts(fullName);
     if (parts.typeParams == null || parts.typeParams.length < 1) {
       return null;
     }
@@ -174,12 +174,12 @@ public final class TypeInfoFactory {
   }
 
   public static CharTypeInfo getCharTypeInfo(int length) {
-    String fullName = BaseCharTypeInfo.getQualifiedName(serdeConstants.CHAR_TYPE_NAME, length);
+    String fullName = BaseCharTypeInfo.getQualifiedName(ColumnType.CHAR_TYPE_NAME, length);
     return (CharTypeInfo) getPrimitiveTypeInfo(fullName);
   }
 
   public static VarcharTypeInfo getVarcharTypeInfo(int length) {
-    String fullName = BaseCharTypeInfo.getQualifiedName(serdeConstants.VARCHAR_TYPE_NAME, length);
+    String fullName = BaseCharTypeInfo.getQualifiedName(ColumnType.VARCHAR_TYPE_NAME, length);
     return (VarcharTypeInfo) getPrimitiveTypeInfo(fullName);
   }
 
@@ -192,22 +192,6 @@ public final class TypeInfoFactory {
     String fullName = TimestampLocalTZTypeInfo.getQualifiedName(defaultTimeZone);
     return (TimestampLocalTZTypeInfo) getPrimitiveTypeInfo(fullName);
   };
-
-  public static TypeInfo getPrimitiveTypeInfoFromPrimitiveWritable(
-      Class<?> clazz) {
-    String typeName = PrimitiveObjectInspectorUtils
-        .getTypeNameFromPrimitiveWritable(clazz);
-    if (typeName == null) {
-      throw new RuntimeException("Internal error: Cannot get typeName for "
-          + clazz);
-    }
-    return getPrimitiveTypeInfo(typeName);
-  }
-
-  public static TypeInfo getPrimitiveTypeInfoFromJavaPrimitive(Class<?> clazz) {
-    return getPrimitiveTypeInfo(PrimitiveObjectInspectorUtils
-        .getTypeNameFromPrimitiveJava(clazz));
-  }
 
   static ConcurrentHashMap<ArrayList<List<?>>, TypeInfo> cachedStructTypeInfo =
     new ConcurrentHashMap<ArrayList<List<?>>, TypeInfo>();

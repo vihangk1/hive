@@ -58,11 +58,11 @@ import org.apache.hadoop.hive.serde2.lazydio.LazyDioInteger;
 import org.apache.hadoop.hive.serde2.lazydio.LazyDioLong;
 import org.apache.hadoop.hive.serde2.lazydio.LazyDioShort;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory.ObjectInspectorOptions;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
@@ -180,7 +180,7 @@ public final class LazyFactory {
    * Create a hierarchical LazyObject based on the given typeInfo.
    */
   public static LazyObject<? extends ObjectInspector> createLazyObject(ObjectInspector oi) {
-    ObjectInspector.Category c = oi.getCategory();
+    Category c = oi.getCategory();
     switch (c) {
     case PRIMITIVE:
       return createLazyPrimitiveClass((PrimitiveObjectInspector) oi);
@@ -325,7 +325,7 @@ public final class LazyFactory {
   public static ObjectInspector createLazyObjectInspector(TypeInfo typeInfo,
       int separatorIndex, LazyObjectInspectorParameters lazyParams,
       ObjectInspectorOptions option) throws SerDeException {
-    ObjectInspector.Category c = typeInfo.getCategory();
+    Category c = typeInfo.getCategory();
     switch (c) {
     case PRIMITIVE:
       return LazyPrimitiveObjectInspectorFactory.getLazyObjectInspector(

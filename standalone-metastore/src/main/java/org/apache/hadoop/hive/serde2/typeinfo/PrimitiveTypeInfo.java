@@ -19,13 +19,14 @@
 package org.apache.hadoop.hive.serde2.typeinfo;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hadoop.hive.common.classification.InterfaceStability;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveTypeEntry;
+import org.apache.hadoop.classification.InterfaceAudience;
+import org.apache.hadoop.classification.InterfaceStability;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveTypeEntry;
 
 /**
  * There are limited number of Primitive Types. All Primitive Types are defined
@@ -39,6 +40,16 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 public class PrimitiveTypeInfo extends TypeInfo implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  // Base type name to PrimitiveTypeEntry map.
+  private static final Map<String, PrimitiveTypeEntry>
+      typeNameToTypeEntry = new HashMap<String, PrimitiveTypeEntry>();
+
+  public static void registerType(PrimitiveTypeEntry t) {
+    if (t.typeName == null) {
+      throw new IllegalArgumentException("Type name cannot be null");
+    }
+    typeNameToTypeEntry.put(t.typeName, t);
+  }
   // Base name (varchar vs fully qualified name such as varchar(200)).
   protected String typeName;
 
@@ -86,7 +97,11 @@ public class PrimitiveTypeInfo extends TypeInfo implements Serializable {
   }
 
   public PrimitiveTypeEntry getPrimitiveTypeEntry() {
-    return PrimitiveObjectInspectorUtils.getTypeEntryFromTypeName(typeName);
+    return typeNameToTypeEntry.get(typeName);
+  }
+
+  public static PrimitiveTypeEntry getPrimitiveTypeEntryFromTypeName(String typename) {
+    return typeNameToTypeEntry.get(typename);
   }
 
   @Override

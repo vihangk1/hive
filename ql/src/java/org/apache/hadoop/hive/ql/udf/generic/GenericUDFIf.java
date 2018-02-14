@@ -25,7 +25,9 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedExpressions;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.BooleanObjectInspector;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.gen.IfExprLongColumnLongScalar;
@@ -113,11 +115,11 @@ public class GenericUDFIf extends GenericUDF {
           "The function IF(expr1,expr2,expr3) accepts exactly 3 arguments.");
     }
 
-    boolean conditionTypeIsOk = (arguments[0].getCategory() == ObjectInspector.Category.PRIMITIVE);
+    boolean conditionTypeIsOk = (arguments[0].getCategory() == Category.PRIMITIVE);
     if (conditionTypeIsOk) {
       PrimitiveObjectInspector poi = ((PrimitiveObjectInspector) arguments[0]);
-      conditionTypeIsOk = (poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.BOOLEAN
-          || poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.VOID);
+      conditionTypeIsOk = (poi.getPrimitiveCategory() == PrimitiveCategory.BOOLEAN
+          || poi.getPrimitiveCategory() == PrimitiveCategory.VOID);
     }
     if (!conditionTypeIsOk) {
       throw new UDFArgumentTypeException(0,

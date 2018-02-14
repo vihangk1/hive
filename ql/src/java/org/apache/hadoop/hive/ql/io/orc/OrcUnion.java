@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hive.ql.io.orc;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObjectInspector;

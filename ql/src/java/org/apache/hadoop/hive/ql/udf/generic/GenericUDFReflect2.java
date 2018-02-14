@@ -34,12 +34,13 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveTypeEntry;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveTypeEntry;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
@@ -71,7 +72,7 @@ public class GenericUDFReflect2 extends AbstractGenericUDFReflect {
           "The function GenericUDFReflect2(arg0,method[,arg1[,arg2]...])"
           + " accepts 2 or more arguments.");
     }
-    if (arguments[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(1, "The target instance should be a primitive type.");
     }
     targetOI = (PrimitiveObjectInspector) arguments[0];
@@ -105,9 +106,9 @@ public class GenericUDFReflect2 extends AbstractGenericUDFReflect {
     return returnOI;
   }
 
-  private PrimitiveObjectInspectorUtils.PrimitiveTypeEntry getTypeFor(Class<?> retType)
+  private PrimitiveTypeEntry getTypeFor(Class<?> retType)
       throws UDFArgumentException {
-    PrimitiveObjectInspectorUtils.PrimitiveTypeEntry entry =
+    PrimitiveTypeEntry entry =
         PrimitiveObjectInspectorUtils.getTypeEntryFromPrimitiveJavaType(retType);
     if (entry == null) {
       entry = PrimitiveObjectInspectorUtils.getTypeEntryFromPrimitiveJavaClass(retType);

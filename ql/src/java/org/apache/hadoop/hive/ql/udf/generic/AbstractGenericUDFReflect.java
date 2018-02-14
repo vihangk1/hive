@@ -23,10 +23,11 @@ import java.lang.reflect.Modifier;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveTypeEntry;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveTypeEntry;
 
 /**
  * common class for reflective UDFs
@@ -46,7 +47,7 @@ public abstract class AbstractGenericUDFReflect extends GenericUDF {
     parameterClasses = new Class[length];
     parameterJavaValues = new Object[length];
     for (int i = 0; i < length; i++) {
-      if (arguments[i + start].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+      if (arguments[i + start].getCategory() != Category.PRIMITIVE) {
         throw new UDFArgumentTypeException(i,
             "The parameters of GenericUDFReflect(class,method[,arg1[,arg2]...])"
             + " must be primitive (int, double, string, etc).");

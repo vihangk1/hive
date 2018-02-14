@@ -27,8 +27,9 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFCorrelation.GenericUDAFC
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFCount.GenericUDAFCountEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFVariance.GenericUDAFVarianceEvaluator;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
@@ -412,12 +413,12 @@ public class GenericUDAFBinarySetFunctions extends AbstractGenericUDAFResolver {
           "Exactly two arguments are expected.");
     }
 
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0, "Only primitive type arguments are accepted but "
           + parameters[0].getTypeName() + " is passed.");
     }
 
-    if (parameters[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[1].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(1, "Only primitive type arguments are accepted but "
           + parameters[1].getTypeName() + " is passed.");
     }

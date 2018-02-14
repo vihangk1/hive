@@ -18,7 +18,6 @@
 
 package org.apache.hadoop.hive.serde2.objectinspector;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

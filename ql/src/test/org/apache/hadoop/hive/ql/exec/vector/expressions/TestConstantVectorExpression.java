@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.exec.vector.util.VectorizedRowGroupGenUtil;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.junit.Test;
 
@@ -45,7 +46,7 @@ public class TestConstantVectorExpression {
     String str = "alpha";
     ConstantVectorExpression bytesCve = new ConstantVectorExpression(2, str.getBytes(), TypeInfoFactory.stringTypeInfo);
     HiveDecimal decVal = HiveDecimal.create("25.8");
-    ConstantVectorExpression decimalCve = new ConstantVectorExpression(3, decVal, TypeInfoFactory.decimalTypeInfo);
+    ConstantVectorExpression decimalCve = new ConstantVectorExpression(3, decVal, PrimitiveObjectInspectorFactory.decimalTypeInfo);
     ConstantVectorExpression nullCve = new ConstantVectorExpression(4, TypeInfoFactory.stringTypeInfo, true);
 
     int size = 20;

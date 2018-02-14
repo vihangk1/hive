@@ -17,9 +17,9 @@
  */
 package org.apache.hadoop.hive.ql.io.orc;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +91,7 @@ public class TestOrcStruct {
     assertEquals(list, inspector.getStructFieldsDataAsList(s1));
     ListObjectInspector listOI = (ListObjectInspector)
         inspector.getAllStructFieldRefs().get(12).getFieldObjectInspector();
-    assertEquals(ObjectInspector.Category.LIST, listOI.getCategory());
+    assertEquals(Category.LIST, listOI.getCategory());
     assertEquals(10, listOI.getListElement(list, 10));
     assertEquals(null, listOI.getListElement(list, -1));
     assertEquals(null, listOI.getListElement(list, 13));

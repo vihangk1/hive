@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.parse;
 
 import java.util.ArrayList;
 
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -59,7 +60,7 @@ public class InputSignature {
 
     if (classList.length != 0) {
       for (Class<?> cl : classList) {
-        typeArray.add(TypeInfoFactory
+        typeArray.add(PrimitiveObjectInspectorUtils
             .getPrimitiveTypeInfoFromPrimitiveWritable(cl));
       }
     }

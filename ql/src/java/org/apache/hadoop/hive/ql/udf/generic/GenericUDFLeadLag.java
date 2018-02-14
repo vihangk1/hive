@@ -23,12 +23,14 @@ import org.apache.hadoop.hive.ql.exec.PTFPartition.PTFPartitionIterator;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.io.IntWritable;
 
@@ -83,8 +85,8 @@ public abstract class GenericUDFLeadLag extends GenericUDF {
     if (arguments.length > 1) {
       ObjectInspector amtOI = arguments[1];
       if (!ObjectInspectorUtils.isConstantObjectInspector(amtOI)
-              || (amtOI.getCategory() != ObjectInspector.Category.PRIMITIVE)
-              || ((PrimitiveObjectInspector) amtOI).getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.INT) {
+              || (amtOI.getCategory() != Category.PRIMITIVE)
+              || ((PrimitiveObjectInspector) amtOI).getPrimitiveCategory() != PrimitiveCategory.INT) {
         throw new UDFArgumentTypeException(1, _getFnName() + " amount must be a integer value "
                 + amtOI.getTypeName() + " was passed as parameter 1.");
       }

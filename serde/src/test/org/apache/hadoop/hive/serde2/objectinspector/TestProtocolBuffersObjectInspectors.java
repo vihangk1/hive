@@ -23,7 +23,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.proto.test.Complexpb.Complex;
 import org.apache.hadoop.hive.serde2.proto.test.Complexpb.IntString;

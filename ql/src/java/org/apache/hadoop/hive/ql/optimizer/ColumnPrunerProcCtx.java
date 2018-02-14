@@ -41,7 +41,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeFieldDesc;
 import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
 import static org.apache.hadoop.hive.ql.optimizer.FieldNode.mergeFieldNodes;
@@ -265,8 +265,8 @@ public class ColumnPrunerProcCtx implements NodeProcessorCtx {
     // Check cases for arr[i].f and map[key].v
     // For these we should not generate paths like arr.f or map.v
     // Otherwise we would have a mismatch between type info and path
-    if (ti.getCategory() != ObjectInspector.Category.LIST
-        && ti.getCategory() != ObjectInspector.Category.MAP) {
+    if (ti.getCategory() != Category.LIST
+        && ti.getCategory() != Category.MAP) {
       fn.addFieldNodes(pathToRoot);
     }
   }

@@ -80,7 +80,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFWhen;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
@@ -270,7 +270,8 @@ public class TypeCheckProcFactory {
         return desc;
       }
 
-      return new ExprNodeConstantDesc(TypeInfoFactory.getPrimitiveTypeInfoFromPrimitiveWritable(NullWritable.class), null);
+      return new ExprNodeConstantDesc(PrimitiveObjectInspectorUtils
+          .getPrimitiveTypeInfoFromPrimitiveWritable(NullWritable.class), null);
     }
 
   }
@@ -935,7 +936,7 @@ public class TypeCheckProcFactory {
         TypeInfo objectTypeInfo = object.getTypeInfo();
 
         // Allow accessing a field of list element structs directly from a list
-        boolean isList = (object.getTypeInfo().getCategory() == ObjectInspector.Category.LIST);
+        boolean isList = (object.getTypeInfo().getCategory() == Category.LIST);
         if (isList) {
           objectTypeInfo = ((ListTypeInfo) objectTypeInfo).getListElementTypeInfo();
         }

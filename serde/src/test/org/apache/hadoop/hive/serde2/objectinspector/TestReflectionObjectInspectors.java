@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.mutable.MutableObject;
 import org.apache.hadoop.hive.common.ObjectPair;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.thrift.test.Complex;
 

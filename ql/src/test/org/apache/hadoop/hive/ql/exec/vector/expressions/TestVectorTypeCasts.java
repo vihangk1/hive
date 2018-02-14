@@ -47,6 +47,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.util.TimestampUtils;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.HiveDecimalUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
@@ -290,7 +291,7 @@ public class TestVectorTypeCasts {
   public void testCastDecimalToBoolean() throws HiveException {
     VectorizedRowBatch b = getBatchDecimalLong();
     VectorExpression expr = new CastDecimalToBoolean(0, 1);
-    expr.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.decimalTypeInfo});
+    expr.setInputTypeInfos(new TypeInfo[] { PrimitiveObjectInspectorFactory.decimalTypeInfo});
     expr.setOutputTypeInfo(TypeInfoFactory.booleanTypeInfo);
     expr.transientInit();
     DecimalColumnVector in = (DecimalColumnVector) b.cols[0];
@@ -382,7 +383,7 @@ public class TestVectorTypeCasts {
   public void testCastDecimalToString() throws HiveException {
     VectorizedRowBatch b = getBatchDecimalString();
     VectorExpression expr = new CastDecimalToString(0, 1);
-    expr.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.decimalTypeInfo});
+    expr.setInputTypeInfos(new TypeInfo[] {PrimitiveObjectInspectorFactory.decimalTypeInfo});
     expr.transientInit();
     expr.evaluate(b);
     BytesColumnVector r = (BytesColumnVector) b.cols[1];

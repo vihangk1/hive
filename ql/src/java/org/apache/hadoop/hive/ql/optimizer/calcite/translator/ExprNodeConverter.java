@@ -75,7 +75,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeFieldDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -151,7 +151,7 @@ public class ExprNodeConverter extends RexVisitorImpl<ExprNodeDesc> {
     String child = fieldAccess.getField().getName();
     TypeInfo parentType = parent.getTypeInfo();
     // Allow accessing a field of list element structs directly from a list
-    boolean isList = (parentType.getCategory() == ObjectInspector.Category.LIST);
+    boolean isList = (parentType.getCategory() == Category.LIST);
     if (isList) {
       parentType = ((ListTypeInfo) parentType).getListElementTypeInfo();
     }

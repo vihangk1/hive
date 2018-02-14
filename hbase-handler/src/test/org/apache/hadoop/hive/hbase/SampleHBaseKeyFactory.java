@@ -23,6 +23,7 @@ import org.apache.hadoop.hive.serde2.ByteStream;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.lazy.ByteArrayRef;
 import org.apache.hadoop.hive.serde2.lazy.LazyObjectBase;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -55,7 +56,7 @@ public class SampleHBaseKeyFactory extends DefaultHBaseKeyFactory {
   @Override
   public byte[] serializeKey(Object object, StructField field) throws IOException {
     ObjectInspector inspector = field.getFieldObjectInspector();
-    if (inspector.getCategory() != ObjectInspector.Category.STRUCT) {
+    if (inspector.getCategory() != Category.STRUCT) {
       throw new IllegalStateException("invalid type value " + inspector.getTypeName());
     }
     output.reset();

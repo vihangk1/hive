@@ -58,7 +58,7 @@ public class TestStreamingAvg {
       throws HiveException {
 
     GenericUDAFAverage fnR = new GenericUDAFAverage();
-    TypeInfo[] inputTypes = { TypeInfoFactory.decimalTypeInfo };
+    TypeInfo[] inputTypes = { PrimitiveObjectInspectorFactory.decimalTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableHiveDecimalObjectInspector };
 
     HiveDecimalWritable[] in = new HiveDecimalWritable[1];

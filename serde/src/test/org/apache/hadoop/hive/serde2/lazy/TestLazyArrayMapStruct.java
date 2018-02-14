@@ -31,11 +31,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeUtils;
 import org.apache.hadoop.hive.serde2.io.ByteWritable;
-import org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryFactory;
-import org.apache.hadoop.hive.serde2.lazybinary.LazyBinaryMap;
-import org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
@@ -518,7 +515,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyArrayNested() throws Throwable {
     for(int i = 2; i < EXTENDED_LEVEL_THRESHOLD; i++ ){
-      testNestedinArrayAtLevelExtended(i, ObjectInspector.Category.LIST);
+      testNestedinArrayAtLevelExtended(i, Category.LIST);
     }
   }
 
@@ -526,7 +523,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    * Test the LazyArray class with multiple levels of nesting
    */
   public void testLazyArrayNestedExceedLimit() throws Throwable {
-    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD, ObjectInspector.Category.LIST);
+    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD, Category.LIST);
   }
 
   private void checkExtendedLimitExceeded(int maxLevel, Category type) {
@@ -545,7 +542,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyArrayNestedExceedLimitNotExtended() throws Throwable {
     checkNotExtendedLimitExceeded(DEFAULT_LEVEL_THRESHOLD,
-        ObjectInspector.Category.LIST);
+        Category.LIST);
   }
 
   /**
@@ -554,7 +551,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyMapNestedExceedLimitNotExtended() throws Throwable {
     checkNotExtendedLimitExceeded(DEFAULT_LEVEL_THRESHOLD-1,
-        ObjectInspector.Category.MAP);
+        Category.MAP);
   }
 
   /**
@@ -563,7 +560,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyStructNestedExceedLimitNotExtended() throws Throwable {
     checkNotExtendedLimitExceeded(DEFAULT_LEVEL_THRESHOLD,
-        ObjectInspector.Category.STRUCT);
+        Category.STRUCT);
   }
 
   /**
@@ -572,7 +569,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyUnionNestedExceedLimitNotExtended() throws Throwable {
     checkNotExtendedLimitExceeded(DEFAULT_LEVEL_THRESHOLD,
-        ObjectInspector.Category.UNION);
+        Category.UNION);
   }
 
   private void checkNotExtendedLimitExceeded(int maxLevel, Category type) {
@@ -591,7 +588,7 @@ public class TestLazyArrayMapStruct extends TestCase {
   public void testLazyMapNested() throws Throwable {
     //map max nesting level is one less because it uses an additional separator
     for(int i = 2; i < EXTENDED_LEVEL_THRESHOLD - 1; i++ ){
-     testNestedinArrayAtLevelExtended(i, ObjectInspector.Category.MAP);
+     testNestedinArrayAtLevelExtended(i, Category.MAP);
     }
   }
 
@@ -600,7 +597,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyMapNestedExceedLimit() throws Throwable {
     //map max nesting level is one less because it uses an additional separator
-    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD - 1, ObjectInspector.Category.MAP);
+    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD - 1, Category.MAP);
   }
 
   /**
@@ -608,7 +605,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyUnionNested() throws Throwable {
     for(int i = 2; i < EXTENDED_LEVEL_THRESHOLD; i++ ){
-     testNestedinArrayAtLevelExtended(i, ObjectInspector.Category.UNION);
+     testNestedinArrayAtLevelExtended(i, Category.UNION);
     }
   }
 
@@ -616,7 +613,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    * Test the LazyUnion class with multiple levels of nesting
    */
   public void testLazyUnionNestedExceedLimit() throws Throwable {
-    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD, ObjectInspector.Category.UNION);
+    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD, Category.UNION);
   }
 
   /**
@@ -624,7 +621,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    */
   public void testLazyStructNested() throws Throwable {
     for(int i = 2; i < EXTENDED_LEVEL_THRESHOLD; i++ ){
-     testNestedinArrayAtLevelExtended(i, ObjectInspector.Category.STRUCT);
+     testNestedinArrayAtLevelExtended(i, Category.STRUCT);
     }
   }
 
@@ -636,7 +633,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    * @throws SerDeException
    */
   private void testNestedinArrayAtLevelExtended(int nestingLevel,
-      ObjectInspector.Category dtype) throws SerDeException {
+      Category dtype) throws SerDeException {
     Properties tableProp = new Properties();
     tableProp.setProperty(LazySerDeParameters.SERIALIZATION_EXTEND_NESTING_LEVELS, "true");
     testNestedinArrayAtLevel(nestingLevel, dtype, tableProp);
@@ -646,7 +643,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    * Test the LazyStruct class with multiple levels of nesting
    */
   public void testLazyStructNestedExceedLimit() throws Throwable {
-    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD, ObjectInspector.Category.STRUCT);
+    checkExtendedLimitExceeded(EXTENDED_LEVEL_THRESHOLD, Category.STRUCT);
   }
 
   /**
@@ -656,7 +653,7 @@ public class TestLazyArrayMapStruct extends TestCase {
    * @throws SerDeException
    */
   private void testNestedinArrayAtLevel(int nestingLevel,
-      ObjectInspector.Category dtype, Properties tableProp) throws SerDeException {
+      Category dtype, Properties tableProp) throws SerDeException {
 
     //create type with nestingLevel levels of nesting
     //set inner schema for dtype

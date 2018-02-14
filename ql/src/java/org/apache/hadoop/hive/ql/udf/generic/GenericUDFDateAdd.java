@@ -33,11 +33,12 @@ import org.apache.hadoop.hive.serde2.io.ByteWritable;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorConverter.TimestampConverter;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.IntWritable;
@@ -79,12 +80,12 @@ public class GenericUDFDateAdd extends GenericUDF {
       throw new UDFArgumentLengthException(
         "date_add() requires 2 argument, got " + arguments.length);
     }
-    if (arguments[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
         "Only primitive type arguments are accepted but "
         + arguments[0].getTypeName() + " is passed. as first arguments");
     }
-    if (arguments[1].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[1].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(1,
         "Only primitive type arguments are accepted but "
         + arguments[1].getTypeName() + " is passed. as second arguments");

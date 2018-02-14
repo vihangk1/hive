@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -113,7 +114,7 @@ public class GenericUDTFJSONTuple extends GenericUDTF {
     }
 
     for (int i = 0; i < args.length; ++i) {
-      if (args[i].getCategory() != ObjectInspector.Category.PRIMITIVE ||
+      if (args[i].getCategory() != Category.PRIMITIVE ||
           !args[i].getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
         throw new UDFArgumentException("json_tuple()'s arguments have to be string type");
       }

@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.serde2.ByteStream;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.lazy.LazyFactory;
 import org.apache.hadoop.hive.serde2.lazy.LazyObjectBase;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -80,7 +81,7 @@ public class DelimitedAccumuloRowIdFactory extends DefaultAccumuloRowIdFactory {
   public byte[] serializeRowId(Object object, StructField field, ByteStream.Output output)
       throws IOException {
     ObjectInspector inspector = field.getFieldObjectInspector();
-    if (inspector.getCategory() != ObjectInspector.Category.STRUCT) {
+    if (inspector.getCategory() != Category.STRUCT) {
       throw new IllegalStateException("invalid type value " + inspector.getTypeName());
     }
 

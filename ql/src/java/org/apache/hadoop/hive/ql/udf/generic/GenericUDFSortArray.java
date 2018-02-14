@@ -28,6 +28,7 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
@@ -63,7 +64,7 @@ public class GenericUDFSortArray extends GenericUDF {
     switch(arguments[0].getCategory()) {
       case LIST:
         if(!((ListObjectInspector)(arguments[0])).getListElementObjectInspector()
-            .getCategory().equals(ObjectInspector.Category.UNION)) {
+            .getCategory().equals(Category.UNION)) {
           break;
         }
       default:

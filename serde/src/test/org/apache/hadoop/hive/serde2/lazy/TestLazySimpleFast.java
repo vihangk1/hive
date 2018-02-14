@@ -18,7 +18,6 @@
 package org.apache.hadoop.hive.serde2.lazy;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Random;
@@ -35,7 +34,7 @@ import org.apache.hadoop.hive.serde2.lazy.fast.LazySimpleDeserializeRead;
 import org.apache.hadoop.hive.serde2.lazy.fast.LazySimpleSerializeWrite;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.io.BytesWritable;

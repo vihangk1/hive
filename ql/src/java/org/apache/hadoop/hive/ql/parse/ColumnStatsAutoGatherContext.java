@@ -41,7 +41,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeConstantDesc;
 import org.apache.hadoop.hive.ql.plan.LoadFileDesc;
 import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
@@ -259,7 +259,7 @@ public class ColumnStatsAutoGatherContext {
     for (ColumnInfo cinfo : curr.getSchema().getSignature()) {
       if (cinfo.getIsVirtualCol()) {
         return false;
-      } else if (cinfo.getObjectInspector().getCategory() != ObjectInspector.Category.PRIMITIVE) {
+      } else if (cinfo.getObjectInspector().getCategory() != Category.PRIMITIVE) {
         return false;
       } else {
         switch (((PrimitiveTypeInfo) cinfo.getType()).getPrimitiveCategory()) {

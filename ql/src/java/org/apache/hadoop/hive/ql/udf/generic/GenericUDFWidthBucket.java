@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
@@ -73,7 +74,7 @@ public class GenericUDFWidthBucket extends GenericUDF {
     checkArgPrimitive(arguments, 2);
     checkArgPrimitive(arguments, 3);
 
-    PrimitiveObjectInspector.PrimitiveCategory[] inputTypes = new PrimitiveObjectInspector.PrimitiveCategory[4];
+    PrimitiveCategory[] inputTypes = new PrimitiveCategory[4];
     checkArgGroups(arguments, 0, inputTypes, NUMERIC_GROUP, VOID_GROUP);
     checkArgGroups(arguments, 1, inputTypes, NUMERIC_GROUP, VOID_GROUP);
     checkArgGroups(arguments, 2, inputTypes, NUMERIC_GROUP, VOID_GROUP);

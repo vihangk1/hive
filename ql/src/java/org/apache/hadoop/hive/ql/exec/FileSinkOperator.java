@@ -71,6 +71,7 @@ import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeStats;
 import org.apache.hadoop.hive.serde2.Serializer;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
@@ -880,7 +881,7 @@ public class FileSinkOperator extends TerminalOperator<FileSinkDesc> implements
       updateProgress();
 
       // if DP is enabled, get the final output writers and prepare the real output row
-      assert inputObjInspectors[0].getCategory() == ObjectInspector.Category.STRUCT
+      assert inputObjInspectors[0].getCategory() == Category.STRUCT
           : "input object inspector is not struct";
 
       if (bDynParts) {

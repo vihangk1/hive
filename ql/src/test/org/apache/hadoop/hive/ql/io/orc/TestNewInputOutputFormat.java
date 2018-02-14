@@ -41,7 +41,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.io.orc.OrcSerde.OrcSerdeRow;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
@@ -202,10 +202,10 @@ public class TestNewInputOutputFormat {
         (StructTypeInfo)TypeInfoUtils.getTypeInfoFromObjectInspector(soi);
     assertEquals(((PrimitiveTypeInfo)ti.getAllStructFieldTypeInfos().get(0))
         .getPrimitiveCategory(),
-        PrimitiveObjectInspector.PrimitiveCategory.INT);
+        PrimitiveCategory.INT);
     assertEquals(((PrimitiveTypeInfo)ti.getAllStructFieldTypeInfos().get(1))
         .getPrimitiveCategory(),
-        PrimitiveObjectInspector.PrimitiveCategory.STRING);
+        PrimitiveCategory.STRING);
     
     RecordReader rows = reader.rows();
     Object row = rows.next(null);

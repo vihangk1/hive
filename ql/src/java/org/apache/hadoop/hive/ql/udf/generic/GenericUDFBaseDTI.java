@@ -19,7 +19,7 @@
 package org.apache.hadoop.hive.ql.udf.generic;
 
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 
 public abstract class GenericUDFBaseDTI extends GenericUDFBaseBinary {
   protected transient PrimitiveObjectInspector[] inputOIs;

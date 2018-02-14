@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
@@ -52,7 +53,7 @@ public class GenericUDTFExplode2 extends GenericUDTF {
       throw new UDFArgumentException("explode() takes only one argument");
     }
 
-    if (args[0].getCategory() != ObjectInspector.Category.LIST) {
+    if (args[0].getCategory() != Category.LIST) {
       throw new UDFArgumentException("explode() takes an array as a parameter");
     }
     listOI = (ListObjectInspector) args[0];

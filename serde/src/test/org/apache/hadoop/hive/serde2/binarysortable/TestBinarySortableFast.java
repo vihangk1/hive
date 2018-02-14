@@ -32,7 +32,7 @@ import org.apache.hadoop.hive.serde2.VerifyFast;
 import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableDeserializeRead;
 import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableSerializeWrite;
 import org.apache.hadoop.hive.serde2.lazy.VerifyLazy;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
@@ -313,7 +313,7 @@ public class TestBinarySortableFast extends TestCase {
 
   private void verifyRead(BinarySortableDeserializeRead binarySortableDeserializeRead,
       TypeInfo typeInfo, Object expectedObject) throws IOException {
-    if (typeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (typeInfo.getCategory() == Category.PRIMITIVE) {
       VerifyFast.verifyDeserializeRead(binarySortableDeserializeRead, typeInfo, expectedObject);
     } else {
       Object complexFieldObj = VerifyFast.deserializeReadComplexType(binarySortableDeserializeRead, typeInfo);

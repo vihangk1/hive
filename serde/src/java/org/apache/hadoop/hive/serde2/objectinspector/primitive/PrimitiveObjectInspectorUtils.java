@@ -18,9 +18,6 @@
 
 package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
@@ -30,8 +27,6 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hadoop.hive.common.classification.InterfaceStability;
 import org.apache.hadoop.hive.common.type.TimestampTZ;
 import org.apache.hadoop.hive.common.type.TimestampTZUtil;
 import org.apache.hadoop.hive.ql.util.TimestampUtils;
@@ -55,9 +50,12 @@ import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.lazy.LazyInteger;
 import org.apache.hadoop.hive.serde2.lazy.LazyLong;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.FloatWritable;
@@ -66,7 +64,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableUtils;
 
 /**
  * ObjectInspectorFactory is the primary way to create new ObjectInspector
@@ -77,105 +74,10 @@ import org.apache.hadoop.io.WritableUtils;
  */
 public final class PrimitiveObjectInspectorUtils {
 
-  /**
-   * TypeEntry stores information about a Hive Primitive TypeInfo.
-   */
-  @InterfaceAudience.Public
-  @InterfaceStability.Stable
-  public static class PrimitiveTypeEntry implements Writable, Cloneable {
-
-    /**
-     * The category of the PrimitiveType.
-     */
-    public PrimitiveObjectInspector.PrimitiveCategory primitiveCategory;
-
-    /**
-     * primitiveJavaType refers to java types like int, double, etc.
-     */
-    public Class<?> primitiveJavaType;
-    /**
-     * primitiveJavaClass refers to java classes like Integer, Double, String
-     * etc.
-     */
-    public Class<?> primitiveJavaClass;
-    /**
-     * writableClass refers to hadoop Writable classes like IntWritable,
-     * DoubleWritable, Text etc.
-     */
-    public Class<?> primitiveWritableClass;
-    /**
-     * typeName is the name of the type as in DDL.
-     */
-    public String typeName;
-
-    protected PrimitiveTypeEntry() {
-      super();
-    }
-
-    PrimitiveTypeEntry(
-        PrimitiveObjectInspector.PrimitiveCategory primitiveCategory,
-        String typeName, Class<?> primitiveType, Class<?> javaClass,
-        Class<?> hiveClass) {
-      this.primitiveCategory = primitiveCategory;
-      primitiveJavaType = primitiveType;
-      primitiveJavaClass = javaClass;
-      primitiveWritableClass = hiveClass;
-      this.typeName = typeName;
-    }
-
-    @Override
-    public void readFields(DataInput in) throws IOException {
-      primitiveCategory = WritableUtils.readEnum(in,
-          PrimitiveObjectInspector.PrimitiveCategory.class);
-      typeName = WritableUtils.readString(in);
-      try {
-        primitiveJavaType = Class.forName(WritableUtils.readString(in));
-        primitiveJavaClass = Class.forName(WritableUtils.readString(in));
-        primitiveWritableClass = Class.forName(WritableUtils.readString(in));
-      } catch (ClassNotFoundException e) {
-        throw new IOException(e);
-      }
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-
-      WritableUtils.writeEnum(out, primitiveCategory);
-      WritableUtils.writeString(out, typeName);
-      WritableUtils.writeString(out, primitiveJavaType.getName());
-      WritableUtils.writeString(out, primitiveJavaClass.getName());
-      WritableUtils.writeString(out, primitiveWritableClass.getName());
-    }
-
-    @Override
-    public Object clone() {
-      PrimitiveTypeEntry result = new PrimitiveTypeEntry(
-          this.primitiveCategory,
-          this.typeName,
-          this.primitiveJavaType,
-          this.primitiveJavaClass,
-          this.primitiveWritableClass);
-      return result;
-    }
-
-    @Override
-    public String toString() {
-      return typeName;
-    }
-
-  }
-
   static final Map<PrimitiveCategory, PrimitiveTypeEntry> primitiveCategoryToTypeEntry = new HashMap<PrimitiveCategory, PrimitiveTypeEntry>();
   static final Map<Class<?>, PrimitiveTypeEntry> primitiveJavaTypeToTypeEntry = new HashMap<Class<?>, PrimitiveTypeEntry>();
   static final Map<Class<?>, PrimitiveTypeEntry> primitiveJavaClassToTypeEntry = new HashMap<Class<?>, PrimitiveTypeEntry>();
   static final Map<Class<?>, PrimitiveTypeEntry> primitiveWritableClassToTypeEntry = new HashMap<Class<?>, PrimitiveTypeEntry>();
-
-  // Base type name to PrimitiveTypeEntry map.
-  private static final Map<String, PrimitiveTypeEntry> typeNameToTypeEntry = new HashMap<String, PrimitiveTypeEntry>();
-
-  static void addParameterizedType(PrimitiveTypeEntry t) {
-    typeNameToTypeEntry.put(t.toString(), t);
-  }
 
   static void registerType(PrimitiveTypeEntry t) {
     if (t.primitiveCategory != PrimitiveCategory.UNKNOWN) {
@@ -191,7 +93,7 @@ public final class PrimitiveObjectInspectorUtils {
       primitiveWritableClassToTypeEntry.put(t.primitiveWritableClass, t);
     }
     if (t.typeName != null) {
-      typeNameToTypeEntry.put(t.typeName, t);
+      PrimitiveTypeInfo.registerType(t);
     }
   }
 
@@ -382,7 +284,7 @@ public final class PrimitiveObjectInspectorUtils {
    * Get the TypeEntry for the given base type name (int, varchar, etc).
    */
   public static PrimitiveTypeEntry getTypeEntryFromTypeName(String typeName) {
-    return typeNameToTypeEntry.get(typeName);
+    return PrimitiveTypeInfo.getPrimitiveTypeEntryFromTypeName(typeName);
   }
 
   /**
@@ -1445,4 +1347,21 @@ public final class PrimitiveObjectInspectorUtils {
     // prevent instantiation
   }
 
+  //TODO Check if this method needs to be here. Probably yes, since the caches
+  //are initialized in this class'es static block
+  public static TypeInfo getPrimitiveTypeInfoFromPrimitiveWritable(
+      Class<?> clazz) {
+    String typeName = PrimitiveObjectInspectorUtils
+        .getTypeNameFromPrimitiveWritable(clazz);
+    if (typeName == null) {
+      throw new RuntimeException("Internal error: Cannot get typeName for "
+          + clazz);
+    }
+    return TypeInfoFactory.getPrimitiveTypeInfo(typeName);
+  }
+
+  public static TypeInfo getPrimitiveTypeInfoFromJavaPrimitive(Class<?> clazz) {
+    return TypeInfoFactory.getPrimitiveTypeInfo(PrimitiveObjectInspectorUtils
+        .getTypeNameFromPrimitiveJava(clazz));
+  }
 }

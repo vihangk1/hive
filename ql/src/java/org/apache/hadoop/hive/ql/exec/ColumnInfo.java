@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import org.apache.hadoop.hive.common.StringInternUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
@@ -71,7 +72,7 @@ public class ColumnInfo implements Serializable {
 
   public ColumnInfo(String internalName, Class type, String tabAlias,
       boolean isVirtualCol) {
-    this(internalName, TypeInfoFactory
+    this(internalName, PrimitiveObjectInspectorUtils
         .getPrimitiveTypeInfoFromPrimitiveWritable(type), tabAlias,
         isVirtualCol, false);
   }

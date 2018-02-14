@@ -43,7 +43,7 @@ public abstract class InstanceCache<SeedObject, Instance> {
    * Retrieve (or create if it doesn't exist) the correct Instance for this
    * SeedObject
    */
-  public Instance retrieve(SeedObject hv) throws AvroSerdeException {
+  public Instance retrieve(SeedObject hv) throws Exception {
     return retrieve(hv, null);
   }
 
@@ -52,7 +52,7 @@ public abstract class InstanceCache<SeedObject, Instance> {
    * SeedObject using 'seenSchemas' to resolve circular references
    */
   public synchronized Instance retrieve(SeedObject hv,
-      Set<SeedObject> seenSchemas) throws AvroSerdeException {
+      Set<SeedObject> seenSchemas) throws Exception {
     if(LOG.isDebugEnabled()) LOG.debug("Checking for hv: " + hv.toString());
 
     if(cache.containsKey(hv)) {
@@ -68,5 +68,5 @@ public abstract class InstanceCache<SeedObject, Instance> {
   }
 
   protected abstract Instance makeInstance(SeedObject hv,
-      Set<SeedObject> seenSchemas) throws AvroSerdeException;
+      Set<SeedObject> seenSchemas) throws Exception;
 }

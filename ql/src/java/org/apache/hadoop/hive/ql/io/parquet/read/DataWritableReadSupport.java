@@ -30,7 +30,7 @@ import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.optimizer.FieldNode;
 import org.apache.hadoop.hive.ql.optimizer.NestedColumnFieldPruningUtils;
 import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -146,7 +146,7 @@ public class DataWritableReadSupport extends ReadSupport<ArrayWritable> {
           .named(fieldType.getName());
       case LIST:
         TypeInfo elemType = ((ListTypeInfo) colType).getListElementTypeInfo();
-        if (elemType.getCategory() == ObjectInspector.Category.STRUCT) {
+        if (elemType.getCategory() == Category.STRUCT) {
           Type subFieldType = fieldType.asGroupType().getType(0);
           if (!subFieldType.isPrimitive()) {
             String subFieldName = subFieldType.getName();

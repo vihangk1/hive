@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeUtils;
 import org.apache.hadoop.hive.serde2.lazy.LazyUtils;
 import org.apache.hadoop.hive.serde2.lazy.LazySerDeParameters;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -76,7 +77,7 @@ public class HBaseRowSerializer {
   }
 
   public Writable serialize(Object obj, ObjectInspector objInspector) throws Exception {
-    if (objInspector.getCategory() != ObjectInspector.Category.STRUCT) {
+    if (objInspector.getCategory() != Category.STRUCT) {
       throw new SerDeException(getClass().toString()
           + " can only serialize struct types, but we got: "
           + objInspector.getTypeName());
@@ -128,8 +129,8 @@ public class HBaseRowSerializer {
     }
     ObjectInspector keyFieldOI = keyField.getFieldObjectInspector();
 
-    if (!keyFieldOI.getCategory().equals(ObjectInspector.Category.PRIMITIVE) &&
-        keyMapping.isCategory(ObjectInspector.Category.PRIMITIVE)) {
+    if (!keyFieldOI.getCategory().equals(Category.PRIMITIVE) &&
+        keyMapping.isCategory(Category.PRIMITIVE)) {
       // we always serialize the String type using the escaped algorithm for LazyString
       return serialize(SerDeUtils.getJSONString(keyValue, keyFieldOI),
           PrimitiveObjectInspectorFactory.javaStringObjectInspector, 1, false);
@@ -183,8 +184,8 @@ public class HBaseRowSerializer {
       // the field is declared as a primitive in initialization, serialize
       // the data to JSON string.  Otherwise serialize the data in the
       // delimited way.
-      if (!foi.getCategory().equals(ObjectInspector.Category.PRIMITIVE)
-          && colMap.isCategory(ObjectInspector.Category.PRIMITIVE)) {
+      if (!foi.getCategory().equals(Category.PRIMITIVE)
+          && colMap.isCategory(Category.PRIMITIVE)) {
         // we always serialize the String type using the escaped algorithm for LazyString
         bytes = serialize(SerDeUtils.getJSONString(value, foi),
             PrimitiveObjectInspectorFactory.javaStringObjectInspector, 1, false);
@@ -216,7 +217,7 @@ public class HBaseRowSerializer {
   private byte[] serialize(Object obj, ObjectInspector objInspector, int level, boolean writeBinary)
       throws IOException {
     output.reset();
-    if (objInspector.getCategory() == ObjectInspector.Category.PRIMITIVE && writeBinary) {
+    if (objInspector.getCategory() == Category.PRIMITIVE && writeBinary) {
       LazyUtils.writePrimitive(output, obj, (PrimitiveObjectInspector) objInspector);
     } else {
       if (!serialize(obj, objInspector, level, output)) {

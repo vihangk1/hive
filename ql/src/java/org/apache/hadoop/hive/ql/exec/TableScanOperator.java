@@ -42,7 +42,7 @@ import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.ql.plan.api.OperatorType;
 import org.apache.hadoop.hive.ql.stats.StatsCollectionContext;
 import org.apache.hadoop.hive.ql.stats.StatsPublisher;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -181,7 +181,7 @@ public class TableScanOperator extends Operator<TableScanDesc> implements
         List<Object> writable;
         List<String> values;
         int dpStartCol; // the first position of partition column
-        assert inputObjInspectors[0].getCategory() == ObjectInspector.Category.STRUCT : "input object inspector is not struct";
+        assert inputObjInspectors[0].getCategory() == Category.STRUCT : "input object inspector is not struct";
 
         writable = new ArrayList<Object>(conf.getPartColumns().size());
         values = new ArrayList<String>(conf.getPartColumns().size());

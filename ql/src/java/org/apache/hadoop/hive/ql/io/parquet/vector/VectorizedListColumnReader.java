@@ -20,7 +20,7 @@ import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -61,7 +61,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
     // the valueList will save all data for ListColumnVector temporary.
     List<Object> valueList = new ArrayList<>();
 
-    PrimitiveObjectInspector.PrimitiveCategory category =
+    PrimitiveCategory category =
         ((PrimitiveTypeInfo) ((ListTypeInfo) columnType).getListElementTypeInfo()).getPrimitiveCategory();
 
     // read the first row in parquet data page, this will be only happened once for this instance
@@ -98,7 +98,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
     return leftInPage;
   }
 
-  private boolean fetchNextValue(PrimitiveObjectInspector.PrimitiveCategory category) throws IOException {
+  private boolean fetchNextValue(PrimitiveCategory category) throws IOException {
     int left = readPageIfNeed();
     if (left > 0) {
       // get the values of repetition and definitionLevel
@@ -121,7 +121,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
   /**
    * The function will set all data from parquet data page for an element in ListColumnVector
    */
-  private void addElement(ListColumnVector lcv, List<Object> elements, PrimitiveObjectInspector.PrimitiveCategory category, int index) throws IOException {
+  private void addElement(ListColumnVector lcv, List<Object> elements, PrimitiveCategory category, int index) throws IOException {
     lcv.offsets[index] = elements.size();
 
     // Return directly if last value is null
@@ -142,7 +142,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
     lcv.lengths[index] = elements.size() - lcv.offsets[index];
   }
 
-  private Object readPrimitiveTypedRow(PrimitiveObjectInspector.PrimitiveCategory category) {
+  private Object readPrimitiveTypedRow(PrimitiveCategory category) {
     switch (category) {
       case INT:
       case BYTE:
@@ -228,7 +228,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
     lcv.offsets = lcvOffset;
   }
 
-  private void fillColumnVector(PrimitiveObjectInspector.PrimitiveCategory category, ListColumnVector lcv,
+  private void fillColumnVector(PrimitiveCategory category, ListColumnVector lcv,
       List valueList, int elementNum) {
     int total = valueList.size();
     setChildrenInfo(lcv, total, elementNum);
@@ -291,7 +291,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
   /**
    * Finish the result ListColumnVector with all collected information.
    */
-  private void convertValueListToListColumnVector(PrimitiveObjectInspector.PrimitiveCategory category,
+  private void convertValueListToListColumnVector(PrimitiveCategory category,
       ListColumnVector lcv, List valueList, int elementNum) {
     // Fill the child of ListColumnVector with valueList
     fillColumnVector(category, lcv, valueList, elementNum);

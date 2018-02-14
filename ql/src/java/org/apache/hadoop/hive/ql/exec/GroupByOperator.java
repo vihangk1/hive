@@ -53,11 +53,12 @@ import org.apache.hadoop.hive.serde2.lazy.LazyPrimitive;
 import org.apache.hadoop.hive.serde2.lazy.LazyString;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyBinaryObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyStringObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
@@ -260,7 +261,7 @@ public class GroupByOperator extends Operator<GroupByDesc> implements IConfigure
             // the last field is the union field, if any
             StructField sf = keysfs.get(keysfs.size() - 1);
             if (sf.getFieldObjectInspector().getCategory().equals(
-                ObjectInspector.Category.UNION)) {
+                Category.UNION)) {
               unionExprEval = ExprNodeEvaluatorFactory.get(
                 new ExprNodeColumnDesc(TypeInfoUtils.getTypeInfoFromObjectInspector(
                 sf.getFieldObjectInspector()),

@@ -18,6 +18,8 @@
 
 package org.apache.hadoop.hive.ql.udf.generic;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
@@ -57,8 +59,8 @@ public abstract class GenericUDAFLeadLag extends AbstractGenericUDAFResolver {
       ObjectInspector amtOI = paramOIs[1];
 
       if (!ObjectInspectorUtils.isConstantObjectInspector(amtOI)
-              || (amtOI.getCategory() != ObjectInspector.Category.PRIMITIVE)
-              || ((PrimitiveObjectInspector) amtOI).getPrimitiveCategory() != PrimitiveObjectInspector.PrimitiveCategory.INT) {
+              || (amtOI.getCategory() != Category.PRIMITIVE)
+              || ((PrimitiveObjectInspector) amtOI).getPrimitiveCategory() != PrimitiveCategory.INT) {
         throw new UDFArgumentTypeException(1, fNm + " amount must be a integer value "
                 + amtOI.getTypeName() + " was passed as parameter 1.");
       }

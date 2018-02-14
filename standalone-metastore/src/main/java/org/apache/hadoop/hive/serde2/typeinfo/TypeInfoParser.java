@@ -1,44 +1,26 @@
-package org.apache.hadoop.hive.metastore.type;
+package org.apache.hadoop.hive.serde2.typeinfo;
 
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.metastore.ColumnType;
+import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfoUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveTypeEntry;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MetastoreTypeInfoParser {
-
-  private final String typeInfoString;
-  private final ArrayList<Token> typeInfoTokens;
-  private ArrayList<MetastoreTypeInfo> typeInfos;
-  private int iToken;
-
-  public MetastoreTypeInfoParser(String columnTypeProperty) {
-    this.typeInfoString = columnTypeProperty;
-    typeInfoTokens = tokenize(columnTypeProperty);
-  }
-
-  public List<MetastoreTypeInfo> parseTypeInfos() {
-    typeInfos = new ArrayList<MetastoreTypeInfo>();
-    iToken = 0;
-    while (iToken < typeInfoTokens.size()) {
-      typeInfos.add(parseType());
-      if (iToken < typeInfoTokens.size()) {
-        Token separator = typeInfoTokens.get(iToken);
-        if (",".equals(separator.text) || ";".equals(separator.text)
-            || ":".equals(separator.text)) {
-          iToken++;
-        } else {
-          throw new IllegalArgumentException(
-              "Error: ',', ':', or ';' expected at position "
-                  + separator.position + " from '" + typeInfoString + "' "
-                  + typeInfoTokens);
-        }
-      }
-    }
-    return typeInfos;
-  }
-
+/**
+ * Parse a recursive TypeInfo list String. For example, the following inputs
+ * are valid inputs:
+ * "int,string,map<string,int>,list<map<int,list<string>>>,list<struct<a:int,b:string>>"
+ * The separators between TypeInfos can be ",", ":", or ";".
+ *
+ * In order to use this class: TypeInfoParser parser = new
+ * TypeInfoParser("int,string"); ArrayList<TypeInfo> typeInfos =
+ * parser.parseTypeInfos();
+ */
+public class TypeInfoParser {
 
   private static class Token {
     public int position;
@@ -104,6 +86,37 @@ public class MetastoreTypeInfoParser {
     return tokens;
   }
 
+  public TypeInfoParser(String typeInfoString) {
+    this.typeInfoString = typeInfoString;
+    typeInfoTokens = tokenize(typeInfoString);
+  }
+
+  private final String typeInfoString;
+  private final ArrayList<Token> typeInfoTokens;
+  private ArrayList<TypeInfo> typeInfos;
+  private int iToken;
+
+  public ArrayList<TypeInfo> parseTypeInfos() {
+    typeInfos = new ArrayList<TypeInfo>();
+    iToken = 0;
+    while (iToken < typeInfoTokens.size()) {
+      typeInfos.add(parseType());
+      if (iToken < typeInfoTokens.size()) {
+        Token separator = typeInfoTokens.get(iToken);
+        if (",".equals(separator.text) || ";".equals(separator.text)
+            || ":".equals(separator.text)) {
+          iToken++;
+        } else {
+          throw new IllegalArgumentException(
+              "Error: ',', ':', or ';' expected at position "
+              + separator.position + " from '" + typeInfoString + "' "
+              + typeInfoTokens);
+        }
+      }
+    }
+    return typeInfos;
+  }
+
   private Token peek() {
     if (iToken < typeInfoTokens.size()) {
       return typeInfoTokens.get(iToken);
@@ -127,8 +140,7 @@ public class MetastoreTypeInfoParser {
           && !ColumnType.MAP_TYPE_NAME.equals(t.text)
           && !ColumnType.STRUCT_TYPE_NAME.equals(t.text)
           && !ColumnType.UNION_TYPE_NAME.equals(t.text)
-          //TODO:HIVE-17580 do we need to support "unknown" type in metastore?
-          && null == MetastorePrimitiveTypeCategory.from(t.text)
+          && null == PrimitiveTypeInfo.getPrimitiveTypeEntryFromTypeName(t.text)
           && !t.text.equals(alternative)) {
         throw new IllegalArgumentException("Error: " + item
             + " expected at the position " + t.position + " of '"
@@ -172,87 +184,91 @@ public class MetastoreTypeInfoParser {
     return params.toArray(new String[params.size()]);
   }
 
-  private MetastoreTypeInfo parseType() {
+  private TypeInfo parseType() {
 
     Token t = expect("type");
 
     // Is this a primitive type?
-    if (ColumnType.PrimitiveTypes.contains(t.text)) {
-      MetastorePrimitiveTypeCategory primitiveTypeCategory =
-          MetastorePrimitiveTypeCategory.from(t.text);
+    PrimitiveTypeEntry typeEntry =
+        PrimitiveTypeInfo.getPrimitiveTypeEntryFromTypeName(t.text);
+    if (typeEntry != null && typeEntry.primitiveCategory != PrimitiveCategory.UNKNOWN ) {
       String[] params = parseParams();
-      switch (primitiveTypeCategory) {
+      switch (typeEntry.primitiveCategory) {
       case CHAR:
       case VARCHAR:
         if (params == null || params.length == 0) {
-          throw new IllegalArgumentException(t.text
+          throw new IllegalArgumentException(typeEntry.typeName
               + " type is specified without length: " + typeInfoString);
         }
 
         int length = 1;
         if (params.length == 1) {
           length = Integer.parseInt(params[0]);
-          if (primitiveTypeCategory == MetastorePrimitiveTypeCategory.VARCHAR) {
-            VarcharMetastoreTypeInfo.validateVarcharParameter(length);
-            return MetastoreTypeInfoFactory.getVarcharTypeInfo(length);
+          if (typeEntry.primitiveCategory == PrimitiveCategory.VARCHAR) {
+            //TODO add check to do lenient validation here
+            //BaseCharUtils.validateVarcharParameter(length);
+            return TypeInfoFactory.getVarcharTypeInfo(length);
           } else {
-            CharMetastoreTypeInfo.validateCharParameter(length);
-            return MetastoreTypeInfoFactory.getCharTypeInfo(length);
+            //TODO add check to do lenient validation here
+            //BaseCharUtils.validateCharParameter(length);
+            return TypeInfoFactory.getCharTypeInfo(length);
           }
         } else if (params.length > 1) {
           throw new IllegalArgumentException(
-              "Type " + t.text+ " only takes one parameter, but " +
-                  params.length + " is seen");
+              "Type " + typeEntry.typeName+ " only takes one parameter, but " +
+              params.length + " is seen");
         }
 
       case DECIMAL:
-        int precision = ColumnType.USER_DEFAULT_PRECISION;
-        int scale = ColumnType.USER_DEFAULT_SCALE;
+        int precision = HiveDecimal.USER_DEFAULT_PRECISION;
+        int scale = HiveDecimal.USER_DEFAULT_SCALE;
         if (params == null || params.length == 0) {
           // It's possible that old metadata still refers to "decimal" as a column type w/o
           // precision/scale. In this case, the default (10,0) is assumed. Thus, do nothing here.
         } else if (params.length == 1) {
           // only precision is specified
           precision = Integer.valueOf(params[0]);
-          DecimalMetastoreTypeInfo.validateParameter(precision, scale);
+          //TODO add check to do lenient validation here
+          //HiveDecimalUtils.validateParameter(precision, scale);
         } else if (params.length == 2) {
           // New metadata always have two parameters.
           precision = Integer.parseInt(params[0]);
           scale = Integer.parseInt(params[1]);
-          DecimalMetastoreTypeInfo.validateParameter(precision, scale);
+          //TODO add check to do lenient validation here
+          //HiveDecimalUtils.validateParameter(precision, scale);
         } else if (params.length > 2) {
           throw new IllegalArgumentException("Type decimal only takes two parameter, but " +
               params.length + " is seen");
         }
-        return MetastoreTypeInfoFactory.getDecimalTypeInfo(precision, scale);
+        return TypeInfoFactory.getDecimalTypeInfo(precision, scale);
 
       default:
-        return MetastoreTypeInfoFactory.getPrimitiveTypeInfo(t.text);
+        return TypeInfoFactory.getPrimitiveTypeInfo(typeEntry.typeName);
       }
     }
 
     // Is this a list type?
     if (ColumnType.LIST_TYPE_NAME.equals(t.text)) {
       expect("<");
-      MetastoreTypeInfo listElementType = parseType();
+      TypeInfo listElementType = parseType();
       expect(">");
-      return MetastoreTypeInfoFactory.getListTypeInfo(listElementType);
+      return TypeInfoFactory.getListTypeInfo(listElementType);
     }
 
     // Is this a map type?
     if (ColumnType.MAP_TYPE_NAME.equals(t.text)) {
       expect("<");
-      MetastoreTypeInfo mapKeyType = parseType();
+      TypeInfo mapKeyType = parseType();
       expect(",");
-      MetastoreTypeInfo mapValueType = parseType();
+      TypeInfo mapValueType = parseType();
       expect(">");
-      return MetastoreTypeInfoFactory.getMapTypeInfo(mapKeyType, mapValueType);
+      return TypeInfoFactory.getMapTypeInfo(mapKeyType, mapValueType);
     }
 
     // Is this a struct type?
     if (ColumnType.STRUCT_TYPE_NAME.equals(t.text)) {
       ArrayList<String> fieldNames = new ArrayList<String>();
-      ArrayList<MetastoreTypeInfo> fieldTypeInfos = new ArrayList<MetastoreTypeInfo>();
+      ArrayList<TypeInfo> fieldTypeInfos = new ArrayList<TypeInfo>();
       boolean first = true;
       do {
         if (first) {
@@ -274,11 +290,11 @@ public class MetastoreTypeInfoParser {
         fieldTypeInfos.add(parseType());
       } while (true);
 
-      return MetastoreTypeInfoFactory.getStructTypeInfo(fieldNames, fieldTypeInfos);
+      return TypeInfoFactory.getStructTypeInfo(fieldNames, fieldTypeInfos);
     }
     // Is this a union type?
     if (ColumnType.UNION_TYPE_NAME.equals(t.text)) {
-      List<MetastoreTypeInfo> objectTypeInfos = new ArrayList<MetastoreTypeInfo>();
+      List<TypeInfo> objectTypeInfos = new ArrayList<TypeInfo>();
       boolean first = true;
       do {
         if (first) {
@@ -294,23 +310,18 @@ public class MetastoreTypeInfoParser {
         objectTypeInfos.add(parseType());
       } while (true);
 
-      return MetastoreTypeInfoFactory.getUnionTypeInfo(objectTypeInfos);
+      return TypeInfoFactory.getUnionTypeInfo(objectTypeInfos);
     }
 
     throw new RuntimeException("Internal error parsing position "
         + t.position + " of '" + typeInfoString + "'");
   }
 
-  public PrimitiveParts parsePrimitiveParts() {
-    PrimitiveParts parts = new PrimitiveParts();
+  public MetastoreTypeInfoUtils.PrimitiveParts parsePrimitiveParts() {
+    MetastoreTypeInfoUtils.PrimitiveParts parts = new MetastoreTypeInfoUtils.PrimitiveParts();
     Token t = expect("type");
     parts.typeName = t.text;
     parts.typeParams = parseParams();
     return parts;
-  }
-
-  public static class PrimitiveParts {
-    public String  typeName;
-    public String[] typeParams;
   }
 }

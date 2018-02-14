@@ -2,29 +2,30 @@ package org.apache.hadoop.hive.metastore.avro.utils;
 
 import org.apache.avro.Schema;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfo;
 import org.apache.hadoop.hive.metastore.utils.StorageSchemaUtils;
+import org.apache.hadoop.hive.serde2.avro.SchemaToTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AvroFieldSchemaGenerator {
   final private List<String> columnNames;
-  final private List< MetastoreTypeInfo> columnTypes;
+  final private List<TypeInfo> columnTypes;
   final private List<String> columnComments;
 
-  public AvroFieldSchemaGenerator(Schema schema) throws AvroSerdeException {
+  public AvroFieldSchemaGenerator(Schema schema) throws Exception {
     verifySchemaIsARecord(schema);
 
     this.columnNames = generateColumnNames(schema);
-    this.columnTypes = SchemaToMetastoreTypeInfo.generateColumnTypes(schema);
+    this.columnTypes = SchemaToTypeInfo.generateColumnTypes(schema);
     this.columnComments = generateColumnComments(schema);
     assert columnNames.size() == columnTypes.size();
   }
 
-  private static void verifySchemaIsARecord(Schema schema) throws AvroSerdeException {
+  private static void verifySchemaIsARecord(Schema schema) throws Exception {
     if(!schema.getType().equals(Schema.Type.RECORD)) {
-      throw new AvroSerdeException("Schema for table must be of type RECORD. " +
+      throw new Exception("Schema for table must be of type RECORD. " +
           "Received type: " + schema.getType());
     }
   }
@@ -52,19 +53,19 @@ public class AvroFieldSchemaGenerator {
     return fieldComments;
   }
 
-  public List<FieldSchema> getFieldSchemas() throws AvroSerdeException {
+  public List<FieldSchema> getFieldSchemas() throws Exception {
     int len = columnNames.size();
     List<FieldSchema> fieldSchemas = new ArrayList<>(len);
     for(int i = 0; i<len; i++) {
       FieldSchema fieldSchema = new FieldSchema();
       fieldSchema.setName(columnNames.get(i));
-       MetastoreTypeInfo columnType = columnTypes.get(i);
+       TypeInfo columnType = columnTypes.get(i);
       if(!AvroSchemaUtils.supportedCategories(columnType)) {
-        throw new AvroSerdeException("Don't yet support this type: " + columnType);
+        throw new Exception("Don't yet support this type: " + columnType);
       }
       //In case of complex types getTypeName() will recusively go into typeName
       //of individual fields when the ColumnType was constructed
-      //in SchemaToMetastoreTypeInfo.generateColumnTypes in the constructor
+      //in SchemaToTypeInfo.generateColumnTypes in the constructor
       fieldSchema.setType(columnTypes.get(i).getTypeName());
       fieldSchema.setComment(StorageSchemaUtils.determineFieldComment(columnComments.get(i)));
       fieldSchemas.add(fieldSchema);

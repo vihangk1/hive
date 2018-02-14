@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.udf.generic;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -34,7 +35,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.DoubleObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
@@ -91,7 +92,7 @@ public class GenericUDAFPercentileApprox extends AbstractGenericUDAFResolver {
 
     // Validate the first parameter, which is the expression to compute over. This should be a
     // numeric primitive type.
-    if (parameters[0].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+    if (parameters[0].getCategory() != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(0,
           "Only primitive type arguments are accepted but "
           + parameters[0].getTypeName() + " was passed as parameter 1.");
@@ -123,7 +124,7 @@ public class GenericUDAFPercentileApprox extends AbstractGenericUDAFResolver {
     case LIST:
       // An array was passed as parameter 2, make sure it's an array of primitives
       if(((ListObjectInspector) parameters[1]).getListElementObjectInspector().getCategory() !=
-         ObjectInspector.Category.PRIMITIVE) {
+         Category.PRIMITIVE) {
           throw new UDFArgumentTypeException(1,
             "A floating point or decimal array argument may be passed as parameter 2, but "
             + parameters[1].getTypeName() + " was passed instead.");
@@ -149,7 +150,7 @@ public class GenericUDAFPercentileApprox extends AbstractGenericUDAFResolver {
     // If a third parameter has been specified, it should be an integer that specifies the number
     // of histogram bins to use in the percentile approximation.
     if(parameters.length == 3) {
-      if(parameters[2].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+      if(parameters[2].getCategory() != Category.PRIMITIVE) {
         throw new UDFArgumentTypeException(2, "Only a primitive argument is accepted as "
            + "parameter 3, but " + parameters[2].getTypeName() + " was passed instead.");
       }

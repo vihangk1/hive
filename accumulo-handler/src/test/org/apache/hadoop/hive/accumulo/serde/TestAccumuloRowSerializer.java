@@ -41,9 +41,10 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazyMapObjectInspector
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazyObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazySimpleStructObjectInspector;
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyStringObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
@@ -78,7 +79,7 @@ public class TestAccumuloRowSerializer {
             Mockito.any(ByteStream.Output.class), Mockito.any(ColumnMapping.class)))
         .thenCallRealMethod();
 
-    Mockito.when(fieldObjectInspector.getCategory()).thenReturn(ObjectInspector.Category.PRIMITIVE);
+    Mockito.when(fieldObjectInspector.getCategory()).thenReturn(Category.PRIMITIVE);
     Mockito.when(fieldObjectInspector.getPrimitiveCategory()).thenReturn(PrimitiveCategory.STRING);
     Mockito.when(fieldObjectInspector.getPrimitiveWritableObject(Mockito.any(Object.class)))
         .thenReturn(new Text(object));

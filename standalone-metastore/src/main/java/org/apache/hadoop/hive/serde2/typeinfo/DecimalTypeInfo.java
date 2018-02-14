@@ -18,7 +18,7 @@
 
 package org.apache.hadoop.hive.serde2.typeinfo;
 
-import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.metastore.ColumnType;
 
 public class DecimalTypeInfo extends PrimitiveTypeInfo {
   private static final long serialVersionUID = 1L;
@@ -28,12 +28,26 @@ public class DecimalTypeInfo extends PrimitiveTypeInfo {
 
   // no-arg constructor to make kyro happy.
   public DecimalTypeInfo() {
-    super(serdeConstants.DECIMAL_TYPE_NAME);
+    super(ColumnType.DECIMAL_TYPE_NAME);
   }
 
   public DecimalTypeInfo(int precision, int scale) {
-    super(serdeConstants.DECIMAL_TYPE_NAME);
-    HiveDecimalUtils.validateParameter(precision, scale);
+    super(ColumnType.DECIMAL_TYPE_NAME);
+    //TODO should this be < 1 instead of < 0?
+    if (precision < 0) {
+      throw new IllegalArgumentException("Decimal precision cannot be negative");
+    }
+
+    if (scale < 0) {
+      throw new IllegalArgumentException("Decimal scale cannot be negative");
+    }
+
+    //TODO do we need to enforce the below check at metastore?
+    //if (precision < scale) {
+    //  throw new IllegalArgumentException("Decimal scale must be less than or equal to precision");
+    //}
+    //TODO need to handle validateCharParameter outside standalone-metastore
+    //HiveDecimalUtils.validateParameter(precision, scale);
     this.precision = precision;
     this.scale = scale;
   }
@@ -83,7 +97,7 @@ public class DecimalTypeInfo extends PrimitiveTypeInfo {
   }
 
   public static String getQualifiedName(int precision, int scale) {
-    StringBuilder sb = new StringBuilder(serdeConstants.DECIMAL_TYPE_NAME);
+    StringBuilder sb = new StringBuilder(ColumnType.DECIMAL_TYPE_NAME);
     sb.append("(");
     sb.append(precision);
     sb.append(",");

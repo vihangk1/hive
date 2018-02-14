@@ -23,11 +23,12 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveGrouping;
@@ -90,8 +91,8 @@ public class GenericUDFSoundex extends GenericUDF {
 
   protected void checkIfPrimitive(ObjectInspector[] arguments, int i, String argOrder)
       throws UDFArgumentTypeException {
-    ObjectInspector.Category oiCat = arguments[i].getCategory();
-    if (oiCat != ObjectInspector.Category.PRIMITIVE) {
+    Category oiCat = arguments[i].getCategory();
+    if (oiCat != Category.PRIMITIVE) {
       throw new UDFArgumentTypeException(i, getFuncName() + " only takes primitive types as "
           + argOrder + " argument, got " + oiCat);
     }

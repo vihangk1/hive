@@ -83,11 +83,8 @@ class SchemaResolutionProblem {
       Properties tblMetadataProperties = MetaStoreUtils.getTableMetadata(tbl);
       try {
         return AvroSchemaUtils.getFieldsFromAvroSchema(conf, tblMetadataProperties);
-      } catch (AvroSerdeException e) {
+      } catch (Exception e) {
         LOG.warn("Exception received while reading avro schema for table " + tbl.getTableName(), e);
-        throw new MetaException(e.getMessage());
-      } catch (IOException e) {
-        LOG.warn("Received IOException while reading avro schema for table " + tbl.getTableName(), e);
         throw new MetaException(e.getMessage());
       }
     }

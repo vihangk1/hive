@@ -42,7 +42,6 @@ import org.apache.hadoop.hive.serde2.io.HiveIntervalYearMonthWritable;
 import org.apache.hadoop.hive.serde2.io.HiveVarcharWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.lazy.LazyDouble;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory.ObjectInspectorOptions;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.AbstractPrimitiveWritableObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.BinaryObjectInspector;
@@ -413,10 +412,10 @@ public final class ObjectInspectorUtils {
       switch (objectInspectorOption) {
       case JAVA:
         result = loi.getPrimitiveJavaObject(o);
-        if (loi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.TIMESTAMP) {
+        if (loi.getPrimitiveCategory() == PrimitiveCategory.TIMESTAMP) {
           result = PrimitiveObjectInspectorFactory.javaTimestampObjectInspector.copyObject(result);
         } else if (loi.getPrimitiveCategory() ==
-            PrimitiveObjectInspector.PrimitiveCategory.TIMESTAMPLOCALTZ) {
+            PrimitiveCategory.TIMESTAMPLOCALTZ) {
           result = PrimitiveObjectInspectorFactory.javaTimestampTZObjectInspector.
               copyObject(result);
         }

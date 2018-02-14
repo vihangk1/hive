@@ -94,7 +94,7 @@ public class TestVectorExpressionWriters {
   private Writable getWritableValue(TypeInfo ti, byte[] value) {
     if (ti.equals(TypeInfoFactory.stringTypeInfo)) {
       return new Text(value);
-    } else if (ti.equals(TypeInfoFactory.varcharTypeInfo)) {
+    } else if (ti.equals(PrimitiveObjectInspectorFactory.varcharTypeInfo)) {
       return new HiveVarcharWritable(
           new HiveVarchar(new Text(value).toString(), -1));
     } else if (ti.equals(TypeInfoFactory.binaryTypeInfo)) {
@@ -489,12 +489,12 @@ public class TestVectorExpressionWriters {
   
   @Test
   public void testVectorExpressionWriterVarchar() throws HiveException {
-    testWriterText(TypeInfoFactory.varcharTypeInfo);
+    testWriterText(PrimitiveObjectInspectorFactory.varcharTypeInfo);
   }
   
   @Test
   public void testVectorExpressionSetterVarchar() throws HiveException {
-    testSetterText(TypeInfoFactory.varcharTypeInfo);
+    testSetterText(PrimitiveObjectInspectorFactory.varcharTypeInfo);
   }    
 
   @Test

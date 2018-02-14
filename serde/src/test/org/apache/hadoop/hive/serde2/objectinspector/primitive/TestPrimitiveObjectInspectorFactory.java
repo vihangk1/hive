@@ -21,7 +21,7 @@ package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 import junit.framework.TestCase;
 
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 
 public class TestPrimitiveObjectInspectorFactory extends TestCase {
 

@@ -64,8 +64,8 @@ import org.apache.hadoop.hive.ql.udf.UDFDateFloorYear;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBridge;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFEpochMilli;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFTimestamp;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.parquet.Strings;
@@ -229,7 +229,7 @@ public class SortedDynPartitionTimeGranularityOptimizer extends Transform {
         ExprNodeColumnDesc columnDesc = new ExprNodeColumnDesc(ci);
         descs.add(columnDesc);
         colNames.add(columnDesc.getExprString());
-        if (columnDesc.getTypeInfo().getCategory() == ObjectInspector.Category.PRIMITIVE
+        if (columnDesc.getTypeInfo().getCategory() == Category.PRIMITIVE
                 && ((PrimitiveTypeInfo) columnDesc.getTypeInfo()).getPrimitiveCategory() == PrimitiveCategory.TIMESTAMPLOCALTZ) {
           if (timestampPos != -1) {
             throw new SemanticException("Multiple columns with timestamp with local time-zone type on query result; "

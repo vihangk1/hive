@@ -18,11 +18,11 @@
 
 package org.apache.hadoop.hive.serde2.typeinfo;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.Objects;
 
-import org.apache.hadoop.hive.common.type.TimestampTZUtil;
-import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.metastore.ColumnType;
 
 public class TimestampLocalTZTypeInfo extends PrimitiveTypeInfo {
   private static final long serialVersionUID = 1L;
@@ -30,17 +30,31 @@ public class TimestampLocalTZTypeInfo extends PrimitiveTypeInfo {
   private ZoneId timeZone;
 
   public TimestampLocalTZTypeInfo() {
-    super(serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME);
+    super(ColumnType.TIMESTAMPLOCALTZ_TYPE_NAME);
   }
 
   public TimestampLocalTZTypeInfo(String timeZoneStr) {
-    super(serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME);
-    this.timeZone = TimestampTZUtil.parseTimeZone(timeZoneStr);
+    super(ColumnType.TIMESTAMPLOCALTZ_TYPE_NAME);
+    this.timeZone = parseTimeZone(timeZoneStr);
+  }
+
+  public static ZoneId parseTimeZone(String timeZoneStr) {
+    if (timeZoneStr == null || timeZoneStr.trim().isEmpty() ||
+        timeZoneStr.trim().toLowerCase().equals("local")) {
+      // default
+      return ZoneId.systemDefault();
+    }
+    try {
+      return ZoneId.of(timeZoneStr);
+    } catch (DateTimeException e1) {
+      // default
+      throw new RuntimeException("Invalid time zone displacement value");
+    }
   }
 
   @Override
   public String getTypeName() {
-    return serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME;
+    return ColumnType.TIMESTAMPLOCALTZ_TYPE_NAME;
   }
 
   @Override
@@ -82,7 +96,7 @@ public class TimestampLocalTZTypeInfo extends PrimitiveTypeInfo {
   }
 
   public static String getQualifiedName(ZoneId timeZone) {
-    StringBuilder sb = new StringBuilder(serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME);
+    StringBuilder sb = new StringBuilder(ColumnType.TIMESTAMPLOCALTZ_TYPE_NAME);
     sb.append("('");
     sb.append(timeZone);
     sb.append("')");

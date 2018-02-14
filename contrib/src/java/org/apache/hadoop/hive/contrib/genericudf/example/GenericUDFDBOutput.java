@@ -22,6 +22,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -86,10 +88,10 @@ public class GenericUDFDBOutput extends GenericUDF {
 
     // this should be connection url,username,password,query,column1[,columnn]*
     for (int i = 0; i < 4; i++) {
-      if (arguments[i].getCategory() == ObjectInspector.Category.PRIMITIVE) {
+      if (arguments[i].getCategory() == Category.PRIMITIVE) {
         PrimitiveObjectInspector poi = ((PrimitiveObjectInspector) arguments[i]);
 
-        if (!(poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.STRING)) {
+        if (!(poi.getPrimitiveCategory() == PrimitiveCategory.STRING)) {
           throw new UDFArgumentTypeException(i,
               "The argument of function  should be \""
               + serdeConstants.STRING_TYPE_NAME + "\", but \""
@@ -98,7 +100,7 @@ public class GenericUDFDBOutput extends GenericUDF {
       }
     }
     for (int i = 4; i < arguments.length; i++) {
-      if (arguments[i].getCategory() != ObjectInspector.Category.PRIMITIVE) {
+      if (arguments[i].getCategory() != Category.PRIMITIVE) {
         throw new UDFArgumentTypeException(i,
             "The argument of function should be primative" + ", but \""
             + arguments[i].getTypeName() + "\" is found");

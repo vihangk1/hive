@@ -7,10 +7,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.ColumnType;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfo;
-import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfoParser;
 import org.apache.hadoop.hive.metastore.utils.StorageSchemaUtils;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
+import org.apache.hadoop.hive.serde2.avro.TypeInfoToSchema;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,11 +73,11 @@ public class AvroSchemaUtils {
   public static final String LIST_COLUMN_COMMENTS = "columns.comments";
 
   public static List<FieldSchema> getFieldsFromAvroSchema(Configuration configuration,
-      Properties properties) throws AvroSerdeException, IOException {
+      Properties properties) throws Exception, IOException {
     // Reset member variables so we don't get in a half-constructed state
     Schema schema = null;
     List<String> columnNames = null;
-    List<MetastoreTypeInfo> columnTypes = null;
+    List<TypeInfo> columnTypes = null;
 
     final String columnNameProperty = properties.getProperty(ColumnType.LIST_COLUMNS);
     final String columnTypeProperty = properties.getProperty(ColumnType.LIST_COLUMN_TYPES);
@@ -116,13 +118,13 @@ public class AvroSchemaUtils {
         || properties.getProperty(AvroTableProperties.SCHEMA_URL.getPropName()) != null;
   }
 
-  public static boolean supportedCategories(MetastoreTypeInfo ti) {
-    final MetastoreTypeInfo.Category c = ti.getCategory();
-    return c.equals(MetastoreTypeInfo.Category.PRIMITIVE) ||
-        c.equals(MetastoreTypeInfo.Category.MAP)       ||
-        c.equals(MetastoreTypeInfo.Category.LIST)      ||
-        c.equals(MetastoreTypeInfo.Category.STRUCT)    ||
-        c.equals(MetastoreTypeInfo.Category.UNION);
+  public static boolean supportedCategories(TypeInfo ti) {
+    final Category c = ti.getCategory();
+    return c.equals(Category.PRIMITIVE) ||
+        c.equals(Category.MAP)       ||
+        c.equals(Category.LIST)      ||
+        c.equals(Category.STRUCT)    ||
+        c.equals(Category.UNION);
   }
 
   /**
@@ -133,12 +135,9 @@ public class AvroSchemaUtils {
   public static Schema determineSchemaOrReturnErrorSchema(Configuration conf, Properties props) {
     try {
       return AvroSchemaUtils.determineSchemaOrThrowException(conf, props);
-    } catch(AvroSerdeException he) {
-      LOG.warn("Encountered AvroSerdeException determining schema. Returning " +
+    } catch(Exception he) {
+      LOG.warn("Encountered Exception determining schema. Returning " +
           "signal schema to indicate problem", he);
-    } catch (Exception e) {
-      LOG.warn("Encountered exception determining schema. Returning signal " +
-          "schema to indicate problem", e);
     }
     return SchemaResolutionProblem.SIGNAL_BAD_SCHEMA;
   }
@@ -148,10 +147,10 @@ public class AvroSchemaUtils {
    * @param properties containing a key pointing to the schema, one way or another
    * @return schema to use while serdeing the avro file
    * @throws IOException if error while trying to read the schema from another location
-   * @throws AvroSerdeException if unable to find a schema or pointer to it in the properties
+   * @throws Exception if unable to find a schema or pointer to it in the properties
    */
   public static Schema determineSchemaOrThrowException(Configuration conf, Properties properties)
-      throws IOException, AvroSerdeException {
+      throws IOException, Exception {
     String schemaString = properties.getProperty(AvroTableProperties.SCHEMA_LITERAL.getPropName());
     if(schemaString != null && !schemaString.equals(SCHEMA_NONE))
       return AvroSchemaUtils.getSchemaFor(schemaString);
@@ -164,13 +163,13 @@ public class AvroSchemaUtils {
       final String columnCommentProperty = properties.getProperty(LIST_COLUMN_COMMENTS);
       if (columnNameProperty == null || columnNameProperty.isEmpty()
           || columnTypeProperty == null || columnTypeProperty.isEmpty() ) {
-        throw new AvroSerdeException(EXCEPTION_MESSAGE);
+        throw new Exception(EXCEPTION_MESSAGE);
       }
       final String columnNameDelimiter = properties.containsKey(ColumnType.COLUMN_NAME_DELIMITER) ? properties
           .getProperty(ColumnType.COLUMN_NAME_DELIMITER) : String.valueOf(COMMA);
       // Get column names and types
       List<String> columnNames = Arrays.asList(columnNameProperty.split(columnNameDelimiter));
-      List<MetastoreTypeInfo> columnTypes = new MetastoreTypeInfoParser(columnTypeProperty).parseTypeInfos();
+      List<TypeInfo> columnTypes = new TypeInfoParser(columnTypeProperty).parseTypeInfos();
 
       Schema schema = getSchemaFromCols(properties, columnNames, columnTypes, columnCommentProperty);
       properties.setProperty(AvroTableProperties.SCHEMA_LITERAL.getPropName(), schema.toString());
@@ -178,7 +177,7 @@ public class AvroSchemaUtils {
         conf.set(AvroTableProperties.AVRO_SERDE_SCHEMA.getPropName(), schema.toString(false));
       return schema;
     } else if(schemaString.equals(SCHEMA_NONE)) {
-      throw new AvroSerdeException(EXCEPTION_MESSAGE);
+      throw new Exception(EXCEPTION_MESSAGE);
     }
 
     try {
@@ -189,9 +188,9 @@ public class AvroSchemaUtils {
       }
       return s;
     } catch (IOException ioe) {
-      throw new AvroSerdeException("Unable to read schema from given path: " + schemaString, ioe);
+      throw new Exception("Unable to read schema from given path: " + schemaString, ioe);
     } catch (URISyntaxException urie) {
-      throw new AvroSerdeException("Unable to read schema from given path: " + schemaString, urie);
+      throw new Exception("Unable to read schema from given path: " + schemaString, urie);
     }
   }
 
@@ -267,7 +266,7 @@ public class AvroSchemaUtils {
   }
 
   public static Schema getSchemaFromCols(Properties properties,
-      List<String> columnNames, List<MetastoreTypeInfo> columnTypes, String columnCommentProperty) {
+      List<String> columnNames, List<TypeInfo> columnTypes, String columnCommentProperty) {
     List<String> columnComments;
     if (columnCommentProperty == null || columnCommentProperty.isEmpty()) {
       columnComments = new ArrayList<String>();
@@ -288,7 +287,7 @@ public class AvroSchemaUtils {
 
     final String tableName = properties.getProperty(AvroSerDeConstants.TABLE_NAME);
     final String tableComment = properties.getProperty(AvroSerDeConstants.TABLE_COMMENT);
-    MetastoreTypeInfoToSchema metastoreTypeInfoToSchema = new MetastoreTypeInfoToSchema();
+    TypeInfoToSchema metastoreTypeInfoToSchema = new TypeInfoToSchema();
     return metastoreTypeInfoToSchema.convert(columnNames, columnTypes, columnComments,
         properties.getProperty(AvroTableProperties.SCHEMA_NAMESPACE.getPropName()),
         properties.getProperty(AvroTableProperties.SCHEMA_NAME.getPropName(), tableName),

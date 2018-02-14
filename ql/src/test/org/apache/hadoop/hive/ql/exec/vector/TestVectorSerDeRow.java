@@ -19,7 +19,6 @@
 package org.apache.hadoop.hive.ql.exec.vector;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Random;
@@ -38,10 +37,9 @@ import org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe;
 import org.apache.hadoop.hive.serde2.lazy.VerifyLazy;
 import org.apache.hadoop.hive.serde2.lazy.fast.LazySimpleDeserializeRead;
 import org.apache.hadoop.hive.serde2.lazy.fast.LazySimpleSerializeWrite;
-import org.apache.hadoop.hive.serde2.lazy.fast.StringToDouble;
 import org.apache.hadoop.hive.serde2.lazybinary.fast.LazyBinaryDeserializeRead;
 import org.apache.hadoop.hive.serde2.lazybinary.fast.LazyBinarySerializeWrite;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.UnionObject;
@@ -65,7 +63,7 @@ public class TestVectorSerDeRow extends TestCase {
   private void verifyRead(
       DeserializeRead deserializeRead, TypeInfo typeInfo, Object expectedObject) throws IOException {
 
-    if (typeInfo.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (typeInfo.getCategory() == Category.PRIMITIVE) {
       VectorVerifyFast.verifyDeserializeRead(deserializeRead, typeInfo, expectedObject);
     } else {
       Object complexFieldObj = VectorVerifyFast.deserializeReadComplexType(deserializeRead, typeInfo);

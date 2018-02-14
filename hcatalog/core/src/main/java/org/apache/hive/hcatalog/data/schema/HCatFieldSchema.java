@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.apache.hadoop.hive.common.classification.InterfaceStability;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hive.hcatalog.common.HCatException;
 import org.apache.hive.hcatalog.common.HCatUtil;
@@ -42,45 +43,45 @@ similarly for mapKeyType/mapKeyTypeInfo */
     * we should just use Hive types directly but that is a larger refactoring effort
     * For HCat->Pig mapping see PigHCatUtil.getPigType(Type)
     * For Pig->HCat mapping see HCatBaseStorer#validateSchema(...)*/
-    BOOLEAN(PrimitiveObjectInspector.PrimitiveCategory.BOOLEAN),
-    TINYINT(PrimitiveObjectInspector.PrimitiveCategory.BYTE),
-    SMALLINT(PrimitiveObjectInspector.PrimitiveCategory.SHORT),
-    INT(PrimitiveObjectInspector.PrimitiveCategory.INT),
-    BIGINT(PrimitiveObjectInspector.PrimitiveCategory.LONG),
-    FLOAT(PrimitiveObjectInspector.PrimitiveCategory.FLOAT),
-    DOUBLE(PrimitiveObjectInspector.PrimitiveCategory.DOUBLE),
-    DECIMAL(PrimitiveObjectInspector.PrimitiveCategory.DECIMAL),
-    STRING(PrimitiveObjectInspector.PrimitiveCategory.STRING),
-    CHAR(PrimitiveObjectInspector.PrimitiveCategory.CHAR),
-    VARCHAR(PrimitiveObjectInspector.PrimitiveCategory.VARCHAR),
-    BINARY(PrimitiveObjectInspector.PrimitiveCategory.BINARY),
-    DATE(PrimitiveObjectInspector.PrimitiveCategory.DATE), 
-    TIMESTAMP(PrimitiveObjectInspector.PrimitiveCategory.TIMESTAMP), 
+    BOOLEAN(PrimitiveCategory.BOOLEAN),
+    TINYINT(PrimitiveCategory.BYTE),
+    SMALLINT(PrimitiveCategory.SHORT),
+    INT(PrimitiveCategory.INT),
+    BIGINT(PrimitiveCategory.LONG),
+    FLOAT(PrimitiveCategory.FLOAT),
+    DOUBLE(PrimitiveCategory.DOUBLE),
+    DECIMAL(PrimitiveCategory.DECIMAL),
+    STRING(PrimitiveCategory.STRING),
+    CHAR(PrimitiveCategory.CHAR),
+    VARCHAR(PrimitiveCategory.VARCHAR),
+    BINARY(PrimitiveCategory.BINARY),
+    DATE(PrimitiveCategory.DATE),
+    TIMESTAMP(PrimitiveCategory.TIMESTAMP),
 
-    ARRAY(ObjectInspector.Category.LIST),
-    MAP(ObjectInspector.Category.MAP),
-    STRUCT(ObjectInspector.Category.STRUCT);
+    ARRAY(org.apache.hadoop.hive.serde2.objectinspector.Category.LIST),
+    MAP(org.apache.hadoop.hive.serde2.objectinspector.Category.MAP),
+    STRUCT(org.apache.hadoop.hive.serde2.objectinspector.Category.STRUCT);
 
     
-    private final ObjectInspector.Category category;
-    private final PrimitiveObjectInspector.PrimitiveCategory primitiveCategory;
-    private Type(ObjectInspector.Category cat) {
+    private final org.apache.hadoop.hive.serde2.objectinspector.Category category;
+    private final PrimitiveCategory primitiveCategory;
+    private Type(org.apache.hadoop.hive.serde2.objectinspector.Category cat) {
       category = cat;
       primitiveCategory = null;
-      assert category != ObjectInspector.Category.PRIMITIVE : 
+      assert category != org.apache.hadoop.hive.serde2.objectinspector.Category.PRIMITIVE :
               "This c'tor should be used for complex category types";
     }
-    private Type(PrimitiveObjectInspector.PrimitiveCategory primCat) {
-      category = ObjectInspector.Category.PRIMITIVE;
+    private Type(PrimitiveCategory primCat) {
+      category = org.apache.hadoop.hive.serde2.objectinspector.Category.PRIMITIVE;
       primitiveCategory = primCat;
     }
-    public ObjectInspector.Category getCategory() {
+    public org.apache.hadoop.hive.serde2.objectinspector.Category getCategory() {
       return category;
     }
     /**
      * May return {@code null}
      */
-    public PrimitiveObjectInspector.PrimitiveCategory getPrimitiveCategory() {
+    public PrimitiveCategory getPrimitiveCategory() {
       return primitiveCategory;
     }
     public static Type getPrimitiveHType(PrimitiveTypeInfo basePrimitiveTypeInfo) {
@@ -95,7 +96,7 @@ similarly for mapKeyType/mapKeyTypeInfo */
     public static int numPrimitiveTypes() {
       int numPrimitives = 0;
       for(Type t : values()) {
-        if(t.category == ObjectInspector.Category.PRIMITIVE) {
+        if(t.category == org.apache.hadoop.hive.serde2.objectinspector.Category.PRIMITIVE) {
           numPrimitives++;
         }
       }

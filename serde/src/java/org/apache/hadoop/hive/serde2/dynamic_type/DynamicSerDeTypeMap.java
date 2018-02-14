@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hadoop.hive.serde2.SerDeException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.thrift.WriteNullsProtocol;
@@ -129,7 +130,7 @@ public class DynamicSerDeTypeMap extends DynamicSerDeTypeBase {
     WriteNullsProtocol nullProtocol =
         (oprot instanceof WriteNullsProtocol) ? (WriteNullsProtocol) oprot : null;
 
-    assert (oi.getCategory() == ObjectInspector.Category.MAP);
+    assert (oi.getCategory() == Category.MAP);
     MapObjectInspector moi = (MapObjectInspector) oi;
     ObjectInspector koi = moi.getMapKeyObjectInspector();
     ObjectInspector voi = moi.getMapValueObjectInspector();

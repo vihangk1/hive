@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.LongWritable;
@@ -100,7 +101,7 @@ public class TestStreamingSum {
       throws HiveException {
 
     GenericUDAFSum fnR = new GenericUDAFSum();
-    TypeInfo[] inputTypes = { TypeInfoFactory.decimalTypeInfo };
+    TypeInfo[] inputTypes = { PrimitiveObjectInspectorFactory.decimalTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableHiveDecimalObjectInspector };
 
     HiveDecimalWritable[] in = new HiveDecimalWritable[1];

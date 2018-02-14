@@ -24,13 +24,13 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.util.Arrays;
-import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.io.HiveCharWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.HiveVarcharWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.BinaryObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.BooleanObjectInspector;
@@ -231,7 +231,7 @@ public final class LazyUtils {
       PrimitiveObjectInspector oi, boolean escaped, byte escapeChar,
       boolean[] needsEscape) throws IOException {
 
-    PrimitiveObjectInspector.PrimitiveCategory category = oi.getPrimitiveCategory();
+    PrimitiveCategory category = oi.getPrimitiveCategory();
     switch (category) {
     case BOOLEAN: {
       boolean b = ((BooleanObjectInspector) oi).get(o);

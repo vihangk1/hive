@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -90,7 +91,7 @@ public class GenericUDTFParseUrlTuple extends GenericUDTF {
     }
 
     for (int i = 0; i < args.length; ++i) {
-      if (args[i].getCategory() != ObjectInspector.Category.PRIMITIVE ||
+      if (args[i].getCategory() != Category.PRIMITIVE ||
           !args[i].getTypeName().equals(serdeConstants.STRING_TYPE_NAME)) {
         throw new UDFArgumentException("parse_url_tuple()'s arguments have to be string type");
       }

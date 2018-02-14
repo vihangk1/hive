@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
@@ -85,7 +85,7 @@ public final class BinarySortableDeserializeRead extends DeserializeRead {
     Field[] children;
 
     Category category;
-    PrimitiveObjectInspector.PrimitiveCategory primitiveCategory;
+    PrimitiveCategory primitiveCategory;
     TypeInfo typeInfo;
 
     int index;

@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.common.HiveStatsUtils;
@@ -41,7 +42,6 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionState.LogHelper;
 import org.apache.hadoop.hive.serde.serdeConstants;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
@@ -228,7 +228,7 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
         if (colName.equalsIgnoreCase(col.getName())) {
           String type = col.getType();
           TypeInfo typeInfo = TypeInfoUtils.getTypeInfoFromTypeString(type);
-          if (typeInfo.getCategory() != ObjectInspector.Category.PRIMITIVE) {
+          if (typeInfo.getCategory() != Category.PRIMITIVE) {
             logTypeWarning(colName, type);
             colNames.remove(colName);
           } else {

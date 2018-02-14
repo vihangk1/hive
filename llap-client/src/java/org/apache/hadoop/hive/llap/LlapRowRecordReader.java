@@ -53,7 +53,7 @@ import org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
@@ -161,7 +161,7 @@ public class LlapRowRecordReader implements RecordReader<NullWritable, Row> {
     }
 
     Object convertedVal = null;
-    ObjectInspector.Category oiCategory = oi.getCategory();
+    Category oiCategory = oi.getCategory();
     switch (oiCategory) {
     case PRIMITIVE:
       convertedVal = convertPrimitive(val, (PrimitiveObjectInspector) oi);

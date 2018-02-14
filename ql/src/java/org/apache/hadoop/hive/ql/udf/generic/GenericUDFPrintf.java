@@ -21,7 +21,6 @@ package org.apache.hadoop.hive.ql.udf.generic;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.IllegalFormatConversionException;
 import java.util.Locale;
 
 import org.apache.hadoop.hive.common.type.HiveDecimal;
@@ -33,11 +32,11 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableHiveDecimalObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableStringObjectInspector;
 import org.apache.hadoop.io.Text;
 
@@ -69,12 +68,12 @@ public class GenericUDFPrintf extends GenericUDF {
 
     WritableStringObjectInspector resultOI = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
 
-    if (arguments[0].getCategory() == ObjectInspector.Category.PRIMITIVE) {
+    if (arguments[0].getCategory() == Category.PRIMITIVE) {
       PrimitiveObjectInspector poi = ((PrimitiveObjectInspector) arguments[0]);
-      if (poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.STRING ||
-          poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.CHAR ||
-          poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.VARCHAR ||
-          poi.getPrimitiveCategory() == PrimitiveObjectInspector.PrimitiveCategory.VOID) {
+      if (poi.getPrimitiveCategory() == PrimitiveCategory.STRING ||
+          poi.getPrimitiveCategory() == PrimitiveCategory.CHAR ||
+          poi.getPrimitiveCategory() == PrimitiveCategory.VARCHAR ||
+          poi.getPrimitiveCategory() == PrimitiveCategory.VOID) {
         converterFormat = ObjectInspectorConverters.getConverter(arguments[0], resultOI);
       } else {
         throw new UDFArgumentTypeException(0, "Argument 1"

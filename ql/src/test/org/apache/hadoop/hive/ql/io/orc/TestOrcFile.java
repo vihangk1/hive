@@ -25,7 +25,6 @@ import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.sql.Date;
@@ -53,6 +52,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -314,7 +314,7 @@ public class TestOrcFile {
     // check the inspectors
     StructObjectInspector readerInspector = (StructObjectInspector) reader
         .getObjectInspector();
-    assertEquals(ObjectInspector.Category.STRUCT, readerInspector.getCategory());
+    assertEquals(Category.STRUCT, readerInspector.getCategory());
     assertEquals("struct<boolean1:boolean,byte1:tinyint,short1:smallint,"
         + "int1:int,long1:bigint,float1:float,double1:double,bytes1:"
         + "binary,string1:string,middle:struct<list:array<struct<int1:int,"
@@ -710,7 +710,7 @@ public class TestOrcFile {
     // check the inspectors
     StructObjectInspector readerInspector =
         (StructObjectInspector) reader.getObjectInspector();
-    assertEquals(ObjectInspector.Category.STRUCT,
+    assertEquals(Category.STRUCT,
         readerInspector.getCategory());
     assertEquals("struct<bytes1:binary,string1:string>",
         readerInspector.getTypeName());
@@ -943,7 +943,7 @@ public class TestOrcFile {
     // check the inspectors
     StructObjectInspector readerInspector =
         (StructObjectInspector) reader.getObjectInspector();
-    assertEquals(ObjectInspector.Category.STRUCT,
+    assertEquals(Category.STRUCT,
         readerInspector.getCategory());
     assertEquals("struct<boolean1:boolean,byte1:tinyint,short1:smallint,"
         + "int1:int,long1:bigint,float1:float,double1:double,bytes1:"

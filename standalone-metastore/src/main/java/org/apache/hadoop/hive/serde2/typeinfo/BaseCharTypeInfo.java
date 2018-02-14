@@ -18,8 +18,8 @@
 
 package org.apache.hadoop.hive.serde2.typeinfo;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hadoop.hive.common.classification.InterfaceStability;
+import org.apache.hadoop.classification.InterfaceAudience;
+import org.apache.hadoop.classification.InterfaceStability;
 
 @InterfaceAudience.Public
 @InterfaceStability.Stable

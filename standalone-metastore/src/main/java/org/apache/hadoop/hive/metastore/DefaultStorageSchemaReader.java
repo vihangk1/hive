@@ -23,12 +23,11 @@ import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.type.MetastoreTypeInfo;
 import org.apache.hadoop.hive.metastore.avro.utils.AvroSchemaUtils;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.utils.StorageSchemaUtils;
 
-import org.apache.hadoop.hive.metastore.avro.utils.AvroSerdeException;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,10 +67,7 @@ public class DefaultStorageSchemaReader implements StorageSchemaReader {
       //in case of avro table use AvroStorageSchemaReader utils
       try {
         return AvroSchemaUtils.getFieldsFromAvroSchema(conf, tblMetadataProperties);
-      } catch (AvroSerdeException e) {
-        LOG.warn("Exception received while reading avro schema for table " + tbl.getTableName(), e);
-        throw new MetaException(e.getMessage());
-      } catch (IOException e) {
+      } catch (Exception e) {
         LOG.warn("Exception received while reading avro schema for table " + tbl.getTableName(), e);
         throw new MetaException(e.getMessage());
       }
@@ -92,7 +88,7 @@ public class DefaultStorageSchemaReader implements StorageSchemaReader {
   public static List<FieldSchema> getFieldSchemasFromTableMetadata(
       Properties tblMetadataProperties) {
     List<String> columnNames = null;
-    List< MetastoreTypeInfo> columnTypes = null;
+    List<TypeInfo> columnTypes = null;
     // Get column names and types
     String columnNameProperty = tblMetadataProperties.getProperty( ColumnType.LIST_COLUMNS);
     String columnTypeProperty = tblMetadataProperties.getProperty( ColumnType.LIST_COLUMN_TYPES);
@@ -130,7 +126,7 @@ public class DefaultStorageSchemaReader implements StorageSchemaReader {
   }
 
   private static List<FieldSchema> getFieldSchemaFromColumnInfo(List<String> columnNames,
-      List<MetastoreTypeInfo> columnTypes, List<String> columnComments) {
+      List<TypeInfo> columnTypes, List<String> columnComments) {
     int len = columnNames.size();
     List<FieldSchema> fieldSchemas = new ArrayList<>(len);
     for (int i = 0; i < len; i++) {

@@ -20,9 +20,9 @@ package org.apache.hadoop.hive.serde2.typeinfo;
 
 import java.io.Serializable;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hadoop.hive.common.classification.InterfaceStability;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.classification.InterfaceAudience;
+import org.apache.hadoop.classification.InterfaceStability;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 
 /**
  * Stores information about a type. Always use the TypeInfoFactory to create new

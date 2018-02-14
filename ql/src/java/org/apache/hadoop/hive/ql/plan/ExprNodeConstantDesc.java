@@ -25,8 +25,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.hadoop.hive.common.StringInternUtils;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.BaseCharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -72,7 +73,7 @@ public class ExprNodeConstantDesc extends ExprNodeDesc implements Serializable {
   }
 
   public ExprNodeConstantDesc(Object value) {
-    this(TypeInfoFactory
+    this(PrimitiveObjectInspectorUtils
         .getPrimitiveTypeInfoFromJavaPrimitive(value.getClass()), value);
   }
 

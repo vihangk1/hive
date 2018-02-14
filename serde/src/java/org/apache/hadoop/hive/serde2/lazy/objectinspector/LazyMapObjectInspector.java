@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.serde2.lazy.objectinspector;
 
 import java.util.Map;
 
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.serde2.lazy.LazyMap;

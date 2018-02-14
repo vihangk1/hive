@@ -24,10 +24,11 @@ import java.util.List;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 
@@ -54,7 +55,7 @@ public class GenericUDTFPosExplode extends GenericUDTF {
       throw new UDFArgumentException("posexplode() takes only one argument");
     }
 
-    if (args[0].getCategory() != ObjectInspector.Category.LIST) {
+    if (args[0].getCategory() != Category.LIST) {
       throw new UDFArgumentException("posexplode() takes an array as a parameter");
     }
     listOI = (ListObjectInspector) args[0];
