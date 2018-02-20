@@ -80,6 +80,7 @@ public final class TypeInfoFactory {
   // instance.
   private static ConcurrentHashMap<String, PrimitiveTypeInfo> cachedPrimitiveTypeInfo =
       new ConcurrentHashMap<String, PrimitiveTypeInfo>();
+
   static {
     cachedPrimitiveTypeInfo.put(ColumnType.VOID_TYPE_NAME, voidTypeInfo);
     cachedPrimitiveTypeInfo.put(ColumnType.BOOLEAN_TYPE_NAME, booleanTypeInfo);
@@ -98,6 +99,16 @@ public final class TypeInfoFactory {
     cachedPrimitiveTypeInfo.put(ColumnType.BINARY_TYPE_NAME, binaryTypeInfo);
     //cachedPrimitiveTypeInfo.put(decimalTypeInfo.getQualifiedName(), decimalTypeInfo);
     cachedPrimitiveTypeInfo.put("unknown", unknownTypeInfo);
+  }
+  /**
+   * Register a Primitive Type. This registers primitiveTypeInfo to the TypeInfoFactory which
+   * is cached and re-used whenever getPrimitiveTypeInfo is called with the same typename
+   * @param typeName The typename for the TypeInfo
+   * @param primitiveTypeInfo The primitiveTypeInfo object to be cached
+   */
+  public static void registerPrimitiveTypeInfo(final String typeName,
+      final PrimitiveTypeInfo primitiveTypeInfo) {
+    cachedPrimitiveTypeInfo.putIfAbsent(typeName, primitiveTypeInfo);
   }
 
   /**
