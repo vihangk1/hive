@@ -18,7 +18,7 @@
 package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 
 import org.apache.hadoop.hive.serde2.io.ByteWritable;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * A WritableByteObjectInspector inspects a ByteWritable Object.
@@ -28,7 +28,7 @@ public class WritableByteObjectInspector extends
     SettableByteObjectInspector {
 
   public WritableByteObjectInspector() {
-    super(TypeInfoFactory.byteTypeInfo);
+    super(TypeInfoUtils.byteTypeInfo);
   }
 
   @Override

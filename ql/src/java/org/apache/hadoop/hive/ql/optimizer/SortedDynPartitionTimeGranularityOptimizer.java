@@ -67,7 +67,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFTimestamp;
 import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.parquet.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -296,19 +296,19 @@ public class SortedDynPartitionTimeGranularityOptimizer extends Transform {
       ExprNodeDesc expr = new ExprNodeColumnDesc(parentCols.get(timestampPos));
       // #2 - UTC epoch for instant
       ExprNodeGenericFuncDesc f1 = new ExprNodeGenericFuncDesc(
-          TypeInfoFactory.longTypeInfo, new GenericUDFEpochMilli(), Lists.newArrayList(expr));
+          TypeInfoUtils.longTypeInfo, new GenericUDFEpochMilli(), Lists.newArrayList(expr));
       // #3 - Cast to timestamp
       ExprNodeGenericFuncDesc f2 = new ExprNodeGenericFuncDesc(
-          TypeInfoFactory.timestampTypeInfo, new GenericUDFTimestamp(), Lists.newArrayList(f1));
+          TypeInfoUtils.timestampTypeInfo, new GenericUDFTimestamp(), Lists.newArrayList(f1));
       // #4 - We apply the granularity function
       ExprNodeGenericFuncDesc f3 = new ExprNodeGenericFuncDesc(
-          TypeInfoFactory.timestampTypeInfo,
+          TypeInfoUtils.timestampTypeInfo,
           new GenericUDFBridge(udfName, false, udfClass.getName()),
           Lists.newArrayList(f2));
       descs.add(f3);
       colNames.add(Constants.DRUID_TIMESTAMP_GRANULARITY_COL_NAME);
       // Add granularity to the row schema
-      ColumnInfo ci = new ColumnInfo(Constants.DRUID_TIMESTAMP_GRANULARITY_COL_NAME, TypeInfoFactory.timestampTypeInfo,
+      ColumnInfo ci = new ColumnInfo(Constants.DRUID_TIMESTAMP_GRANULARITY_COL_NAME, TypeInfoUtils.timestampTypeInfo,
               selRS.getSignature().get(0).getTabAlias(), false, false);
       selRS.getSignature().add(ci);
 

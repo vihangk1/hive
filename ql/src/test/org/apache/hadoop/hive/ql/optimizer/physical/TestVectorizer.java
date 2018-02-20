@@ -36,15 +36,13 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorGroupByOperator;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizationContext;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.aggregates.VectorUDAFCountStar;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.aggregates.gen.VectorUDAFSumLong;
-import org.apache.hadoop.hive.ql.exec.vector.expressions.gen.FuncAbsLongToLong;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.optimizer.physical.Vectorizer.VectorizerCannotVectorizeException;
 import org.apache.hadoop.hive.ql.plan.*;
 import org.apache.hadoop.hive.ql.plan.VectorGroupByDesc.ProcessingMode;
 import org.apache.hadoop.hive.ql.udf.generic.*;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFSum.GenericUDAFSumLong;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -89,7 +87,7 @@ public class TestVectorizer {
 
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     children.add(colExprA);
-    ExprNodeGenericFuncDesc exprNodeDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.intTypeInfo, new GenericUDFAbs(), children);
+    ExprNodeGenericFuncDesc exprNodeDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.intTypeInfo, new GenericUDFAbs(), children);
 
     ArrayList<ExprNodeDesc> params = new ArrayList<ExprNodeDesc>();
     params.add(exprNodeDesc);
@@ -112,8 +110,8 @@ public class TestVectorizer {
     vectorDesc.setVecAggrDescs(
         new VectorAggregationDesc[] {
           new VectorAggregationDesc(
-              aggDesc, new GenericUDAFSum.GenericUDAFSumLong(), TypeInfoFactory.longTypeInfo, ColumnVector.Type.LONG, null,
-              TypeInfoFactory.longTypeInfo, ColumnVector.Type.LONG, VectorUDAFCountStar.class)});
+              aggDesc, new GenericUDAFSum.GenericUDAFSumLong(), TypeInfoUtils.longTypeInfo, ColumnVector.Type.LONG, null,
+              TypeInfoUtils.longTypeInfo, ColumnVector.Type.LONG, VectorUDAFCountStar.class)});
 
     desc.setOutputColumnNames(outputColumnNames);
     ArrayList<AggregationDesc> aggDescList = new ArrayList<AggregationDesc>();
@@ -146,7 +144,7 @@ public class TestVectorizer {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -155,12 +153,12 @@ public class TestVectorizer {
 
     FakeGenericUDF udf2 = new FakeGenericUDF();
     ExprNodeGenericFuncDesc nonSupportedExpr = new ExprNodeGenericFuncDesc();
-    nonSupportedExpr.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    nonSupportedExpr.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     nonSupportedExpr.setGenericUDF(udf2);
 
     GenericUDFOPAnd andUdf = new GenericUDFOPAnd();
     ExprNodeGenericFuncDesc andExprDesc = new ExprNodeGenericFuncDesc();
-    andExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    andExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     andExprDesc.setGenericUDF(andUdf);
     List<ExprNodeDesc> children3 = new ArrayList<ExprNodeDesc>(2);
     children3.add(greaterExprDesc);
@@ -192,7 +190,7 @@ public class TestVectorizer {
       //Set filter expression
       GenericUDFOPEqual udf = new GenericUDFOPEqual();
       ExprNodeGenericFuncDesc equalExprDesc = new ExprNodeGenericFuncDesc();
-      equalExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+      equalExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
       equalExprDesc.setGenericUDF(udf);
       List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
       children1.add(new ExprNodeColumnDesc(Integer.class, "col2", "T1", false));
@@ -242,7 +240,7 @@ public class TestVectorizer {
 
   @Test
   public void testExprNodeDynamicValue() {
-    ExprNodeDesc exprNode = new ExprNodeDynamicValueDesc(new DynamicValue("id1", TypeInfoFactory.stringTypeInfo));
+    ExprNodeDesc exprNode = new ExprNodeDynamicValueDesc(new DynamicValue("id1", TypeInfoUtils.stringTypeInfo));
     Vectorizer v = new Vectorizer();
     Assert.assertTrue(v.validateExprNodeDesc(exprNode, "Test", Mode.FILTER, false));
     Assert.assertTrue(v.validateExprNodeDesc(exprNode, "Test", Mode.PROJECTION, false));
@@ -250,14 +248,14 @@ public class TestVectorizer {
 
   @Test
   public void testExprNodeBetweenWithDynamicValue() {
-    ExprNodeDesc notBetween = new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, Boolean.FALSE);
+    ExprNodeDesc notBetween = new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, Boolean.FALSE);
     ExprNodeColumnDesc colExpr = new ExprNodeColumnDesc(String.class, "col1", "table", false);
-    ExprNodeDesc minExpr = new ExprNodeDynamicValueDesc(new DynamicValue("id1", TypeInfoFactory.stringTypeInfo));
-    ExprNodeDesc maxExpr = new ExprNodeDynamicValueDesc(new DynamicValue("id2", TypeInfoFactory.stringTypeInfo));
+    ExprNodeDesc minExpr = new ExprNodeDynamicValueDesc(new DynamicValue("id1", TypeInfoUtils.stringTypeInfo));
+    ExprNodeDesc maxExpr = new ExprNodeDynamicValueDesc(new DynamicValue("id2", TypeInfoUtils.stringTypeInfo));
 
     ExprNodeGenericFuncDesc betweenExpr = new ExprNodeGenericFuncDesc();
     GenericUDF betweenUdf = new GenericUDFBetween();
-    betweenExpr.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    betweenExpr.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     betweenExpr.setGenericUDF(betweenUdf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(notBetween);

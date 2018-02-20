@@ -28,7 +28,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.C
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 
@@ -71,7 +70,7 @@ public abstract class GenericUDFBaseNwayCompare extends GenericUDF {
 
     resultOI = TypeInfoUtils.getStandardWritableObjectInspectorFromTypeInfo(
       (commonInfo == null) ?
-        TypeInfoFactory.doubleTypeInfo : commonInfo);
+        TypeInfoUtils.doubleTypeInfo : commonInfo);
 
     for (int i = 0; i < arguments.length; i++) {
       converters[i] = ObjectInspectorConverters.getConverter(arguments[i], resultOI);

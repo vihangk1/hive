@@ -41,7 +41,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -124,7 +123,7 @@ public class RegexSerDe extends AbstractSerDe {
 
     // All columns have to be of type STRING.
     for (int c = 0; c < numColumns; c++) {
-      if (!columnTypes.get(c).equals(TypeInfoFactory.stringTypeInfo)) {
+      if (!columnTypes.get(c).equals(TypeInfoUtils.stringTypeInfo)) {
         throw new SerDeException(getClass().getName()
             + " only accepts string columns, but column[" + c + "] named "
             + columnNames.get(c) + " has type " + columnTypes.get(c));

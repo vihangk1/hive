@@ -18,7 +18,6 @@ package org.apache.hadoop.hive.accumulo.mr;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -55,12 +54,12 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazySimpleStructObject
 import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyStringObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordWriter;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
-import org.apache.hadoop.security.token.TokenIdentifier;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -215,8 +214,8 @@ public class TestHiveAccumuloTableOutputFormat {
         .getRecordWriter(local, conf, null, null);
 
     List<String> names = Arrays.asList("row", "col1", "col2");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
 
     Properties tableProperties = new Properties();
     tableProperties.setProperty(AccumuloSerDeParameters.COLUMN_MAPPINGS, ":rowID,cf:cq1,cf:cq2");
@@ -308,8 +307,8 @@ public class TestHiveAccumuloTableOutputFormat {
         .getRecordWriter(local, conf, null, null);
 
     List<String> names = Arrays.asList("row", "col1", "col2");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
 
     Properties tableProperties = new Properties();
     tableProperties.setProperty(AccumuloSerDeParameters.COLUMN_MAPPINGS, ":rowID,cf:cq1,cf:cq2");
@@ -326,8 +325,8 @@ public class TestHiveAccumuloTableOutputFormat {
 
     LazySimpleStructObjectInspector structOI = (LazySimpleStructObjectInspector) LazyFactory
         .createLazyStructInspector(Arrays.asList("row", "cq1", "cq2"), Arrays.<TypeInfo> asList(
-            TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo,
-            TypeInfoFactory.stringTypeInfo), serDeParams.getSeparators(), serDeParams
+            TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo,
+            TypeInfoUtils.stringTypeInfo), serDeParams.getSeparators(), serDeParams
             .getNullSequence(), serDeParams.isLastColumnTakesRest(), serDeParams.isEscaped(),
             serDeParams.getEscapeChar());
 
@@ -397,8 +396,8 @@ public class TestHiveAccumuloTableOutputFormat {
         .getRecordWriter(local, conf, null, null);
 
     List<String> names = Arrays.asList("row", "col1");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo);
 
     Properties tableProperties = new Properties();
     tableProperties.setProperty(AccumuloSerDeParameters.COLUMN_MAPPINGS, ":rowID,cf:*");
@@ -496,8 +495,8 @@ public class TestHiveAccumuloTableOutputFormat {
         .getRecordWriter(local, conf, null, null);
 
     List<String> names = Arrays.asList("row", "col1", "col2");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
 
     Properties tableProperties = new Properties();
     tableProperties.setProperty(AccumuloSerDeParameters.COLUMN_MAPPINGS, ":rowID,cf:cq1,cf:cq2");

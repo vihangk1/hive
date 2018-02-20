@@ -36,6 +36,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -59,7 +60,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.byteTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.byteTypeInfo, oi.getTypeInfo());
     ByteWritable res = (ByteWritable) udf.evaluate(args);
     Assert.assertEquals((byte)-4, res.get());
   }
@@ -77,7 +78,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.shortTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.shortTypeInfo, oi.getTypeInfo());
     ShortWritable res = (ShortWritable) udf.evaluate(args);
     Assert.assertEquals((short)-74, res.get());
   }
@@ -95,7 +96,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.intTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.intTypeInfo, oi.getTypeInfo());
     IntWritable res = (IntWritable) udf.evaluate(args);
     Assert.assertEquals(-747, res.get());
   }
@@ -113,7 +114,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(-3234747L, res.get());
   }
@@ -131,7 +132,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.floatTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.floatTypeInfo, oi.getTypeInfo());
     FloatWritable res = (FloatWritable) udf.evaluate(args);
     Assert.assertEquals(new Float(-323.4747f), new Float(res.get()));
   }
@@ -149,7 +150,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-32300.004747), new Double(res.get()));
   }
@@ -186,7 +187,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-32300.004747), new Double(res.get()));
   }
@@ -206,7 +207,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-32300.004747), new Double(res.get()));
   }
@@ -226,7 +227,7 @@ public class TestGenericUDFOPNegative {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-32300.004747), new Double(res.get()));
   }

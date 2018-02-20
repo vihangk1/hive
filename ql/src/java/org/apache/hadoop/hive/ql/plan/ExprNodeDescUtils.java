@@ -42,7 +42,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.HiveDecimalUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.util.ReflectionUtils;
 
 public class ExprNodeDescUtils {
@@ -172,7 +172,7 @@ public class ExprNodeDescUtils {
     } else {
       children.add(next);
     }
-    return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
         FunctionRegistry.getGenericUDFForAnd(), children);
   }
 

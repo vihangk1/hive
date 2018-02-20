@@ -76,6 +76,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -217,7 +218,7 @@ public class TestVectorGroupByOperator {
         new VectorAggregationDesc[] {
           new VectorAggregationDesc(
               agg, new GenericUDAFCount.GenericUDAFCountEvaluator(), null, ColumnVector.Type.NONE, null,
-              TypeInfoFactory.longTypeInfo, ColumnVector.Type.LONG, VectorUDAFCountStar.class)});
+              TypeInfoUtils.longTypeInfo, ColumnVector.Type.LONG, VectorUDAFCountStar.class)});
 
     vectorDesc.setProcessingMode(VectorGroupByDesc.ProcessingMode.HASH);
 
@@ -263,8 +264,8 @@ public class TestVectorGroupByOperator {
     VectorizationContext ctx = new VectorizationContext("name", mapColumnNames);
 
     Pair<GroupByDesc,VectorGroupByDesc> pair = buildKeyGroupByDesc (ctx, "max",
-        "Value", TypeInfoFactory.longTypeInfo,
-        "Key", TypeInfoFactory.longTypeInfo);
+        "Value", TypeInfoUtils.longTypeInfo,
+        "Key", TypeInfoUtils.longTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
 
@@ -2071,7 +2072,7 @@ public class TestVectorGroupByOperator {
         new String[] {"string", "long"},
         list,
         values);
-    testAggregateStringKeyIterable (aggregateName, fdr,  TypeInfoFactory.longTypeInfo, expected);
+    testAggregateStringKeyIterable (aggregateName, fdr,  TypeInfoUtils.longTypeInfo, expected);
   }
 
   public void testAggregateDoubleStringKeyAggregate (
@@ -2087,7 +2088,7 @@ public class TestVectorGroupByOperator {
         new String[] {"string", "double"},
         list,
         values);
-    testAggregateStringKeyIterable (aggregateName, fdr,  TypeInfoFactory.doubleTypeInfo, expected);
+    testAggregateStringKeyIterable (aggregateName, fdr,  TypeInfoUtils.doubleTypeInfo, expected);
   }
 
   public void testAggregateLongKeyAggregate (
@@ -2387,7 +2388,7 @@ public class TestVectorGroupByOperator {
     mapColumnNames.add("A");
     VectorizationContext ctx = new VectorizationContext("name", mapColumnNames);
 
-    Pair<GroupByDesc,VectorGroupByDesc> pair = buildGroupByDescType(ctx, "count", GenericUDAFEvaluator.Mode.FINAL, "A", TypeInfoFactory.longTypeInfo);
+    Pair<GroupByDesc,VectorGroupByDesc> pair = buildGroupByDescType(ctx, "count", GenericUDAFEvaluator.Mode.FINAL, "A", TypeInfoUtils.longTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
     vectorDesc.setProcessingMode(ProcessingMode.GLOBAL);  // Use GLOBAL when no key for Reduce.
@@ -2425,7 +2426,7 @@ public class TestVectorGroupByOperator {
     VectorizationContext ctx = new VectorizationContext("name", mapColumnNames);
 
     Pair<GroupByDesc,VectorGroupByDesc> pair = buildGroupByDescType(ctx, aggregateName, GenericUDAFEvaluator.Mode.PARTIAL1, "A",
-        TypeInfoFactory.stringTypeInfo);
+        TypeInfoUtils.stringTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
 
@@ -2502,7 +2503,7 @@ public class TestVectorGroupByOperator {
     VectorizationContext ctx = new VectorizationContext("name", mapColumnNames);
 
     Pair<GroupByDesc,VectorGroupByDesc> pair = buildGroupByDescType (ctx, aggregateName, GenericUDAFEvaluator.Mode.PARTIAL1, "A",
-        TypeInfoFactory.doubleTypeInfo);
+        TypeInfoUtils.doubleTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
 
@@ -2539,7 +2540,7 @@ public class TestVectorGroupByOperator {
     mapColumnNames.add("A");
     VectorizationContext ctx = new VectorizationContext("name", mapColumnNames);
 
-    Pair<GroupByDesc,VectorGroupByDesc> pair = buildGroupByDescType(ctx, aggregateName, GenericUDAFEvaluator.Mode.PARTIAL1, "A", TypeInfoFactory.longTypeInfo);
+    Pair<GroupByDesc,VectorGroupByDesc> pair = buildGroupByDescType(ctx, aggregateName, GenericUDAFEvaluator.Mode.PARTIAL1, "A", TypeInfoUtils.longTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
 
@@ -2580,7 +2581,7 @@ public class TestVectorGroupByOperator {
     Set<Object> keys = new HashSet<Object>();
 
     Pair<GroupByDesc,VectorGroupByDesc> pair = buildKeyGroupByDesc (ctx, aggregateName, "Value",
-        TypeInfoFactory.longTypeInfo, "Key", TypeInfoFactory.longTypeInfo);
+        TypeInfoUtils.longTypeInfo, "Key", TypeInfoUtils.longTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
 
@@ -2652,7 +2653,7 @@ public class TestVectorGroupByOperator {
     Set<Object> keys = new HashSet<Object>();
 
     Pair<GroupByDesc,VectorGroupByDesc> pair = buildKeyGroupByDesc (ctx, aggregateName, "Value",
-       dataTypeInfo, "Key", TypeInfoFactory.stringTypeInfo);
+       dataTypeInfo, "Key", TypeInfoUtils.stringTypeInfo);
     GroupByDesc desc = pair.fst;
     VectorGroupByDesc vectorDesc = pair.snd;
 

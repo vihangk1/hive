@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
@@ -60,22 +59,22 @@ public class ComparisonOpMethodResolver implements UDFMethodResolver {
     assert (argTypeInfos.size() == 2);
 
     List<TypeInfo> pTypeInfos = null;
-    if (argTypeInfos.get(0).equals(TypeInfoFactory.voidTypeInfo)
-        || argTypeInfos.get(1).equals(TypeInfoFactory.voidTypeInfo)) {
+    if (argTypeInfos.get(0).equals(TypeInfoUtils.voidTypeInfo)
+        || argTypeInfos.get(1).equals(TypeInfoUtils.voidTypeInfo)) {
       pTypeInfos = new ArrayList<TypeInfo>();
-      pTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
-      pTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
-    } else if (argTypeInfos.get(0).equals(TypeInfoFactory.booleanTypeInfo) &&
-               argTypeInfos.get(1).equals(TypeInfoFactory.booleanTypeInfo)) {
+      pTypeInfos.add(TypeInfoUtils.doubleTypeInfo);
+      pTypeInfos.add(TypeInfoUtils.doubleTypeInfo);
+    } else if (argTypeInfos.get(0).equals(TypeInfoUtils.booleanTypeInfo) &&
+               argTypeInfos.get(1).equals(TypeInfoUtils.booleanTypeInfo)) {
       pTypeInfos = new ArrayList<TypeInfo>();
-      pTypeInfos.add(TypeInfoFactory.intTypeInfo);
-      pTypeInfos.add(TypeInfoFactory.intTypeInfo);
+      pTypeInfos.add(TypeInfoUtils.intTypeInfo);
+      pTypeInfos.add(TypeInfoUtils.intTypeInfo);
     } else if (argTypeInfos.get(0) == argTypeInfos.get(1)) {
       pTypeInfos = argTypeInfos;
     } else {
       pTypeInfos = new ArrayList<TypeInfo>();
-      pTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
-      pTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
+      pTypeInfos.add(TypeInfoUtils.doubleTypeInfo);
+      pTypeInfos.add(TypeInfoUtils.doubleTypeInfo);
     }
 
     Method udfMethod = null;

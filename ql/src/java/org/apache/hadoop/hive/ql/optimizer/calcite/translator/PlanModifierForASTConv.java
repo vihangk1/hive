@@ -51,7 +51,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortLimit;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSemiJoin;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRelColumnsAlignment;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -392,8 +392,8 @@ public class PlanModifierForASTConv {
     }
     HiveAggregate oldAggRel = (HiveAggregate) rel;
     RelDataTypeFactory typeFactory = oldAggRel.getCluster().getTypeFactory();
-    RelDataType longType = TypeConverter.convert(TypeInfoFactory.longTypeInfo, typeFactory);
-    RelDataType intType = TypeConverter.convert(TypeInfoFactory.intTypeInfo, typeFactory);
+    RelDataType longType = TypeConverter.convert(TypeInfoUtils.longTypeInfo, typeFactory);
+    RelDataType intType = TypeConverter.convert(TypeInfoUtils.intTypeInfo, typeFactory);
     // Create the dummy aggregation.
     SqlAggFunction countFn = SqlFunctionConverter.getCalciteAggFn("count", false,
         ImmutableList.of(intType), longType);

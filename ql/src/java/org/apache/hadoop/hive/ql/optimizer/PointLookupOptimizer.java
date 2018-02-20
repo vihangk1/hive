@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.calcite.util.Pair;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -279,7 +280,7 @@ public class PointLookupOptimizer extends Transform {
         }
         newChildren.add(values);
       }
-      newPredicate = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      newPredicate = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
               FunctionRegistry.getFunctionInfo(IN_UDF).getGenericUDF(), newChildren);
 
       return newPredicate;

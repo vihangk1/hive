@@ -29,7 +29,7 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyPrimitiv
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
@@ -47,7 +47,7 @@ public class TestGenericUDFNullif {
         new DeferredJavaObject(new ByteWritable((byte) 4)) };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.byteTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.byteTypeInfo, oi.getTypeInfo());
     ByteWritable res = (ByteWritable) udf.evaluate(args);
     Assert.assertEquals(null, res);
   }
@@ -62,7 +62,7 @@ public class TestGenericUDFNullif {
         new DeferredJavaObject(new ByteWritable((byte) 1)) };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.byteTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.byteTypeInfo, oi.getTypeInfo());
     ByteWritable res = (ByteWritable) udf.evaluate(args);
     Assert.assertEquals(4, res.get());
   }
@@ -128,7 +128,7 @@ public class TestGenericUDFNullif {
         };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.dateTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.dateTypeInfo, oi.getTypeInfo());
     Assert.assertEquals(null, udf.evaluate(args));
   }
 
@@ -146,7 +146,7 @@ public class TestGenericUDFNullif {
     DeferredObject[] args = { new DeferredJavaObject(a1), new DeferredJavaObject(a2) };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.intTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.intTypeInfo, oi.getTypeInfo());
     Assert.assertEquals(null, udf.evaluate(args));
   }
 }

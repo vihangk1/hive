@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -66,7 +67,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.shortTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.shortTypeInfo);
     ShortWritable res = (ShortWritable) udf.evaluate(args);
     Assert.assertEquals(-2, res.get());
   }
@@ -88,7 +89,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.doubleTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.doubleTypeInfo);
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-333.0), new Double(res.get()));
   }
@@ -110,7 +111,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-5.5), new Double(res.get()));
   }
@@ -152,7 +153,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.floatTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.floatTypeInfo);
     FloatWritable res = (FloatWritable) udf.evaluate(args);
     Assert.assertEquals(new Float(4.5), new Float(res.get()));
   }
@@ -173,7 +174,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(-160.45), new Double(res.get()));
   }
@@ -272,7 +273,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.intervalYearMonthTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.intervalYearMonthTypeInfo, oi.getTypeInfo());
     HiveIntervalYearMonthWritable res = (HiveIntervalYearMonthWritable) udf.evaluate(args);
     Assert.assertEquals(HiveIntervalYearMonth.valueOf("1-11"), res.getHiveIntervalYearMonth());
   }
@@ -296,7 +297,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.dateTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.dateTypeInfo, oi.getTypeInfo());
     DateWritable res = (DateWritable) udf.evaluate(args);
     Assert.assertEquals(Date.valueOf("2001-06-15"), res.get());
   }
@@ -319,7 +320,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.timestampTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.timestampTypeInfo, oi.getTypeInfo());
     TimestampWritable res = (TimestampWritable) udf.evaluate(args);
     Assert.assertEquals(Timestamp.valueOf("2001-11-15 01:02:03.123456789"), res.getTimestamp());
   }
@@ -342,7 +343,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.intervalDayTimeTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.intervalDayTimeTypeInfo, oi.getTypeInfo());
     HiveIntervalDayTimeWritable res = (HiveIntervalDayTimeWritable) udf.evaluate(args);
     Assert.assertEquals(HiveIntervalDayTime.valueOf("1 0:0:0.567"), res.getHiveIntervalDayTime());
   }
@@ -365,7 +366,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.timestampTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.timestampTypeInfo, oi.getTypeInfo());
     TimestampWritable res = (TimestampWritable) udf.evaluate(args);
     Assert.assertEquals(Timestamp.valueOf("2001-01-01 00:00:00"), res.getTimestamp());
   }
@@ -388,7 +389,7 @@ public class TestGenericUDFOPMinus extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.timestampTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.timestampTypeInfo, oi.getTypeInfo());
     TimestampWritable res = (TimestampWritable) udf.evaluate(args);
     Assert.assertEquals(Timestamp.valueOf("2000-12-30 23:59:59.445"), res.getTimestamp());
   }

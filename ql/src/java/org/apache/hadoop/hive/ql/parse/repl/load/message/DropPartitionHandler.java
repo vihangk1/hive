@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeConstantDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class DropPartitionHandler extends AbstractMessageHandler {
         PrimitiveTypeInfo pti = TypeInfoFactory.getPrimitiveTypeInfo(type);
         ExprNodeColumnDesc column = new ExprNodeColumnDesc(pti, key, null, true);
         ExprNodeGenericFuncDesc op = DDLSemanticAnalyzer.makeBinaryPredicate(
-            "=", column, new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, val));
+            "=", column, new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, val));
         expr = (expr == null) ? op : DDLSemanticAnalyzer.makeBinaryPredicate("and", expr, op);
       }
       if (expr != null) {

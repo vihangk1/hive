@@ -62,6 +62,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -398,7 +399,7 @@ public class PartitionPruner extends Transform {
             // partcol=... AND nonpartcol=...   is replaced with partcol=... AND TRUE
             // which will be folded to partcol=...
             // This cannot be done also for OR
-            Preconditions.checkArgument(expr.getTypeInfo().accept(TypeInfoFactory.booleanTypeInfo));
+            Preconditions.checkArgument(expr.getTypeInfo().accept(TypeInfoUtils.booleanTypeInfo));
             other = new ExprNodeConstantDesc(expr.getTypeInfo(), true);
           } else {
             // Functions like NVL, COALESCE, CASE can change a 

@@ -419,7 +419,7 @@ public class TypeCheckProcFactory {
         str = BaseSemanticAnalyzer.unescapeIdentifier(expr.getText().toLowerCase());
         break;
       }
-      return new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, str);
+      return new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, str);
     }
 
   }
@@ -465,7 +465,7 @@ public class TypeCheckProcFactory {
       default:
         assert false;
       }
-      return new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, bool);
+      return new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, bool);
     }
 
   }
@@ -505,12 +505,12 @@ public class TypeCheckProcFactory {
       try {
         // todo replace below with joda-time, which supports timezone
         if (expr.getType() == HiveParser.TOK_DATELITERAL) {
-          PrimitiveTypeInfo typeInfo = TypeInfoFactory.dateTypeInfo;
+          PrimitiveTypeInfo typeInfo = TypeInfoUtils.dateTypeInfo;
           return new ExprNodeConstantDesc(typeInfo,
               Date.valueOf(timeString));
         }
         if (expr.getType() == HiveParser.TOK_TIMESTAMPLITERAL) {
-          return new ExprNodeConstantDesc(TypeInfoFactory.timestampTypeInfo,
+          return new ExprNodeConstantDesc(TypeInfoUtils.timestampTypeInfo,
               Timestamp.valueOf(timeString));
         }
         if (expr.getType() == HiveParser.TOK_TIMESTAMPLOCALTZLITERAL) {
@@ -558,31 +558,31 @@ public class TypeCheckProcFactory {
       try {
         switch (expr.getType()) {
           case HiveParser.TOK_INTERVAL_YEAR_MONTH_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalYearMonthTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalYearMonthTypeInfo,
                 HiveIntervalYearMonth.valueOf(intervalString));
           case HiveParser.TOK_INTERVAL_DAY_TIME_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo,
                 HiveIntervalDayTime.valueOf(intervalString));
           case HiveParser.TOK_INTERVAL_YEAR_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalYearMonthTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalYearMonthTypeInfo,
                 new HiveIntervalYearMonth(Integer.parseInt(intervalString), 0));
           case HiveParser.TOK_INTERVAL_MONTH_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalYearMonthTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalYearMonthTypeInfo,
                 new HiveIntervalYearMonth(0, Integer.parseInt(intervalString)));
           case HiveParser.TOK_INTERVAL_DAY_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo,
                 new HiveIntervalDayTime(Integer.parseInt(intervalString), 0, 0, 0, 0));
           case HiveParser.TOK_INTERVAL_HOUR_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo,
                 new HiveIntervalDayTime(0, Integer.parseInt(intervalString), 0, 0, 0));
           case HiveParser.TOK_INTERVAL_MINUTE_LITERAL:
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo,
                 new HiveIntervalDayTime(0, 0, Integer.parseInt(intervalString), 0, 0));
           case HiveParser.TOK_INTERVAL_SECOND_LITERAL:
             BigDecimal bd = new BigDecimal(intervalString);
             BigDecimal bdSeconds = new BigDecimal(bd.toBigInteger());
             BigDecimal bdNanos = bd.subtract(bdSeconds);
-            return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo,
+            return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo,
                 new HiveIntervalDayTime(0, 0, 0, bdSeconds.intValueExact(),
                     bdNanos.multiply(NANOS_PER_SEC_BD).intValue()));
           default:
@@ -962,7 +962,7 @@ public class TypeCheckProcFactory {
         if (myt.getCategory() == Category.LIST) {
           // Only allow integer index for now
           if (!TypeInfoUtils.implicitConvertible(children.get(1).getTypeInfo(),
-              TypeInfoFactory.intTypeInfo)) {
+              TypeInfoUtils.intTypeInfo)) {
             throw new SemanticException(SemanticAnalyzer.generateErrorMessage(
                   expr, ErrorMsg.INVALID_ARRAYINDEX_TYPE.getMsg()));
           }
@@ -1467,13 +1467,13 @@ public class TypeCheckProcFactory {
       //For now because subquery is only supported in filter
       // we will create subquery expression of boolean type
       if(isEXISTS) {
-        return new ExprNodeSubQueryDesc(TypeInfoFactory.booleanTypeInfo, subqueryRel,
+        return new ExprNodeSubQueryDesc(TypeInfoUtils.booleanTypeInfo, subqueryRel,
                 ExprNodeSubQueryDesc.SubqueryType.EXISTS);
       }
       else if(isIN) {
         assert(nodeOutputs[2] != null);
         ExprNodeDesc lhs = (ExprNodeDesc)nodeOutputs[2];
-        return new ExprNodeSubQueryDesc(TypeInfoFactory.booleanTypeInfo, subqueryRel,
+        return new ExprNodeSubQueryDesc(TypeInfoUtils.booleanTypeInfo, subqueryRel,
                 ExprNodeSubQueryDesc.SubqueryType.IN, lhs);
       }
       else if(isScalar){

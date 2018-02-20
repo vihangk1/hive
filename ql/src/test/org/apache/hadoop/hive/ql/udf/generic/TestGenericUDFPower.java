@@ -31,6 +31,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -55,7 +56,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(16), new Double(res.get()));
   }
@@ -77,7 +78,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.doubleTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.doubleTypeInfo);
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(3.14 * 3.14), new Double(res.get()));
   }
@@ -98,7 +99,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(4.5 * 4.5 * 4.5 * 4.5), new Double(res.get()));
   }
@@ -119,7 +120,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(1380.3842646028852), new Double(res.get()));
    }
@@ -140,7 +141,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.doubleTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.doubleTypeInfo);
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(0.10475656017578482), new Double(res.get()));
   }
@@ -161,7 +162,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.doubleTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.doubleTypeInfo);
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(0.009065844089438033), new Double(res.get()));
   }
@@ -182,7 +183,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals("Unexpected result", new Double(-4.52 * 4.52 * 4.52), new Double(res.get()), 1e-6);
   }
@@ -203,7 +204,7 @@ public class TestGenericUDFPower {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(1.9214203800477838E-4), new Double(res.get()));
   }

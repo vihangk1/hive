@@ -23,16 +23,16 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class TestGenericUDAFCorrelation extends TestCase {
 
   public void testCorr() throws HiveException {
     GenericUDAFCorrelation corr = new GenericUDAFCorrelation();
     GenericUDAFEvaluator eval1 = corr.getEvaluator(
-        new TypeInfo[]{TypeInfoFactory.doubleTypeInfo,TypeInfoFactory.doubleTypeInfo });
+        new TypeInfo[]{ TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.doubleTypeInfo });
     GenericUDAFEvaluator eval2 = corr.getEvaluator(
-        new TypeInfo[]{TypeInfoFactory.doubleTypeInfo,TypeInfoFactory.doubleTypeInfo });
+        new TypeInfo[]{ TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.doubleTypeInfo });
 
     ObjectInspector poi1 = eval1.init(GenericUDAFEvaluator.Mode.PARTIAL1,
         new ObjectInspector[] {PrimitiveObjectInspectorFactory.javaDoubleObjectInspector,

@@ -24,7 +24,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredJavaObject;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.Text;
 
@@ -35,7 +35,7 @@ public class TestGenericUDFRegexp extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text regexText = new Text("^fo");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, regexText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, regexText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -53,7 +53,7 @@ public class TestGenericUDFRegexp extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text regexText = new Text("");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, regexText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, regexText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -70,7 +70,7 @@ public class TestGenericUDFRegexp extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text regexText = null;
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, regexText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, regexText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);

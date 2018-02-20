@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.UnionTypeInfo;
 
 import com.google.common.base.Function;
@@ -313,23 +314,23 @@ public class TypeConverter {
   public static TypeInfo convertPrimitiveType(RelDataType rType) {
     switch (rType.getSqlTypeName()) {
     case BOOLEAN:
-      return TypeInfoFactory.booleanTypeInfo;
+      return TypeInfoUtils.booleanTypeInfo;
     case TINYINT:
-      return TypeInfoFactory.byteTypeInfo;
+      return TypeInfoUtils.byteTypeInfo;
     case SMALLINT:
-      return TypeInfoFactory.shortTypeInfo;
+      return TypeInfoUtils.shortTypeInfo;
     case INTEGER:
-      return TypeInfoFactory.intTypeInfo;
+      return TypeInfoUtils.intTypeInfo;
     case BIGINT:
-      return TypeInfoFactory.longTypeInfo;
+      return TypeInfoUtils.longTypeInfo;
     case FLOAT:
-      return TypeInfoFactory.floatTypeInfo;
+      return TypeInfoUtils.floatTypeInfo;
     case DOUBLE:
-      return TypeInfoFactory.doubleTypeInfo;
+      return TypeInfoUtils.doubleTypeInfo;
     case DATE:
-      return TypeInfoFactory.dateTypeInfo;
+      return TypeInfoUtils.dateTypeInfo;
     case TIMESTAMP:
-      return TypeInfoFactory.timestampTypeInfo;
+      return TypeInfoUtils.timestampTypeInfo;
     case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
       HiveConf conf;
       try {
@@ -341,7 +342,7 @@ public class TypeConverter {
     case INTERVAL_YEAR:
     case INTERVAL_MONTH:
     case INTERVAL_YEAR_MONTH:
-      return TypeInfoFactory.intervalYearMonthTypeInfo;
+      return TypeInfoUtils.intervalYearMonthTypeInfo;
     case INTERVAL_DAY:
     case INTERVAL_DAY_HOUR:
     case INTERVAL_DAY_MINUTE:
@@ -352,9 +353,9 @@ public class TypeConverter {
     case INTERVAL_MINUTE:
     case INTERVAL_MINUTE_SECOND:
     case INTERVAL_SECOND:
-      return TypeInfoFactory.intervalDayTimeTypeInfo;
+      return TypeInfoUtils.intervalDayTimeTypeInfo;
     case BINARY:
-      return TypeInfoFactory.binaryTypeInfo;
+      return TypeInfoUtils.binaryTypeInfo;
     case DECIMAL:
       return TypeInfoFactory.getDecimalTypeInfo(rType.getPrecision(), rType.getScale());
     case VARCHAR:
@@ -370,7 +371,7 @@ public class TypeConverter {
       else
         return TypeInfoFactory.getCharTypeInfo(charLength);
     default:
-      return TypeInfoFactory.voidTypeInfo;
+      return TypeInfoUtils.voidTypeInfo;
     }
 
   }

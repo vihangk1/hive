@@ -29,7 +29,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFMax;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class TestStreamingMax {
       int numFollowing, Iterator<Long> outVals) throws HiveException {
 
     GenericUDAFMax fnR = new GenericUDAFMax();
-    TypeInfo[] inputTypes = { TypeInfoFactory.longTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.longTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableLongObjectInspector };
 
     LongWritable[] in = new LongWritable[1];

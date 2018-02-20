@@ -53,7 +53,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFIn;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPAnd;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFStruct;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * This optimization will take a Filter expression, and if its predicate contains
@@ -108,7 +108,7 @@ public class PartitionColumnsSeparator extends Transform {
         subExpr.add(predicate);
         subExpr.add(newPredicate);
         ExprNodeGenericFuncDesc newFilterPredicate = new ExprNodeGenericFuncDesc(
-                TypeInfoFactory.booleanTypeInfo,
+                TypeInfoUtils.booleanTypeInfo,
                 FunctionRegistry.getFunctionInfo(AND_UDF).getGenericUDF(), subExpr);
         filterOp.getConf().setPredicate(newFilterPredicate);
       }
@@ -503,7 +503,7 @@ public class PartitionColumnsSeparator extends Transform {
 
         // Add the newly generated IN clause to subExpr.
         subExpr.add(new ExprNodeGenericFuncDesc(
-          TypeInfoFactory.booleanTypeInfo, FunctionRegistry.
+          TypeInfoUtils.booleanTypeInfo, FunctionRegistry.
           getFunctionInfo(IN_UDF).getGenericUDF(), currInStructExprList));
       }
       /***************************************************************************************\
@@ -518,7 +518,7 @@ public class PartitionColumnsSeparator extends Transform {
       // Return the new expression containing only partition columns
       // after concatenating them with AND operator
       return new ExprNodeGenericFuncDesc(
-        TypeInfoFactory.booleanTypeInfo,
+        TypeInfoUtils.booleanTypeInfo,
         FunctionRegistry.getFunctionInfo(AND_UDF).getGenericUDF(), subExpr);
     }
   }

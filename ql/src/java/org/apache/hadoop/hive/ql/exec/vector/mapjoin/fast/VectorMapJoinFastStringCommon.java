@@ -23,7 +23,7 @@ import java.io.IOException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableDeserializeRead;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BytesWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class VectorMapJoinFastStringCommon {
 
   public VectorMapJoinFastStringCommon(boolean isOuterJoin) {
     this.isOuterJoin = isOuterJoin;
-    PrimitiveTypeInfo[] primitiveTypeInfos = { TypeInfoFactory.stringTypeInfo };
+    PrimitiveTypeInfo[] primitiveTypeInfos = { TypeInfoUtils.stringTypeInfo };
     keyBinarySortableDeserializeRead =
         new BinarySortableDeserializeRead(
             primitiveTypeInfos,

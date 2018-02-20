@@ -19,7 +19,7 @@ package org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive;
 
 import org.apache.hadoop.hive.serde2.lazy.LazyBoolean;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.BooleanObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BooleanWritable;
 
 /**
@@ -32,7 +32,7 @@ public class LazyBooleanObjectInspector extends
   private boolean extendedLiteral = false;
 
   LazyBooleanObjectInspector() {
-    super(TypeInfoFactory.booleanTypeInfo);
+    super(TypeInfoUtils.booleanTypeInfo);
   }
 
   @Override

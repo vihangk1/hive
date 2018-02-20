@@ -29,7 +29,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class CustomSerDe5 extends CustomSerDe4 {
@@ -54,10 +53,10 @@ public class CustomSerDe5 extends CustomSerDe4 {
       List<ObjectInspector> columnOIs = new ArrayList<ObjectInspector>(
           columnNames.size());
       for (int c = 0; c < numColumns; c++) {
-        if (columnTypes.get(c).equals(TypeInfoFactory.stringTypeInfo)) {
+        if (columnTypes.get(c).equals(TypeInfoUtils.stringTypeInfo)) {
           columnOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
         }
-        else if (columnTypes.get(c).equals(TypeInfoFactory.doubleTypeInfo)) {
+        else if (columnTypes.get(c).equals(TypeInfoUtils.doubleTypeInfo)) {
           columnOIs.add(PrimitiveObjectInspectorFactory.javaDoubleObjectInspector);
         }
         else {

@@ -18,18 +18,13 @@
 
 package org.apache.hadoop.hive.ql.exec;
 
-import java.util.Arrays;
-
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.serde2.lazy.LazyDouble;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectsEqualComparer;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 
 public class KeyWrapperFactory {
@@ -44,9 +39,9 @@ public class KeyWrapperFactory {
   public KeyWrapper getKeyWrapper() {
     if (keyFields.length == 1
         && TypeInfoUtils.getTypeInfoFromObjectInspector(keyObjectInspectors[0]).equals(
-            TypeInfoFactory.stringTypeInfo)) {
+            TypeInfoUtils.stringTypeInfo)) {
       assert(TypeInfoUtils.getTypeInfoFromObjectInspector(currentKeyObjectInspectors[0]).equals(
-            TypeInfoFactory.stringTypeInfo));
+            TypeInfoUtils.stringTypeInfo));
       soi_new = (StringObjectInspector) keyObjectInspectors[0];
       soi_copy = (StringObjectInspector) currentKeyObjectInspectors[0];
       return new TextKeyWrapper(false);

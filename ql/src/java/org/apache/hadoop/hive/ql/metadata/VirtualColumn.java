@@ -40,15 +40,15 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 @InterfaceAudience.Private
 public enum VirtualColumn {
-  FILENAME("INPUT__FILE__NAME", TypeInfoFactory.stringTypeInfo),
-  BLOCKOFFSET("BLOCK__OFFSET__INSIDE__FILE", TypeInfoFactory.longTypeInfo),
-  ROWOFFSET("ROW__OFFSET__INSIDE__BLOCK", TypeInfoFactory.longTypeInfo),
+  FILENAME("INPUT__FILE__NAME", TypeInfoUtils.stringTypeInfo),
+  BLOCKOFFSET("BLOCK__OFFSET__INSIDE__FILE", TypeInfoUtils.longTypeInfo),
+  ROWOFFSET("ROW__OFFSET__INSIDE__BLOCK", TypeInfoUtils.longTypeInfo),
 
-  RAWDATASIZE("RAW__DATA__SIZE", TypeInfoFactory.longTypeInfo),
+  RAWDATASIZE("RAW__DATA__SIZE", TypeInfoUtils.longTypeInfo),
   /**
    * {@link org.apache.hadoop.hive.ql.io.RecordIdentifier} 
    */
@@ -61,7 +61,7 @@ public enum VirtualColumn {
    * set if that column has been aggregated in that row. Otherwise the
    * value is "0".  Returns the decimal representation of the bit vector.
    */
-  GROUPINGID("GROUPING__ID", TypeInfoFactory.longTypeInfo);
+  GROUPINGID("GROUPING__ID", TypeInfoUtils.longTypeInfo);
 
   public static final ImmutableSet<String> VIRTUAL_COLUMN_NAMES =
       ImmutableSet.of(FILENAME.getName(), BLOCKOFFSET.getName(), ROWOFFSET.getName(),

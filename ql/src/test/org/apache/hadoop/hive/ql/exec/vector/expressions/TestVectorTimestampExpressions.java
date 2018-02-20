@@ -26,12 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hive.common.type.RandomTypeUtil;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -49,9 +47,8 @@ import org.apache.hadoop.hive.ql.udf.UDFWeekOfYear;
 import org.apache.hadoop.hive.ql.udf.UDFYear;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Test;
 
@@ -240,10 +237,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf = null;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFYearTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFYearString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -334,10 +331,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf = null;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFDayOfMonthTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFDayOfMonthString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -420,10 +417,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf = null;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFHourTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFHourString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -507,10 +504,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf = null;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFMinuteTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFMinuteString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -593,10 +590,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFMonthTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFMonthString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -679,10 +676,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFSecondTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFSecondString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -767,10 +764,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFUnixTimeStampTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFUnixTimeStampString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);
@@ -854,10 +851,10 @@ public class TestVectorTimestampExpressions {
     VectorExpression udf;
     if (testType == TestType.TIMESTAMP_LONG) {
       udf = new VectorUDFWeekOfYearTimestamp(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo});
     } else {
       udf = new VectorUDFWeekOfYearString(0, 1);
-      udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+      udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     }
     udf.transientInit();
     udf.evaluate(batch);

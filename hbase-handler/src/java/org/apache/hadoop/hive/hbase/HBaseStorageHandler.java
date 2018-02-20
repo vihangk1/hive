@@ -42,7 +42,6 @@ import org.apache.hadoop.hive.hbase.ColumnMappings.ColumnMapping;
 import org.apache.hadoop.hive.metastore.HiveMetaHook;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
-import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.index.IndexPredicateAnalyzer;
 import org.apache.hadoop.hive.ql.index.IndexSearchCondition;
@@ -63,7 +62,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveGrouping;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.JobConf;
@@ -482,7 +481,7 @@ public class HBaseStorageHandler extends DefaultStorageHandler
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     children.add(analyzer.translateSearchConditions(searchConditions));
     children.add(inputExpr);
-    return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
             FunctionRegistry.getGenericUDFForAnd(), children);
   }
 
@@ -494,7 +493,7 @@ public class HBaseStorageHandler extends DefaultStorageHandler
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     children.add(analyzer.translateOriginalConditions(searchConditions));
     children.add(inputExpr);
-    return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
             FunctionRegistry.getGenericUDFForAnd(), children);
   }
 

@@ -73,12 +73,11 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.plan.FileSinkDesc;
 import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.hive.ql.plan.MapredWork;
-import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFFromUtcTimestamp;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.InputSplit;
@@ -137,7 +136,7 @@ public class TestUtilities {
     ExprNodeConstantDesc constant = new ExprNodeConstantDesc(ts);
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(1);
     children.add(constant);
-    ExprNodeGenericFuncDesc desc = new ExprNodeGenericFuncDesc(TypeInfoFactory.timestampTypeInfo,
+    ExprNodeGenericFuncDesc desc = new ExprNodeGenericFuncDesc(TypeInfoUtils.timestampTypeInfo,
         new GenericUDFFromUtcTimestamp(), children);
     assertEquals(desc.getExprString(), SerializationUtilities.deserializeExpression(
         SerializationUtilities.serializeExpression(desc)).getExprString());

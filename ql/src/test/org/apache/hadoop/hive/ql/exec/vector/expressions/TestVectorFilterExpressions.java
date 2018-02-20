@@ -55,7 +55,7 @@ import org.apache.hadoop.hive.ql.exec.vector.expressions.gen.FilterTimestampColu
 import org.apache.hadoop.hive.ql.exec.vector.expressions.gen.LongColAddLongScalar;
 import org.apache.hadoop.hive.ql.exec.vector.util.VectorizedRowGroupGenUtil;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -652,7 +652,7 @@ public class TestVectorFilterExpressions {
     long[] inList = {5, 20};
     FilterLongColumnInList f = new FilterLongColumnInList(0);
     f.setInListValues(inList);
-    f.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.longTypeInfo});
+    f.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.longTypeInfo});
     f.transientInit();
     VectorExpression expr1 = f;
 
@@ -755,7 +755,7 @@ public class TestVectorFilterExpressions {
     double[] inList = {5.0, 20.2};
     FilterDoubleColumnInList f = new FilterDoubleColumnInList(0);
     f.setInListValues(inList);
-    f.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.doubleTypeInfo});
+    f.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.doubleTypeInfo});
     f.transientInit();
     VectorExpression expr1 = f;
 

@@ -33,7 +33,7 @@ import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 
 public class TestStreamingAvg {
@@ -42,7 +42,7 @@ public class TestStreamingAvg {
       int numFollowing, Iterator<Double> outVals) throws HiveException {
 
     GenericUDAFAverage fnR = new GenericUDAFAverage();
-    TypeInfo[] inputTypes = { TypeInfoFactory.doubleTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.doubleTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableDoubleObjectInspector };
 
     DoubleWritable[] in = new DoubleWritable[1];
@@ -58,7 +58,7 @@ public class TestStreamingAvg {
       throws HiveException {
 
     GenericUDAFAverage fnR = new GenericUDAFAverage();
-    TypeInfo[] inputTypes = { PrimitiveObjectInspectorFactory.decimalTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.decimalTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableHiveDecimalObjectInspector };
 
     HiveDecimalWritable[] in = new HiveDecimalWritable[1];

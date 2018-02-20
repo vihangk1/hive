@@ -75,6 +75,7 @@ import org.apache.hadoop.hive.accumulo.serde.TooManyAccumuloColumnsException;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.InputSplit;
@@ -126,8 +127,8 @@ public class TestHiveAccumuloTableInputFormat {
                                                                     // required by input format.
 
     columnNames = Arrays.asList("name", "sid", "dgrs", "mills");
-    columnTypes = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.doubleTypeInfo, TypeInfoFactory.longTypeInfo);
+    columnTypes = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.longTypeInfo);
     conf.set(AccumuloSerDeParameters.COLUMN_MAPPINGS, "cf:name,cf:sid,cf:dgrs,cf:mills");
     conf.set(serdeConstants.LIST_COLUMNS, "name,sid,dgrs,mills");
     conf.set(serdeConstants.LIST_COLUMN_TYPES, "string,int,double,bigint");
@@ -439,19 +440,19 @@ public class TestHiveAccumuloTableInputFormat {
 
     // Row ID
     mappings.add(new HiveAccumuloRowIdColumnMapping(AccumuloHiveConstants.ROWID,
-        ColumnEncoding.STRING, "row", TypeInfoFactory.stringTypeInfo.toString()));
+        ColumnEncoding.STRING, "row", TypeInfoUtils.stringTypeInfo.toString()));
 
     // Some cf:cq
     mappings.add(new HiveAccumuloColumnMapping("person", "name", ColumnEncoding.STRING, "col1",
-        TypeInfoFactory.stringTypeInfo.toString()));
+        TypeInfoUtils.stringTypeInfo.toString()));
     mappings.add(new HiveAccumuloColumnMapping("person", "age", ColumnEncoding.STRING, "col2",
-        TypeInfoFactory.stringTypeInfo.toString()));
+        TypeInfoUtils.stringTypeInfo.toString()));
     mappings.add(new HiveAccumuloColumnMapping("person", "height", ColumnEncoding.STRING, "col3",
-        TypeInfoFactory.stringTypeInfo.toString()));
+        TypeInfoUtils.stringTypeInfo.toString()));
 
     // Bare cf
     mappings.add(new HiveAccumuloColumnMapping("city", "name", ColumnEncoding.STRING, "col4",
-        TypeInfoFactory.stringTypeInfo.toString()));
+        TypeInfoUtils.stringTypeInfo.toString()));
 
     columns.add(new Pair<Text,Text>(new Text("person"), new Text("name")));
     columns.add(new Pair<Text,Text>(new Text("person"), new Text("age")));
@@ -763,8 +764,8 @@ public class TestHiveAccumuloTableInputFormat {
   public void testMapColumnPairs() throws TooManyAccumuloColumnsException {
     ColumnMapper columnMapper = new ColumnMapper(":rowID,cf:*",
         conf.get(AccumuloSerDeParameters.DEFAULT_STORAGE_TYPE), Arrays.asList("row", "col"),
-        Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo, TypeInfoFactory.getMapTypeInfo(
-            TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo)));
+        Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo, TypeInfoFactory.getMapTypeInfo(
+            TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo)));
     Set<Pair<Text,Text>> pairs = inputformat.getPairCollection(columnMapper.getColumnMappings());
 
     Assert.assertEquals(1, pairs.size());

@@ -29,7 +29,7 @@ import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 
 public class TestGenericUDFDateFormat extends TestCase {
@@ -39,7 +39,7 @@ public class TestGenericUDFDateFormat extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text fmtText = new Text("EEEE");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, fmtText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, fmtText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -80,7 +80,7 @@ public class TestGenericUDFDateFormat extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableDateObjectInspector;
     Text fmtText = new Text("EEEE");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, fmtText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, fmtText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -100,7 +100,7 @@ public class TestGenericUDFDateFormat extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableTimestampObjectInspector;
     Text fmtText = new Text("EEEE");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, fmtText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, fmtText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -121,7 +121,7 @@ public class TestGenericUDFDateFormat extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text fmtText = null;
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, fmtText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, fmtText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -134,7 +134,7 @@ public class TestGenericUDFDateFormat extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text fmtText = new Text("Q");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, fmtText);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, fmtText);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);

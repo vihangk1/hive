@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -57,7 +58,7 @@ public class TestGenericUDFOPMultiply extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.shortTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.shortTypeInfo);
     ShortWritable res = (ShortWritable) udf.evaluate(args);
     Assert.assertEquals(24, res.get());
   }
@@ -79,7 +80,7 @@ public class TestGenericUDFOPMultiply extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.doubleTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.doubleTypeInfo);
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(123 * 456), new Double(res.get()));
   }
@@ -100,7 +101,7 @@ public class TestGenericUDFOPMultiply extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(45.0), new Double(res.get()));
   }
@@ -142,7 +143,7 @@ public class TestGenericUDFOPMultiply extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(oi.getTypeInfo(), TypeInfoFactory.floatTypeInfo);
+    Assert.assertEquals(oi.getTypeInfo(), TypeInfoUtils.floatTypeInfo);
     FloatWritable res = (FloatWritable) udf.evaluate(args);
     Assert.assertEquals(new Float(0.0), new Float(res.get()));
   }
@@ -163,7 +164,7 @@ public class TestGenericUDFOPMultiply extends AbstractTestGenericUDFOPNumeric {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.doubleTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.doubleTypeInfo, oi.getTypeInfo());
     DoubleWritable res = (DoubleWritable) udf.evaluate(args);
     Assert.assertEquals(new Double(17509.9644), new Double(res.get()));
   }

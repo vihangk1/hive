@@ -26,7 +26,7 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.udf.UDFType;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 
 // This function is not a deterministic function, but a runtime constant.
@@ -53,7 +53,7 @@ public class UDFCurrentDB extends GenericUDF {
       database = SessionState.get().getCurrentDatabase();
     }
     return PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(
-        TypeInfoFactory.stringTypeInfo, new Text(database));
+        TypeInfoUtils.stringTypeInfo, new Text(database));
   }
 
   @Override

@@ -68,7 +68,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TimestampLocalTZTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,42 +165,42 @@ public class SqlFunctionConverter {
     if (op.kind == SqlKind.CAST) {
       TypeInfo castType = TypeConverter.convert(dt);
 
-      if (castType.equals(TypeInfoFactory.byteTypeInfo)) {
+      if (castType.equals(TypeInfoUtils.byteTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("tinyint");
       } else if (castType instanceof CharTypeInfo) {
         castUDF = handleCastForParameterizedType(castType, FunctionRegistry.getFunctionInfo("char"));
       } else if (castType instanceof VarcharTypeInfo) {
         castUDF = handleCastForParameterizedType(castType,
             FunctionRegistry.getFunctionInfo("varchar"));
-      } else if (castType.equals(TypeInfoFactory.stringTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.stringTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("string");
-      } else if (castType.equals(TypeInfoFactory.booleanTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.booleanTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("boolean");
-      } else if (castType.equals(TypeInfoFactory.shortTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.shortTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("smallint");
-      } else if (castType.equals(TypeInfoFactory.intTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.intTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("int");
-      } else if (castType.equals(TypeInfoFactory.longTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.longTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("bigint");
-      } else if (castType.equals(TypeInfoFactory.floatTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.floatTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("float");
-      } else if (castType.equals(TypeInfoFactory.doubleTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.doubleTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("double");
-      } else if (castType.equals(TypeInfoFactory.timestampTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.timestampTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("timestamp");
       } else if (castType instanceof TimestampLocalTZTypeInfo) {
         castUDF = handleCastForParameterizedType(castType,
             FunctionRegistry.getFunctionInfo(serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME));
-      } else if (castType.equals(TypeInfoFactory.dateTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.dateTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("date");
       } else if (castType instanceof DecimalTypeInfo) {
         castUDF = handleCastForParameterizedType(castType,
             FunctionRegistry.getFunctionInfo("decimal"));
-      } else if (castType.equals(TypeInfoFactory.binaryTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.binaryTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo("binary");
-      } else if (castType.equals(TypeInfoFactory.intervalDayTimeTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.intervalDayTimeTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo(serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME);
-      } else if (castType.equals(TypeInfoFactory.intervalYearMonthTypeInfo)) {
+      } else if (castType.equals(TypeInfoUtils.intervalYearMonthTypeInfo)) {
         castUDF = FunctionRegistry.getFunctionInfo(serdeConstants.INTERVAL_YEAR_MONTH_TYPE_NAME);
       } else
         throw new IllegalStateException("Unexpected type : " + castType.getQualifiedName());

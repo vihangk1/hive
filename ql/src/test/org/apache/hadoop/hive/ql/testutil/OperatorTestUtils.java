@@ -33,12 +33,12 @@ import org.apache.hadoop.hive.serde2.objectinspector.InspectableObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class OperatorTestUtils {
 
   public static ExprNodeColumnDesc getStringColumn(String columnName) {
-    return new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, columnName, "", false);
+    return new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, columnName, "", false);
   }
 
   /**

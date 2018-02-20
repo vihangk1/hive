@@ -19,7 +19,7 @@ package org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive;
 
 import org.apache.hadoop.hive.serde2.lazy.LazyString;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 
 /**
@@ -36,7 +36,7 @@ public class LazyStringObjectInspector extends
   }
 
   LazyStringObjectInspector(boolean escaped, byte escapeChar) {
-    super(TypeInfoFactory.stringTypeInfo);
+    super(TypeInfoUtils.stringTypeInfo);
     this.escaped = escaped;
     this.escapeChar = escapeChar;
   }

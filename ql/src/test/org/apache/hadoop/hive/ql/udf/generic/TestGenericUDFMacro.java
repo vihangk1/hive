@@ -26,10 +26,9 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeConstantDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredJavaObject;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,9 +51,9 @@ public class TestGenericUDFMacro {
     colNames = new ArrayList<String>();
     colTypes = new ArrayList<TypeInfo>();
     colNames.add("x");
-    colTypes.add(TypeInfoFactory.intTypeInfo);
+    colTypes.add(TypeInfoUtils.intTypeInfo);
     colNames.add("y");
-    colTypes.add(TypeInfoFactory.intTypeInfo);
+    colTypes.add(TypeInfoUtils.intTypeInfo);
     x = new IntWritable(1);
     y = new IntWritable(2);
     expected = x.get() + y.get();
@@ -62,10 +61,10 @@ public class TestGenericUDFMacro {
     inspectors = new ObjectInspector[] {
         PrimitiveObjectInspectorFactory.
           getPrimitiveWritableConstantObjectInspector(
-              TypeInfoFactory.intTypeInfo, x),
+              TypeInfoUtils.intTypeInfo, x),
         PrimitiveObjectInspectorFactory.
           getPrimitiveWritableConstantObjectInspector(
-              TypeInfoFactory.intTypeInfo, y),
+              TypeInfoUtils.intTypeInfo, y),
     };
     arguments = new DeferredObject[] {
         new DeferredJavaObject(x),

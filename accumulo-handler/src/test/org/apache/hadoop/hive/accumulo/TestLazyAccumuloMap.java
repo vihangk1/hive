@@ -60,7 +60,7 @@ public class TestLazyAccumuloMap {
 
     HiveAccumuloMapColumnMapping mapping = new HiveAccumuloMapColumnMapping("cf1", null,
         ColumnEncoding.STRING, ColumnEncoding.STRING, "column", TypeInfoFactory.getMapTypeInfo(
-            TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo).toString());
+            TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo).toString());
 
     // Map of Integer to String
     Text nullSequence = new Text("\\N");
@@ -92,7 +92,7 @@ public class TestLazyAccumuloMap {
 
     HiveAccumuloMapColumnMapping mapping = new HiveAccumuloMapColumnMapping("cf1", null,
         ColumnEncoding.STRING, ColumnEncoding.STRING, "column", TypeInfoFactory.getMapTypeInfo(
-            TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo).toString());
+            TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo).toString());
 
     // Map of Integer to Integer
     Text nullSequence = new Text("\\N");
@@ -128,7 +128,7 @@ public class TestLazyAccumuloMap {
 
     HiveAccumuloMapColumnMapping mapping = new HiveAccumuloMapColumnMapping("cf1", null,
         ColumnEncoding.BINARY, ColumnEncoding.BINARY, "column", TypeInfoFactory.getMapTypeInfo(
-            TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo).toString());
+            TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo).toString());
 
     // Map of Integer to String
     Text nullSequence = new Text("\\N");
@@ -164,7 +164,7 @@ public class TestLazyAccumuloMap {
 
     HiveAccumuloMapColumnMapping mapping = new HiveAccumuloMapColumnMapping("cf1", null,
         ColumnEncoding.BINARY, ColumnEncoding.STRING, "column", TypeInfoFactory.getMapTypeInfo(
-            TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo).toString());
+            TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo).toString());
 
     // Map of Integer to String
     Text nullSequence = new Text("\\N");

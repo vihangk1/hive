@@ -37,10 +37,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.HiveChar;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.common.type.HiveVarchar;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Job;
@@ -211,7 +210,7 @@ abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata {
       if(hcatFieldSchema != null && hcatFieldSchema.getTypeInfo() != null) {
         return new HCatFieldSchema(fSchema.alias, hcatFieldSchema.getTypeInfo(), null);
       }
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.stringTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.stringTypeInfo, null);
     case DataType.INTEGER:
       if (hcatFieldSchema != null) {
         if (!SUPPORTED_INTEGER_CONVERSIONS.contains(hcatFieldSchema.getType())) {
@@ -220,29 +219,29 @@ abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata {
         }
         return new HCatFieldSchema(fSchema.alias, hcatFieldSchema.getTypeInfo(), null);
       }
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.intTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.intTypeInfo, null);
     case DataType.LONG:
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.longTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.longTypeInfo, null);
     case DataType.FLOAT:
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.floatTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.floatTypeInfo, null);
     case DataType.DOUBLE:
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.doubleTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.doubleTypeInfo, null);
     case DataType.BYTEARRAY:
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.binaryTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.binaryTypeInfo, null);
     case DataType.BOOLEAN:
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.booleanTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.booleanTypeInfo, null);
     case DataType.DATETIME:
       //Pig DATETIME can map to DATE or TIMESTAMP (see HCatBaseStorer#validateSchema()) which
       //is controlled by Hive target table information
       if(hcatFieldSchema != null && hcatFieldSchema.getTypeInfo() != null) {
         return new HCatFieldSchema(fSchema.alias, hcatFieldSchema.getTypeInfo(), null);
       }
-      return new HCatFieldSchema(fSchema.alias, TypeInfoFactory.timestampTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.timestampTypeInfo, null);
     case DataType.BIGDECIMAL:
       if(hcatFieldSchema != null && hcatFieldSchema.getTypeInfo() != null) {
         return new HCatFieldSchema(fSchema.alias, hcatFieldSchema.getTypeInfo(), null);
       }
-      return new HCatFieldSchema(fSchema.alias, PrimitiveObjectInspectorFactory.decimalTypeInfo, null);
+      return new HCatFieldSchema(fSchema.alias, TypeInfoUtils.decimalTypeInfo, null);
     case DataType.BAG:
       Schema bagSchema = fSchema.schema;
       List<HCatFieldSchema> arrFields = new ArrayList<HCatFieldSchema>(1);
@@ -279,10 +278,10 @@ abstract class HCatBaseStorer extends StoreFunc implements StoreMetadata {
       }
 
       // Column not found in target table. Its a new column. Its schema is map<string,string>
-      valFS = new HCatFieldSchema(fSchema.alias, TypeInfoFactory.stringTypeInfo, "");
+      valFS = new HCatFieldSchema(fSchema.alias, TypeInfoUtils.stringTypeInfo, "");
       valFSList.add(valFS);
       return HCatFieldSchema.createMapTypeFieldSchema(fSchema.alias,
-        TypeInfoFactory.stringTypeInfo, new HCatSchema(valFSList), "");
+        TypeInfoUtils.stringTypeInfo, new HCatSchema(valFSList), "");
     }
     case DataType.BIGINTEGER:
       //fall through; doesn't map to Hive/Hcat type; here for completeness

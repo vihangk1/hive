@@ -3195,7 +3195,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
       if (ExprNodeDescUtils.isNullConstant(c)) {
         // If filter condition is NULL, transform to FALSE
-        filterCond = new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, false);
+        filterCond = new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, false);
       }
     }
 
@@ -3639,11 +3639,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (!outputColNames && !outputColSchemas) {
       String intName = getColumnInternalName(0);
       ColumnInfo colInfo = new ColumnInfo(intName,
-          TypeInfoFactory.stringTypeInfo, null, false);
+          TypeInfoUtils.stringTypeInfo, null, false);
       colInfo.setAlias("key");
       outputCols.add(colInfo);
       intName = getColumnInternalName(1);
-      colInfo = new ColumnInfo(intName, TypeInfoFactory.stringTypeInfo, null,
+      colInfo = new ColumnInfo(intName, TypeInfoUtils.stringTypeInfo, null,
           false);
       colInfo.setAlias("value");
       outputCols.add(colInfo);
@@ -3660,7 +3660,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           failIfColAliasExists(colAliasNamesDuplicateCheck, colAlias);
           String intName = getColumnInternalName(i);
           ColumnInfo colInfo = new ColumnInfo(intName,
-              TypeInfoFactory.stringTypeInfo, null, false);
+              TypeInfoUtils.stringTypeInfo, null, false);
           colInfo.setAlias(colAlias);
           outputCols.add(colInfo);
         }
@@ -4403,7 +4403,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       for(Map.Entry<String, String> partKeyVal : partSpec.entrySet()) {
         if (partKeyVal.getValue() == null) {
           targetTableColNames.add(partKeyVal.getKey());//these must be after non-partition cols
-          targetTableColTypes.add(TypeInfoFactory.stringTypeInfo);
+          targetTableColTypes.add(TypeInfoUtils.stringTypeInfo);
         }
       }
     }
@@ -5860,7 +5860,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         expressions.add(current);
         expressions.add(previous);
         ExprNodeDesc orExpr =
-            new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo, or, expressions);
+            new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo, or, expressions);
         previous = orExpr;
       } else {
         // If an expression does not have a where clause, there can be no common filter
@@ -7813,7 +7813,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     ExprNodeDesc column = new ExprNodeColumnDesc(rowFieldTypeInfo, rowField.getInternalName(),
         rowField.getTabAlias(), true);
     if (convert) {
-      column = ParseUtils.createConversionCast(column, TypeInfoFactory.intTypeInfo);
+      column = ParseUtils.createConversionCast(column, TypeInfoUtils.intTypeInfo);
     }
     ArrayList<ExprNodeDesc> rlist = new ArrayList<ExprNodeDesc>(1);
     rlist.add(column);
@@ -10389,13 +10389,13 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       throws SemanticException {
 
     ExprNodeDesc numeratorExpr = new ExprNodeConstantDesc(
-        TypeInfoFactory.intTypeInfo, Integer.valueOf(ts.getNumerator() - 1));
+        TypeInfoUtils.intTypeInfo, Integer.valueOf(ts.getNumerator() - 1));
 
     ExprNodeDesc denominatorExpr = new ExprNodeConstantDesc(
-        TypeInfoFactory.intTypeInfo, Integer.valueOf(ts.getDenominator()));
+        TypeInfoUtils.intTypeInfo, Integer.valueOf(ts.getDenominator()));
 
     ExprNodeDesc intMaxExpr = new ExprNodeConstantDesc(
-        TypeInfoFactory.intTypeInfo, Integer.valueOf(Integer.MAX_VALUE));
+        TypeInfoUtils.intTypeInfo, Integer.valueOf(Integer.MAX_VALUE));
 
     ArrayList<ExprNodeDesc> args = new ArrayList<ExprNodeDesc>();
     if (planExpr != null) {
@@ -10415,7 +10415,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     ExprNodeDesc equalsExpr = null;
     {
       ExprNodeDesc hashfnExpr = new ExprNodeGenericFuncDesc(
-          TypeInfoFactory.intTypeInfo, new GenericUDFHash(), args);
+          TypeInfoUtils.intTypeInfo, new GenericUDFHash(), args);
       assert (hashfnExpr != null);
       LOG.info("hashfnExpr = " + hashfnExpr);
       ExprNodeDesc andExpr = TypeCheckProcFactory.DefaultExprProcessor

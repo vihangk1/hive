@@ -45,7 +45,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -235,20 +234,20 @@ public abstract class GenericUDFBaseNumeric extends GenericUDFBaseBinary {
     // string types get converted to double
     if (PrimitiveObjectInspectorUtils.getPrimitiveGrouping(left.getPrimitiveCategory())
             == PrimitiveGrouping.STRING_GROUP) {
-      left = TypeInfoFactory.doubleTypeInfo;
+      left = TypeInfoUtils.doubleTypeInfo;
     }
     if (PrimitiveObjectInspectorUtils.getPrimitiveGrouping(right.getPrimitiveCategory())
         == PrimitiveGrouping.STRING_GROUP) {
-      right = TypeInfoFactory.doubleTypeInfo;
+      right = TypeInfoUtils.doubleTypeInfo;
     }    
 
     // Use type promotion
     PrimitiveCategory commonCat = FunctionRegistry.getPrimitiveCommonCategory(left, right);
     if (commonCat == PrimitiveCategory.DECIMAL) {
       // Hive 0.12 behavior where double * decimal -> decimal is gone.
-      return TypeInfoFactory.doubleTypeInfo;
+      return TypeInfoUtils.doubleTypeInfo;
     } else if (commonCat == null) {
-      return TypeInfoFactory.doubleTypeInfo;
+      return TypeInfoUtils.doubleTypeInfo;
     } else {
       return left.getPrimitiveCategory() == commonCat ? left : right;
     }

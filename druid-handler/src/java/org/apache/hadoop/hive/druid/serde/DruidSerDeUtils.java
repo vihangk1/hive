@@ -18,7 +18,7 @@
 package org.apache.hadoop.hive.druid.serde;
 
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,13 +46,13 @@ public final class DruidSerDeUtils {
     typeName = typeName.toUpperCase();
     switch (typeName) {
       case FLOAT_TYPE:
-        return TypeInfoFactory.floatTypeInfo;
+        return TypeInfoUtils.floatTypeInfo;
       case DOUBLE_TYPE:
-        return TypeInfoFactory.doubleTypeInfo;
+        return TypeInfoUtils.doubleTypeInfo;
       case LONG_TYPE:
-        return TypeInfoFactory.longTypeInfo;
+        return TypeInfoUtils.longTypeInfo;
       case STRING_TYPE:
-        return TypeInfoFactory.stringTypeInfo;
+        return TypeInfoUtils.stringTypeInfo;
       default:
         // This is a guard for special Druid types e.g. hyperUnique
         // (http://druid.io/docs/0.9.1.1/querying/aggregations.html#hyperunique-aggregator).
@@ -61,7 +61,7 @@ public final class DruidSerDeUtils {
         // dimensions e.g. with a select query. Thus, we print the warning and just read them
         // as String.
         LOG.warn("Transformation to STRING for unknown type " + typeName);
-        return TypeInfoFactory.stringTypeInfo;
+        return TypeInfoUtils.stringTypeInfo;
     }
   }
 
@@ -73,14 +73,14 @@ public final class DruidSerDeUtils {
       TimeFormatExtractionFn tfe = (TimeFormatExtractionFn) eds.getExtractionFn();
       if (tfe.getFormat() == null || tfe.getFormat().equals(ISO_TIME_FORMAT)) {
         // Timestamp (null or default used by FLOOR)
-        return TypeInfoFactory.timestampLocalTZTypeInfo;
+        return TypeInfoUtils.timestampLocalTZTypeInfo;
       } else {
         // EXTRACT from timestamp
-        return TypeInfoFactory.intTypeInfo;
+        return TypeInfoUtils.intTypeInfo;
       }
     }
     // Default
-    return TypeInfoFactory.stringTypeInfo;
+    return TypeInfoUtils.stringTypeInfo;
   }
 
 }

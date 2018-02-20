@@ -66,7 +66,6 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPOr;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -567,7 +566,7 @@ public class SkewJoinOptimizer extends Transform {
     private ExprNodeConstantDesc createConstDesc(
       String skewedValue, ExprNodeColumnDesc keyCol) {
       ObjectInspector inputOI = TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(
-        TypeInfoFactory.stringTypeInfo);
+        TypeInfoUtils.stringTypeInfo);
       ObjectInspector outputOI = TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(
         keyCol.getTypeInfo());
       Converter converter = ObjectInspectorConverters.getConverter(inputOI, outputOI);

@@ -48,6 +48,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
 import org.junit.Test;
@@ -95,8 +96,8 @@ public class TestAccumuloRowSerializer {
   @Test
   public void testBinarySerialization() throws IOException, SerDeException {
     List<String> columns = Arrays.asList("row", "cq1", "cq2", "cq3");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo, TypeInfoUtils.stringTypeInfo);
     List<String> typeNames = new ArrayList<String>(types.size());
     for (TypeInfo type : types) {
       typeNames.add(type.getTypeName());
@@ -164,8 +165,8 @@ public class TestAccumuloRowSerializer {
   @Test
   public void testVisibilityLabel() throws IOException, SerDeException {
     List<String> columns = Arrays.asList("row", "cq1", "cq2", "cq3");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo, TypeInfoUtils.stringTypeInfo);
     List<String> typeNames = new ArrayList<String>(types.size());
     for (TypeInfo type : types) {
       typeNames.add(type.getTypeName());
@@ -236,8 +237,8 @@ public class TestAccumuloRowSerializer {
   @Test
   public void testMapSerialization() throws IOException, SerDeException {
     List<String> columns = Arrays.asList("row", "col");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo, TypeInfoFactory
-        .getMapTypeInfo(TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo));
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo, TypeInfoFactory
+        .getMapTypeInfo(TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo));
     List<String> typeNames = new ArrayList<String>(types.size());
     for (TypeInfo type : types) {
       typeNames.add(type.getTypeName());

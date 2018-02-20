@@ -72,7 +72,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFRank.GenericUDAFRankEval
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPEqualOrLessThan;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPLessThan;
 import org.apache.hadoop.hive.serde2.Deserializer;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.mapred.JobConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -297,7 +297,7 @@ public final class OpProcFactory {
 
       ExprNodeConstantDesc constantExpr = (ExprNodeConstantDesc) fExpr.getChildren().get(1) ;
 
-      if ( constantExpr.getTypeInfo() != TypeInfoFactory.intTypeInfo ) {
+      if ( constantExpr.getTypeInfo() != TypeInfoUtils.intTypeInfo ) {
         return null;
       }
 

@@ -25,6 +25,7 @@ import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.common.type.DataTypePhysicalVariation;
@@ -46,7 +47,6 @@ import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.UnionTypeInfo;
 import org.apache.hadoop.io.Text;
 import org.apache.hive.common.util.TimestampParser;
@@ -185,7 +185,7 @@ public final class LazySimpleDeserializeRead extends DeserializeRead {
 
     public UnionComplexTypeHelper(Field complexField, Field[] fields) {
       super(complexField);
-      this.tagField = new Field(TypeInfoFactory.intTypeInfo);
+      this.tagField = new Field(TypeInfoUtils.intTypeInfo);
       this.fields = fields;
       fieldHaveParsedTag = false;
     }

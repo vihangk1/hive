@@ -42,7 +42,6 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
@@ -76,7 +75,7 @@ public class TestFunctionRegistry extends TestCase {
   TypeInfo maxVarchar;
   TypeInfo char5;
   TypeInfo char10;
-  TypeInfo decimalTypeInfo = PrimitiveObjectInspectorFactory.decimalTypeInfo;
+  TypeInfo decimalTypeInfo = TypeInfoUtils.decimalTypeInfo;
 
   @Override
   protected void setUp() {
@@ -94,35 +93,35 @@ public class TestFunctionRegistry extends TestCase {
   }
 
   public void testImplicitConversion() {
-    implicit(TypeInfoFactory.intTypeInfo, decimalTypeInfo, true);
-    implicit(TypeInfoFactory.longTypeInfo, decimalTypeInfo, true);
-    implicit(TypeInfoFactory.floatTypeInfo, decimalTypeInfo, false);
-    implicit(TypeInfoFactory.doubleTypeInfo, decimalTypeInfo, false);
-    implicit(TypeInfoFactory.stringTypeInfo, decimalTypeInfo, false);
-    implicit(TypeInfoFactory.dateTypeInfo, decimalTypeInfo, false);
-    implicit(TypeInfoFactory.timestampTypeInfo, decimalTypeInfo, false);
-    implicit(varchar10, TypeInfoFactory.stringTypeInfo, true);
-    implicit(TypeInfoFactory.stringTypeInfo, varchar10, true);
+    implicit(TypeInfoUtils.intTypeInfo, decimalTypeInfo, true);
+    implicit(TypeInfoUtils.longTypeInfo, decimalTypeInfo, true);
+    implicit(TypeInfoUtils.floatTypeInfo, decimalTypeInfo, false);
+    implicit(TypeInfoUtils.doubleTypeInfo, decimalTypeInfo, false);
+    implicit(TypeInfoUtils.stringTypeInfo, decimalTypeInfo, false);
+    implicit(TypeInfoUtils.dateTypeInfo, decimalTypeInfo, false);
+    implicit(TypeInfoUtils.timestampTypeInfo, decimalTypeInfo, false);
+    implicit(varchar10, TypeInfoUtils.stringTypeInfo, true);
+    implicit(TypeInfoUtils.stringTypeInfo, varchar10, true);
 
     // Try with parameterized varchar types
     TypeInfo varchar10 = TypeInfoFactory.getPrimitiveTypeInfo("varchar(10)");
     TypeInfo varchar20 = TypeInfoFactory.getPrimitiveTypeInfo("varchar(20)");
 
-    implicit(varchar10, TypeInfoFactory.stringTypeInfo, true);
-    implicit(varchar20, TypeInfoFactory.stringTypeInfo, true);
-    implicit(TypeInfoFactory.stringTypeInfo, varchar10, true);
-    implicit(TypeInfoFactory.stringTypeInfo, varchar20, true);
+    implicit(varchar10, TypeInfoUtils.stringTypeInfo, true);
+    implicit(varchar20, TypeInfoUtils.stringTypeInfo, true);
+    implicit(TypeInfoUtils.stringTypeInfo, varchar10, true);
+    implicit(TypeInfoUtils.stringTypeInfo, varchar20, true);
     implicit(varchar20, varchar10, true);
 
-    implicit(char10, TypeInfoFactory.stringTypeInfo, true);
-    implicit(TypeInfoFactory.stringTypeInfo, char10, true);
+    implicit(char10, TypeInfoUtils.stringTypeInfo, true);
+    implicit(TypeInfoUtils.stringTypeInfo, char10, true);
     implicit(char5, char10, true);
     implicit(char5, varchar10, true);
     implicit(varchar5, char10, true);
 
-    implicit(TypeInfoFactory.intTypeInfo, char10, true);
-    implicit(TypeInfoFactory.intTypeInfo, varchar10, true);
-    implicit(TypeInfoFactory.intTypeInfo, TypeInfoFactory.stringTypeInfo, true);
+    implicit(TypeInfoUtils.intTypeInfo, char10, true);
+    implicit(TypeInfoUtils.intTypeInfo, varchar10, true);
+    implicit(TypeInfoUtils.intTypeInfo, TypeInfoUtils.stringTypeInfo, true);
   }
 
   private static List<Method> getMethods(Class<?> udfClass, String methodName) {
@@ -153,24 +152,24 @@ public class TestFunctionRegistry extends TestCase {
 
   public void testTypeAffinity() {
     // Prefer numeric type arguments over other method signatures
-    typeAffinity("typeaffinity1", TypeInfoFactory.shortTypeInfo, 1, DoubleWritable.class);
-    typeAffinity("typeaffinity1", TypeInfoFactory.intTypeInfo, 1, DoubleWritable.class);
-    typeAffinity("typeaffinity1", TypeInfoFactory.floatTypeInfo, 1, DoubleWritable.class);
+    typeAffinity("typeaffinity1", TypeInfoUtils.shortTypeInfo, 1, DoubleWritable.class);
+    typeAffinity("typeaffinity1", TypeInfoUtils.intTypeInfo, 1, DoubleWritable.class);
+    typeAffinity("typeaffinity1", TypeInfoUtils.floatTypeInfo, 1, DoubleWritable.class);
 
     // Prefer date type arguments over other method signatures
-    typeAffinity("typeaffinity1", TypeInfoFactory.dateTypeInfo, 1, DateWritable.class);
-    typeAffinity("typeaffinity1", TypeInfoFactory.timestampTypeInfo, 1, DateWritable.class);
+    typeAffinity("typeaffinity1", TypeInfoUtils.dateTypeInfo, 1, DateWritable.class);
+    typeAffinity("typeaffinity1", TypeInfoUtils.timestampTypeInfo, 1, DateWritable.class);
 
     // String type affinity
-    typeAffinity("typeaffinity1", TypeInfoFactory.stringTypeInfo, 1, Text.class);
+    typeAffinity("typeaffinity1", TypeInfoUtils.stringTypeInfo, 1, Text.class);
     typeAffinity("typeaffinity1", char5, 1, Text.class);
     typeAffinity("typeaffinity1", varchar5, 1, Text.class);
 
     // Type affinity does not help when multiple methods have the same type affinity.
-    typeAffinity("typeaffinity2", TypeInfoFactory.shortTypeInfo, 2, null);
+    typeAffinity("typeaffinity2", TypeInfoUtils.shortTypeInfo, 2, null);
 
     // Type affinity does not help when type affinity does not match input args
-    typeAffinity("typeaffinity2", TypeInfoFactory.dateTypeInfo, 2, null);
+    typeAffinity("typeaffinity2", TypeInfoUtils.dateTypeInfo, 2, null);
   }
 
   private void verify(Class udf, String name, TypeInfo ta, TypeInfo tb,
@@ -195,35 +194,35 @@ public class TestFunctionRegistry extends TestCase {
 
   public void testGetMethodInternal() {
 
-    verify(TestUDF.class, "same", TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo,
+    verify(TestUDF.class, "same", TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo,
            HiveDecimalWritable.class, HiveDecimalWritable.class, false);
 
-    verify(TestUDF.class, "same", TypeInfoFactory.doubleTypeInfo, TypeInfoFactory.doubleTypeInfo,
+    verify(TestUDF.class, "same", TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.doubleTypeInfo,
            DoubleWritable.class, DoubleWritable.class, false);
 
-    verify(TestUDF.class, "same", TypeInfoFactory.doubleTypeInfo, decimalTypeInfo,
+    verify(TestUDF.class, "same", TypeInfoUtils.doubleTypeInfo, decimalTypeInfo,
            DoubleWritable.class, DoubleWritable.class, false);
 
-    verify(TestUDF.class, "same", decimalTypeInfo, TypeInfoFactory.doubleTypeInfo,
+    verify(TestUDF.class, "same", decimalTypeInfo, TypeInfoUtils.doubleTypeInfo,
            DoubleWritable.class, DoubleWritable.class, false);
 
     verify(TestUDF.class, "same", decimalTypeInfo, decimalTypeInfo,
            HiveDecimalWritable.class, HiveDecimalWritable.class, false);
 
-    verify(TestUDF.class, "one", TypeInfoFactory.intTypeInfo, decimalTypeInfo,
+    verify(TestUDF.class, "one", TypeInfoUtils.intTypeInfo, decimalTypeInfo,
            IntWritable.class, HiveDecimalWritable.class, false);
 
-    verify(TestUDF.class, "one", TypeInfoFactory.intTypeInfo, TypeInfoFactory.floatTypeInfo,
+    verify(TestUDF.class, "one", TypeInfoUtils.intTypeInfo, TypeInfoUtils.floatTypeInfo,
            IntWritable.class, DoubleWritable.class, false);
 
-    verify(TestUDF.class, "one", TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo,
+    verify(TestUDF.class, "one", TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo,
            IntWritable.class, IntWritable.class, false);
 
     // Passing char/varchar arguments should prefer the version of evaluate() with Text args.
     verify(TestUDF.class, "same", varchar5, varchar10, Text.class, Text.class, false);
     verify(TestUDF.class, "same", char5, char10, Text.class, Text.class, false);
 
-    verify(TestUDF.class, "mismatch", TypeInfoFactory.voidTypeInfo, TypeInfoFactory.intTypeInfo,
+    verify(TestUDF.class, "mismatch", TypeInfoUtils.voidTypeInfo, TypeInfoUtils.intTypeInfo,
            null, null, true);
   }
 
@@ -232,21 +231,21 @@ public class TestFunctionRegistry extends TestCase {
   }
 
   public void testCommonClass() {
-    common(TypeInfoFactory.intTypeInfo, decimalTypeInfo,
+    common(TypeInfoUtils.intTypeInfo, decimalTypeInfo,
            decimalTypeInfo);
-    common(TypeInfoFactory.stringTypeInfo, decimalTypeInfo,
-           TypeInfoFactory.stringTypeInfo);
-    common(TypeInfoFactory.doubleTypeInfo, decimalTypeInfo,
-           TypeInfoFactory.doubleTypeInfo);
-    common(TypeInfoFactory.doubleTypeInfo, TypeInfoFactory.stringTypeInfo,
-           TypeInfoFactory.stringTypeInfo);
+    common(TypeInfoUtils.stringTypeInfo, decimalTypeInfo,
+           TypeInfoUtils.stringTypeInfo);
+    common(TypeInfoUtils.doubleTypeInfo, decimalTypeInfo,
+           TypeInfoUtils.doubleTypeInfo);
+    common(TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.stringTypeInfo,
+           TypeInfoUtils.stringTypeInfo);
 
-    common(TypeInfoFactory.stringTypeInfo, varchar10, TypeInfoFactory.stringTypeInfo);
-    common(varchar10, TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
-    common(TypeInfoFactory.stringTypeInfo, char10, TypeInfoFactory.stringTypeInfo);
-    common(char10, TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
+    common(TypeInfoUtils.stringTypeInfo, varchar10, TypeInfoUtils.stringTypeInfo);
+    common(varchar10, TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
+    common(TypeInfoUtils.stringTypeInfo, char10, TypeInfoUtils.stringTypeInfo);
+    common(char10, TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
     // common class between char/varchar is string?
-    common(char5, varchar10, TypeInfoFactory.stringTypeInfo);
+    common(char5, varchar10, TypeInfoUtils.stringTypeInfo);
   }
 
   private void comparison(TypeInfo a, TypeInfo b, TypeInfo result) {
@@ -254,39 +253,39 @@ public class TestFunctionRegistry extends TestCase {
   }
 
   public void testCommonClassComparison() {
-    comparison(TypeInfoFactory.intTypeInfo, decimalTypeInfo,
+    comparison(TypeInfoUtils.intTypeInfo, decimalTypeInfo,
                decimalTypeInfo);
-    comparison(TypeInfoFactory.stringTypeInfo, decimalTypeInfo,
-               TypeInfoFactory.doubleTypeInfo);
-    comparison(TypeInfoFactory.doubleTypeInfo, decimalTypeInfo,
-               TypeInfoFactory.doubleTypeInfo);
-    comparison(TypeInfoFactory.doubleTypeInfo, TypeInfoFactory.stringTypeInfo,
-               TypeInfoFactory.doubleTypeInfo);
+    comparison(TypeInfoUtils.stringTypeInfo, decimalTypeInfo,
+               TypeInfoUtils.doubleTypeInfo);
+    comparison(TypeInfoUtils.doubleTypeInfo, decimalTypeInfo,
+               TypeInfoUtils.doubleTypeInfo);
+    comparison(TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.stringTypeInfo,
+               TypeInfoUtils.doubleTypeInfo);
 
-    comparison(TypeInfoFactory.dateTypeInfo, TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.dateTypeInfo);
-    comparison(TypeInfoFactory.stringTypeInfo, TypeInfoFactory.dateTypeInfo,
-        TypeInfoFactory.dateTypeInfo);
-    comparison(TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.timestampTypeInfo);
-    comparison(TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo,
-        TypeInfoFactory.timestampTypeInfo);
+    comparison(TypeInfoUtils.dateTypeInfo, TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.dateTypeInfo);
+    comparison(TypeInfoUtils.stringTypeInfo, TypeInfoUtils.dateTypeInfo,
+        TypeInfoUtils.dateTypeInfo);
+    comparison(TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.timestampTypeInfo);
+    comparison(TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo,
+        TypeInfoUtils.timestampTypeInfo);
 
-    comparison(TypeInfoFactory.intTypeInfo, TypeInfoFactory.timestampTypeInfo,
-        TypeInfoFactory.doubleTypeInfo);
-    comparison(TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.intTypeInfo,
-        TypeInfoFactory.doubleTypeInfo);
-   comparison(TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.dateTypeInfo,
-        TypeInfoFactory.timestampTypeInfo);
+    comparison(TypeInfoUtils.intTypeInfo, TypeInfoUtils.timestampTypeInfo,
+        TypeInfoUtils.doubleTypeInfo);
+    comparison(TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.intTypeInfo,
+        TypeInfoUtils.doubleTypeInfo);
+   comparison(TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.dateTypeInfo,
+        TypeInfoUtils.timestampTypeInfo);
 
-    comparison(TypeInfoFactory.stringTypeInfo, varchar10, TypeInfoFactory.stringTypeInfo);
-    comparison(varchar10, TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
+    comparison(TypeInfoUtils.stringTypeInfo, varchar10, TypeInfoUtils.stringTypeInfo);
+    comparison(varchar10, TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
     comparison(varchar5, varchar10, varchar10);
-    comparison(TypeInfoFactory.stringTypeInfo, char10, TypeInfoFactory.stringTypeInfo);
-    comparison(char10, TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
+    comparison(TypeInfoUtils.stringTypeInfo, char10, TypeInfoUtils.stringTypeInfo);
+    comparison(char10, TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
     comparison(char5, char10, char10);
     // common comparison class for char/varchar is string?
-    comparison(char10, varchar5, TypeInfoFactory.stringTypeInfo);
+    comparison(char10, varchar5, TypeInfoUtils.stringTypeInfo);
   }
 
   /**
@@ -340,29 +339,29 @@ public class TestFunctionRegistry extends TestCase {
   }
 
   public void testCommonClassUnionAll() {
-    unionAll(TypeInfoFactory.doubleTypeInfo, TypeInfoFactory.intTypeInfo,
-        TypeInfoFactory.doubleTypeInfo);
-    unionAll(TypeInfoFactory.intTypeInfo, decimalTypeInfo,
+    unionAll(TypeInfoUtils.doubleTypeInfo, TypeInfoUtils.intTypeInfo,
+        TypeInfoUtils.doubleTypeInfo);
+    unionAll(TypeInfoUtils.intTypeInfo, decimalTypeInfo,
         decimalTypeInfo);
-    unionAll(TypeInfoFactory.doubleTypeInfo, decimalTypeInfo,
-        TypeInfoFactory.doubleTypeInfo);
+    unionAll(TypeInfoUtils.doubleTypeInfo, decimalTypeInfo,
+        TypeInfoUtils.doubleTypeInfo);
 
     unionAll(varchar5, varchar10, varchar10);
     unionAll(varchar10, varchar5, varchar10);
-    unionAll(varchar10, TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
-    unionAll(TypeInfoFactory.stringTypeInfo, varchar10, TypeInfoFactory.stringTypeInfo);
+    unionAll(varchar10, TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
+    unionAll(TypeInfoUtils.stringTypeInfo, varchar10, TypeInfoUtils.stringTypeInfo);
 
     unionAll(char5, char10, char10);
     unionAll(char10, char5, char10);
-    unionAll(char10, TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo);
-    unionAll(TypeInfoFactory.stringTypeInfo, char10, TypeInfoFactory.stringTypeInfo);
+    unionAll(char10, TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo);
+    unionAll(TypeInfoUtils.stringTypeInfo, char10, TypeInfoUtils.stringTypeInfo);
 
-    unionAll(TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.dateTypeInfo,
-        TypeInfoFactory.timestampTypeInfo);
+    unionAll(TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.dateTypeInfo,
+        TypeInfoUtils.timestampTypeInfo);
 
     // Invalid cases
-    unionAll(TypeInfoFactory.stringTypeInfo, decimalTypeInfo, null);
-    unionAll(TypeInfoFactory.doubleTypeInfo, varchar10, null);
+    unionAll(TypeInfoUtils.stringTypeInfo, decimalTypeInfo, null);
+    unionAll(TypeInfoUtils.doubleTypeInfo, varchar10, null);
 
   }
 
@@ -383,16 +382,16 @@ public class TestFunctionRegistry extends TestCase {
         (PrimitiveTypeInfo) varchar5, (PrimitiveTypeInfo) char10, PrimitiveCategory.VARCHAR));
 
     // non-qualified types should simply return the TypeInfo associated with that type
-    assertEquals(TypeInfoFactory.stringTypeInfo, FunctionRegistry.getTypeInfoForPrimitiveCategory(
-        (PrimitiveTypeInfo) varchar10, TypeInfoFactory.stringTypeInfo,
+    assertEquals(TypeInfoUtils.stringTypeInfo, FunctionRegistry.getTypeInfoForPrimitiveCategory(
+        (PrimitiveTypeInfo) varchar10, TypeInfoUtils.stringTypeInfo,
         PrimitiveCategory.STRING));
-    assertEquals(TypeInfoFactory.stringTypeInfo, FunctionRegistry.getTypeInfoForPrimitiveCategory(
-        TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo,
+    assertEquals(TypeInfoUtils.stringTypeInfo, FunctionRegistry.getTypeInfoForPrimitiveCategory(
+        TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo,
         PrimitiveCategory.STRING));
-    assertEquals(TypeInfoFactory.doubleTypeInfo, FunctionRegistry.getTypeInfoForPrimitiveCategory(
-        TypeInfoFactory.doubleTypeInfo,
-        TypeInfoFactory.stringTypeInfo,
+    assertEquals(TypeInfoUtils.doubleTypeInfo, FunctionRegistry.getTypeInfoForPrimitiveCategory(
+        TypeInfoUtils.doubleTypeInfo,
+        TypeInfoUtils.stringTypeInfo,
         PrimitiveCategory.DOUBLE));
   }
 
@@ -498,7 +497,7 @@ public class TestFunctionRegistry extends TestCase {
     GenericUDF udf = new GenericUDFCurrentTimestamp();
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     ExprNodeGenericFuncDesc fnExpr =
-        new ExprNodeGenericFuncDesc(TypeInfoFactory.timestampTypeInfo, udf, children);
+        new ExprNodeGenericFuncDesc(TypeInfoUtils.timestampTypeInfo, udf, children);
 
     assertFalse("Function not added as permanent yet", FunctionRegistry.isPermanentFunction(fnExpr));
 

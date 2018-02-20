@@ -31,7 +31,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.ArrayWritable;
 
@@ -94,17 +94,17 @@ public class ArrayWritableObjectInspector extends SettableStructObjectInspector 
 
   private ObjectInspector getObjectInspector(
       TypeInfo typeInfo, TypeInfo prunedTypeInfo) {
-    if (typeInfo.equals(TypeInfoFactory.doubleTypeInfo)) {
+    if (typeInfo.equals(TypeInfoUtils.doubleTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableDoubleObjectInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.booleanTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.booleanTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableBooleanObjectInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.floatTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.floatTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableFloatObjectInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.intTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.intTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableIntObjectInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.longTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.longTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableLongObjectInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.stringTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.stringTypeInfo)) {
       return ParquetPrimitiveInspectorFactory.parquetStringInspector;
     }  else if (typeInfo instanceof DecimalTypeInfo) {
       return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector((DecimalTypeInfo) typeInfo);
@@ -116,23 +116,23 @@ public class ArrayWritableObjectInspector extends SettableStructObjectInspector 
     } else if (typeInfo.getCategory().equals(Category.MAP)) {
       final TypeInfo keyTypeInfo = ((MapTypeInfo) typeInfo).getMapKeyTypeInfo();
       final TypeInfo valueTypeInfo = ((MapTypeInfo) typeInfo).getMapValueTypeInfo();
-      if (keyTypeInfo.equals(TypeInfoFactory.stringTypeInfo) || keyTypeInfo.equals(TypeInfoFactory.byteTypeInfo)
-              || keyTypeInfo.equals(TypeInfoFactory.shortTypeInfo)) {
+      if (keyTypeInfo.equals(TypeInfoUtils.stringTypeInfo) || keyTypeInfo.equals(TypeInfoUtils.byteTypeInfo)
+              || keyTypeInfo.equals(TypeInfoUtils.shortTypeInfo)) {
         return new DeepParquetHiveMapInspector(getObjectInspector(keyTypeInfo, null),
             getObjectInspector(valueTypeInfo, null));
       } else {
         return new StandardParquetHiveMapInspector(getObjectInspector(keyTypeInfo, null),
             getObjectInspector(valueTypeInfo, null));
       }
-    } else if (typeInfo.equals(TypeInfoFactory.byteTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.byteTypeInfo)) {
       return ParquetPrimitiveInspectorFactory.parquetByteInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.shortTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.shortTypeInfo)) {
       return ParquetPrimitiveInspectorFactory.parquetShortInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.timestampTypeInfo)) {
+    } else if (typeInfo.equals(TypeInfoUtils.timestampTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableTimestampObjectInspector;
-    } else if (typeInfo.equals(TypeInfoFactory.binaryTypeInfo)){
+    } else if (typeInfo.equals(TypeInfoUtils.binaryTypeInfo)){
       return PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
-    }else if (typeInfo.equals(TypeInfoFactory.dateTypeInfo)) {
+    }else if (typeInfo.equals(TypeInfoUtils.dateTypeInfo)) {
       return PrimitiveObjectInspectorFactory.writableDateObjectInspector;
     } else if (typeInfo.getTypeName().toLowerCase().startsWith(serdeConstants.CHAR_TYPE_NAME)) {
       return PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector((CharTypeInfo) typeInfo);

@@ -94,7 +94,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -681,7 +680,7 @@ public final class ConstantPropagateProcFactory {
         removed++;
       }
       if (newExprs.size() == 0) {
-        return new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, Boolean.TRUE);
+        return new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, Boolean.TRUE);
       }
       if (newExprs.size() == 1) {
         return newExprs.get(0);
@@ -712,7 +711,7 @@ public final class ConstantPropagateProcFactory {
         removed++;
       }
       if (newExprs.size() == 0) {
-        return new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, Boolean.FALSE);
+        return new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, Boolean.FALSE);
       }
       if (newExprs.size() == 1) {
         return newExprs.get(0);

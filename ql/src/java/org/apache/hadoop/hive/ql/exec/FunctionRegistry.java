@@ -774,7 +774,7 @@ public final class FunctionRegistry {
     case NUMERIC_GROUP:
       return TypeInfoUtils.implicitConvertible(a, b) ? b : a;
     case DATE_GROUP:
-      return TypeInfoFactory.timestampTypeInfo;
+      return TypeInfoUtils.timestampTypeInfo;
     default:
       return null;
     }
@@ -835,7 +835,7 @@ public final class FunctionRegistry {
     // Another special case, because timestamp is not implicitly convertible to numeric types.
     if ((pgA == PrimitiveGrouping.NUMERIC_GROUP || pgB == PrimitiveGrouping.NUMERIC_GROUP)
         && (pcA == PrimitiveCategory.TIMESTAMP || pcB == PrimitiveCategory.TIMESTAMP)) {
-      return TypeInfoFactory.doubleTypeInfo;
+      return TypeInfoUtils.doubleTypeInfo;
     }
 
     for (PrimitiveCategory t : TypeInfoUtils.numericTypeList) {
@@ -1105,7 +1105,7 @@ public final class FunctionRegistry {
       // matches
       return 0;
     }
-    if (argumentPassed.equals(TypeInfoFactory.voidTypeInfo)) {
+    if (argumentPassed.equals(TypeInfoUtils.voidTypeInfo)) {
       // passing null matches everything
       return 0;
     }
@@ -1137,7 +1137,7 @@ public final class FunctionRegistry {
       return Math.max(cost1, cost2);
     }
 
-    if (argumentAccepted.equals(TypeInfoFactory.unknownTypeInfo)) {
+    if (argumentAccepted.equals(TypeInfoUtils.unknownTypeInfo)) {
       // accepting Object means accepting everything,
       // but there is a conversion cost.
       return 1;

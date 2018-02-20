@@ -27,7 +27,7 @@ import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
@@ -51,7 +51,7 @@ public class TestGenericUDFMonthsBetween extends TestCase {
     ObjectInspector vOI1 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     ObjectInspector vOI2 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     ObjectInspector vOI3 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.booleanTypeInfo,
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.booleanTypeInfo,
             new BooleanWritable(false));
     ObjectInspector[] args = { vOI1, vOI2, vOI3 };
     udfWithoutRoundOff.initialize(args);
@@ -132,7 +132,7 @@ public class TestGenericUDFMonthsBetween extends TestCase {
     ObjectInspector vOI1 = PrimitiveObjectInspectorFactory.writableTimestampObjectInspector;
     ObjectInspector vOI2 = PrimitiveObjectInspectorFactory.writableTimestampObjectInspector;
     ObjectInspector vOI3 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.booleanTypeInfo,
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.booleanTypeInfo,
             new BooleanWritable(false));
     ObjectInspector[] args = { vOI1, vOI2, vOI3 };
     udfWithoutRoundOff.initialize(args);
@@ -198,7 +198,7 @@ public class TestGenericUDFMonthsBetween extends TestCase {
     ObjectInspector vOI1 = PrimitiveObjectInspectorFactory.writableDateObjectInspector;
     ObjectInspector vOI2 = PrimitiveObjectInspectorFactory.writableDateObjectInspector;
     ObjectInspector vOI3 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.booleanTypeInfo,
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.booleanTypeInfo,
             new BooleanWritable(false));
     ObjectInspector[] args = { vOI1, vOI2, vOI3 };
     udfWithoutRoundOff.initialize(args);

@@ -40,7 +40,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveGrouping;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hive.common.util.DateUtils;
 
 /**
@@ -147,7 +147,7 @@ public class GenericUDFInternalInterval extends GenericUDF {
 
     @Override
     public final PrimitiveTypeInfo getTypeInfo() {
-      return TypeInfoFactory.intervalDayTimeTypeInfo;
+      return TypeInfoUtils.intervalDayTimeTypeInfo;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class GenericUDFInternalInterval extends GenericUDF {
 
     @Override
     public final PrimitiveTypeInfo getTypeInfo() {
-      return TypeInfoFactory.intervalYearMonthTypeInfo;
+      return TypeInfoUtils.intervalYearMonthTypeInfo;
     }
 
     @Override

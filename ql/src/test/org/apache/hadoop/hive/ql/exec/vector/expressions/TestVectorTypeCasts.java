@@ -22,12 +22,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -42,15 +38,12 @@ import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.gen.*;
-import org.apache.hadoop.hive.ql.exec.vector.expressions.*;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.util.TimestampUtils;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.HiveDecimalUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 
 /**
@@ -210,7 +203,7 @@ public class TestVectorTypeCasts {
     BytesColumnVector resultV = (BytesColumnVector) b.cols[2];
     b.cols[1].noNulls = true;
     VectorExpression expr = new CastLongToString(1, 2);
-    expr.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.longTypeInfo});
+    expr.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.longTypeInfo});
     expr.transientInit();
     expr.evaluate(b);
     byte[] num255 = toBytes("255");
@@ -245,7 +238,7 @@ public class TestVectorTypeCasts {
     VectorExpression expr = new CastDecimalToLong(0, 1);
 
     // With the integer type range checking, we need to know the Hive data type.
-    expr.setOutputTypeInfo(TypeInfoFactory.longTypeInfo);
+    expr.setOutputTypeInfo(TypeInfoUtils.longTypeInfo);
     expr.transientInit();
     expr.evaluate(b);
     LongColumnVector r = (LongColumnVector) b.cols[1];
@@ -291,8 +284,8 @@ public class TestVectorTypeCasts {
   public void testCastDecimalToBoolean() throws HiveException {
     VectorizedRowBatch b = getBatchDecimalLong();
     VectorExpression expr = new CastDecimalToBoolean(0, 1);
-    expr.setInputTypeInfos(new TypeInfo[] { PrimitiveObjectInspectorFactory.decimalTypeInfo});
-    expr.setOutputTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    expr.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.decimalTypeInfo});
+    expr.setOutputTypeInfo(TypeInfoUtils.booleanTypeInfo);
     expr.transientInit();
     DecimalColumnVector in = (DecimalColumnVector) b.cols[0];
     in.vector[1].set(HiveDecimal.create(0));
@@ -383,7 +376,7 @@ public class TestVectorTypeCasts {
   public void testCastDecimalToString() throws HiveException {
     VectorizedRowBatch b = getBatchDecimalString();
     VectorExpression expr = new CastDecimalToString(0, 1);
-    expr.setInputTypeInfos(new TypeInfo[] {PrimitiveObjectInspectorFactory.decimalTypeInfo});
+    expr.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.decimalTypeInfo});
     expr.transientInit();
     expr.evaluate(b);
     BytesColumnVector r = (BytesColumnVector) b.cols[1];

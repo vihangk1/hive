@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections.Bag;
-import org.apache.commons.collections.bag.TreeBag;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +44,6 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFMacro;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
@@ -243,13 +240,14 @@ public class ExprNodeGenericFuncDesc extends ExprNodeDesc implements
       LogHelper console = new LogHelper(LOG);
 
       // For now, if a bigint is going to be cast to a double throw an error or warning
-      if ((oiTypeInfo0.equals(TypeInfoFactory.stringTypeInfo) && oiTypeInfo1.equals(TypeInfoFactory.longTypeInfo)) ||
-          (oiTypeInfo0.equals(TypeInfoFactory.longTypeInfo) && oiTypeInfo1.equals(TypeInfoFactory.stringTypeInfo))) {
+      if ((oiTypeInfo0.equals(TypeInfoUtils.stringTypeInfo) && oiTypeInfo1.equals(TypeInfoUtils.longTypeInfo)) ||
+          (oiTypeInfo0.equals(TypeInfoUtils.longTypeInfo) && oiTypeInfo1.equals(TypeInfoUtils.stringTypeInfo))) {
         String error = StrictChecks.checkTypeSafety(conf);
         if (error != null) throw new UDFArgumentException(error);
         console.printError("WARNING: Comparing a bigint and a string may result in a loss of precision.");
-      } else if ((oiTypeInfo0.equals(TypeInfoFactory.doubleTypeInfo) && oiTypeInfo1.equals(TypeInfoFactory.longTypeInfo)) ||
-          (oiTypeInfo0.equals(TypeInfoFactory.longTypeInfo) && oiTypeInfo1.equals(TypeInfoFactory.doubleTypeInfo))) {
+      } else if ((oiTypeInfo0.equals(TypeInfoUtils.doubleTypeInfo) && oiTypeInfo1.equals(
+          TypeInfoUtils.longTypeInfo)) ||
+          (oiTypeInfo0.equals(TypeInfoUtils.longTypeInfo) && oiTypeInfo1.equals(TypeInfoUtils.doubleTypeInfo))) {
         String error = StrictChecks.checkTypeSafety(conf);
         if (error != null) throw new UDFArgumentException(error);
         console.printError("WARNING: Comparing a bigint and a double may result in a loss of precision.");

@@ -51,7 +51,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -61,7 +60,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.common.JavaUtils;
 import org.apache.hadoop.hive.common.StatsSetupConst;
-import org.apache.hadoop.hive.common.ValidReadTxnList;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.conf.Constants;
@@ -76,7 +74,6 @@ import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
-import org.apache.hadoop.hive.metastore.api.BasicTxnInfo;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsData;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.CompactionResponse;
@@ -108,7 +105,6 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.TxnInfo;
 import org.apache.hadoop.hive.metastore.api.WMFullResourcePlan;
 import org.apache.hadoop.hive.metastore.api.WMNullableResourcePlan;
-import org.apache.hadoop.hive.metastore.api.WMResourcePlan;
 import org.apache.hadoop.hive.metastore.api.WMResourcePlanStatus;
 import org.apache.hadoop.hive.metastore.api.WMTrigger;
 import org.apache.hadoop.hive.metastore.api.WMValidateResourcePlanResponse;
@@ -274,7 +270,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.C
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.mapreduce.MRJobConfig;
@@ -1537,12 +1532,12 @@ public class DDLTask extends Task<DDLWork> implements Serializable {
           Object convertedValue =
               converter.convert(value);
           if (convertedValue == null) {
-            throw new HiveException(" Converting from " + TypeInfoFactory.stringTypeInfo + " to " +
+            throw new HiveException(" Converting from " + TypeInfoUtils.stringTypeInfo + " to " +
               expectedType + " for value : " + value + " resulted in NULL object");
           }
         } catch (Exception e) {
           throw new HiveException("Exception while converting " +
-              TypeInfoFactory.stringTypeInfo + " to " +
+              TypeInfoUtils.stringTypeInfo + " to " +
               expectedType + " for value : " + part.getValues().get(colIndex));
         }
       }

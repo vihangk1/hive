@@ -33,7 +33,7 @@ import org.apache.hadoop.hive.ql.plan.MapredWork;
 import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.mapred.JobConf;
 
 import junit.framework.TestCase;
@@ -52,9 +52,9 @@ public class TestPlan extends TestCase {
     try {
       // initialize a complete map reduce configuration
       ExprNodeDesc expr1 = new ExprNodeColumnDesc(
-          TypeInfoFactory.stringTypeInfo, F1, "", false);
+          TypeInfoUtils.stringTypeInfo, F1, "", false);
       ExprNodeDesc expr2 = new ExprNodeColumnDesc(
-          TypeInfoFactory.stringTypeInfo, F2, "", false);
+          TypeInfoUtils.stringTypeInfo, F2, "", false);
       ExprNodeDesc filterExpr = TypeCheckProcFactory.DefaultExprProcessor
           .getFuncExprNodeDesc("==", expr1, expr2);
 

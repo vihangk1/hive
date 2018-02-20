@@ -16,7 +16,7 @@
  */
 package org.apache.hadoop.hive.accumulo.columns;
 
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class TestHiveAccumuloColumnMapping {
     // A column qualifier with a colon
     String cf = "cf", cq = "cq1:cq2";
     HiveAccumuloColumnMapping mapping = new HiveAccumuloColumnMapping(cf, cq,
-        ColumnEncoding.STRING, "col", TypeInfoFactory.stringTypeInfo.toString());
+        ColumnEncoding.STRING, "col", TypeInfoUtils.stringTypeInfo.toString());
 
     Assert.assertEquals(cf, mapping.getColumnFamily());
     Assert.assertEquals(cq, mapping.getColumnQualifier());

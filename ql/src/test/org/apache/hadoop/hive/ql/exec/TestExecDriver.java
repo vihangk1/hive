@@ -27,6 +27,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.hadoop.hive.metastore.Warehouse;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -186,17 +187,17 @@ public class TestExecDriver extends TestCase {
 
   private FilterDesc getTestFilterDesc(String column) throws Exception {
     ArrayList<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>();
-    children1.add(new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo,
+    children1.add(new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo,
         column, "", false));
     ExprNodeDesc lhs = new ExprNodeGenericFuncDesc(
-        TypeInfoFactory.doubleTypeInfo, FunctionRegistry.getFunctionInfo(
+        TypeInfoUtils.doubleTypeInfo, FunctionRegistry.getFunctionInfo(
         serdeConstants.DOUBLE_TYPE_NAME).getGenericUDF(), children1);
 
     ArrayList<ExprNodeDesc> children2 = new ArrayList<ExprNodeDesc>();
-    children2.add(new ExprNodeConstantDesc(TypeInfoFactory.longTypeInfo, Long
+    children2.add(new ExprNodeConstantDesc(TypeInfoUtils.longTypeInfo, Long
         .valueOf(100)));
     ExprNodeDesc rhs = new ExprNodeGenericFuncDesc(
-        TypeInfoFactory.doubleTypeInfo, FunctionRegistry.getFunctionInfo(
+        TypeInfoUtils.doubleTypeInfo, FunctionRegistry.getFunctionInfo(
         serdeConstants.DOUBLE_TYPE_NAME).getGenericUDF(), children2);
 
     ArrayList<ExprNodeDesc> children3 = new ArrayList<ExprNodeDesc>();
@@ -204,7 +205,7 @@ public class TestExecDriver extends TestCase {
     children3.add(rhs);
 
     ExprNodeDesc desc = new ExprNodeGenericFuncDesc(
-        TypeInfoFactory.booleanTypeInfo, FunctionRegistry.getFunctionInfo("<")
+        TypeInfoUtils.booleanTypeInfo, FunctionRegistry.getFunctionInfo("<")
         .getGenericUDF(), children3);
 
     return new FilterDesc(desc, false);
@@ -342,8 +343,8 @@ public class TestExecDriver extends TestCase {
         + "mapredplan3.out"), Utilities.defaultTd, false));
 
     Operator<SelectDesc> op5 = OperatorFactory.get(new SelectDesc(Utilities
-        .makeList(new ExprNodeFieldDesc(TypeInfoFactory.stringTypeInfo,
-        new ExprNodeColumnDesc(TypeInfoFactory.getListTypeInfo(TypeInfoFactory.stringTypeInfo),
+        .makeList(new ExprNodeFieldDesc(TypeInfoUtils.stringTypeInfo,
+        new ExprNodeColumnDesc(TypeInfoFactory.getListTypeInfo(TypeInfoUtils.stringTypeInfo),
         Utilities.ReduceField.VALUE.toString(), "", false), "0", false)),
         Utilities.makeList(outputColumns.get(0))), op4);
 
@@ -391,7 +392,7 @@ public class TestExecDriver extends TestCase {
   }
 
   public static ExprNodeColumnDesc getStringColumn(String columnName) {
-    return new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, columnName,
+    return new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, columnName,
         "", false);
   }
 

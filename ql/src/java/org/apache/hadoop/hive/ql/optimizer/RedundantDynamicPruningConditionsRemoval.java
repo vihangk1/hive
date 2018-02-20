@@ -49,7 +49,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.plan.FilterDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBaseCompare;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFIn;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +130,7 @@ public class RedundantDynamicPruningConditionsRemoval extends Transform {
           }
           if (!generate) {
             // We can safely remove the condition by replacing it with "true"
-            ExprNodeDesc constNode = new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, Boolean.TRUE);
+            ExprNodeDesc constNode = new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, Boolean.TRUE);
             if (parent == null) {
               desc.setPredicate(constNode);
             } else {

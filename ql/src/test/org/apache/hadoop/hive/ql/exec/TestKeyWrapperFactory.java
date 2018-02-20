@@ -52,12 +52,12 @@ public class TestKeyWrapperFactory {
     col1.add(new Text("1"));
     col1.add(new Text("2"));
     col1.add(new Text("3"));
-    TypeInfo col1Type = TypeInfoFactory.getListTypeInfo(TypeInfoFactory.stringTypeInfo);
+    TypeInfo col1Type = TypeInfoFactory.getListTypeInfo(TypeInfoUtils.stringTypeInfo);
     ArrayList<Text> cola = new ArrayList<Text>();
     cola.add(new Text("a"));
     cola.add(new Text("b"));
     cola.add(new Text("c"));
-    TypeInfo colaType = TypeInfoFactory.getListTypeInfo(TypeInfoFactory.stringTypeInfo);
+    TypeInfo colaType = TypeInfoFactory.getListTypeInfo(TypeInfoUtils.stringTypeInfo);
     try {
       ArrayList<Object> data = new ArrayList<Object>();
       data.add(col1);

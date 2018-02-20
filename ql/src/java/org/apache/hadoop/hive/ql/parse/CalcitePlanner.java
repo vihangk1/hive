@@ -3173,9 +3173,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // 3.2 Rank functions type is 'int'/'double'
       if (FunctionRegistry.isRankingFunction(aggName)) {
         if (aggName.equalsIgnoreCase("percent_rank"))
-          udafRetType = TypeInfoFactory.doubleTypeInfo;
+          udafRetType = TypeInfoUtils.doubleTypeInfo;
         else
-          udafRetType = TypeInfoFactory.intTypeInfo;
+          udafRetType = TypeInfoUtils.intTypeInfo;
       } else {
         // 3.3 Try obtaining UDAF evaluators to determine the ret type
         try {

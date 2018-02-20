@@ -116,7 +116,7 @@ import org.apache.hadoop.hive.ql.session.LineageState;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.mapred.InputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1308,7 +1308,7 @@ public final class GenMapRedUtils {
       String tblAlias = fsInputDesc.getTableInfo().getTableName();
       for (String dpCol : dpCtx.getDPColNames()) {
         ColumnInfo colInfo = new ColumnInfo(dpCol,
-            TypeInfoFactory.stringTypeInfo, // all partition column type should be string
+            TypeInfoUtils.stringTypeInfo, // all partition column type should be string
             tblAlias, true); // partition column is virtual column
         signature.add(colInfo);
       }

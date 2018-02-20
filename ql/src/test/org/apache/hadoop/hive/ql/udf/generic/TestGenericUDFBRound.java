@@ -31,7 +31,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.junit.Assert;
@@ -46,7 +46,7 @@ public class TestGenericUDFBRound {
 
     IntWritable scale = new IntWritable(0);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, scale);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, scale);
 
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
@@ -75,7 +75,7 @@ public class TestGenericUDFBRound {
 
     IntWritable scale = new IntWritable(-1);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, scale);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, scale);
 
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
@@ -107,7 +107,7 @@ public class TestGenericUDFBRound {
 
     IntWritable scale = new IntWritable(0);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, scale);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, scale);
 
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
@@ -136,7 +136,7 @@ public class TestGenericUDFBRound {
 
     IntWritable scale = new IntWritable(0);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, scale);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, scale);
 
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 

@@ -22,14 +22,14 @@ import org.apache.hadoop.hive.common.type.HiveIntervalYearMonth;
 import org.apache.hadoop.hive.serde2.io.HiveIntervalYearMonthWritable;
 import org.apache.hadoop.hive.serde2.lazy.LazyHiveIntervalYearMonth;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.HiveIntervalYearMonthObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class LazyHiveIntervalYearMonthObjectInspector
     extends AbstractPrimitiveLazyObjectInspector<HiveIntervalYearMonthWritable>
     implements HiveIntervalYearMonthObjectInspector{
 
   LazyHiveIntervalYearMonthObjectInspector() {
-    super(TypeInfoFactory.intervalYearMonthTypeInfo);
+    super(TypeInfoUtils.intervalYearMonthTypeInfo);
   }
 
   @Override

@@ -80,6 +80,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,25 +227,25 @@ public class ExprNodeConverter extends RexVisitorImpl<ExprNodeDesc> {
     if (RexLiteral.value(literal) == null) {
       switch (literal.getType().getSqlTypeName()) {
       case BOOLEAN:
-        return new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, null);
       case TINYINT:
-        return new ExprNodeConstantDesc(TypeInfoFactory.byteTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.byteTypeInfo, null);
       case SMALLINT:
-        return new ExprNodeConstantDesc(TypeInfoFactory.shortTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.shortTypeInfo, null);
       case INTEGER:
-        return new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, null);
       case BIGINT:
-        return new ExprNodeConstantDesc(TypeInfoFactory.longTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.longTypeInfo, null);
       case FLOAT:
       case REAL:
-        return new ExprNodeConstantDesc(TypeInfoFactory.floatTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.floatTypeInfo, null);
       case DOUBLE:
-        return new ExprNodeConstantDesc(TypeInfoFactory.doubleTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.doubleTypeInfo, null);
       case DATE:
-        return new ExprNodeConstantDesc(TypeInfoFactory.dateTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.dateTypeInfo, null);
       case TIME:
       case TIMESTAMP:
-        return new ExprNodeConstantDesc(TypeInfoFactory.timestampTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.timestampTypeInfo, null);
       case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
         HiveConf conf;
         try {
@@ -255,17 +256,17 @@ public class ExprNodeConverter extends RexVisitorImpl<ExprNodeDesc> {
         return new ExprNodeConstantDesc(
                 TypeInfoFactory.getTimestampTZTypeInfo(conf.getLocalTimeZone()), null);
       case BINARY:
-        return new ExprNodeConstantDesc(TypeInfoFactory.binaryTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.binaryTypeInfo, null);
       case DECIMAL:
         return new ExprNodeConstantDesc(
                 TypeInfoFactory.getDecimalTypeInfo(lType.getPrecision(), lType.getScale()), null);
       case VARCHAR:
       case CHAR:
-        return new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, null);
       case INTERVAL_YEAR:
       case INTERVAL_MONTH:
       case INTERVAL_YEAR_MONTH:
-        return new ExprNodeConstantDesc(TypeInfoFactory.intervalYearMonthTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.intervalYearMonthTypeInfo, null);
       case INTERVAL_DAY:
       case INTERVAL_DAY_HOUR:
       case INTERVAL_DAY_MINUTE:
@@ -276,42 +277,42 @@ public class ExprNodeConverter extends RexVisitorImpl<ExprNodeDesc> {
       case INTERVAL_MINUTE:
       case INTERVAL_MINUTE_SECOND:
       case INTERVAL_SECOND:
-        return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo, null);
       default:
-        return new ExprNodeConstantDesc(TypeInfoFactory.voidTypeInfo, null);
+        return new ExprNodeConstantDesc(TypeInfoUtils.voidTypeInfo, null);
       }
     } else {
       switch (literal.getType().getSqlTypeName()) {
       case BOOLEAN:
-        return new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, Boolean.valueOf(RexLiteral
+        return new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, Boolean.valueOf(RexLiteral
             .booleanValue(literal)));
       case TINYINT:
-        return new ExprNodeConstantDesc(TypeInfoFactory.byteTypeInfo, Byte.valueOf(((Number) literal
+        return new ExprNodeConstantDesc(TypeInfoUtils.byteTypeInfo, Byte.valueOf(((Number) literal
             .getValue3()).byteValue()));
       case SMALLINT:
-        return new ExprNodeConstantDesc(TypeInfoFactory.shortTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.shortTypeInfo,
             Short.valueOf(((Number) literal.getValue3()).shortValue()));
       case INTEGER:
-        return new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo,
             Integer.valueOf(((Number) literal.getValue3()).intValue()));
       case BIGINT:
-        return new ExprNodeConstantDesc(TypeInfoFactory.longTypeInfo, Long.valueOf(((Number) literal
+        return new ExprNodeConstantDesc(TypeInfoUtils.longTypeInfo, Long.valueOf(((Number) literal
             .getValue3()).longValue()));
       case FLOAT:
       case REAL:
-        return new ExprNodeConstantDesc(TypeInfoFactory.floatTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.floatTypeInfo,
             Float.valueOf(((Number) literal.getValue3()).floatValue()));
       case DOUBLE:
-        return new ExprNodeConstantDesc(TypeInfoFactory.doubleTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.doubleTypeInfo,
             Double.valueOf(((Number) literal.getValue3()).doubleValue()));
       case DATE:
-        return new ExprNodeConstantDesc(TypeInfoFactory.dateTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.dateTypeInfo,
             Date.valueOf(literal.getValueAs(DateString.class).toString()));
       case TIME:
-        return new ExprNodeConstantDesc(TypeInfoFactory.timestampTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.timestampTypeInfo,
             Timestamp.valueOf(literal.getValueAs(TimeString.class).toString()));
       case TIMESTAMP:
-        return new ExprNodeConstantDesc(TypeInfoFactory.timestampTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.timestampTypeInfo,
             Timestamp.valueOf(literal.getValueAs(TimestampString.class).toString()));
       case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
         HiveConf conf;
@@ -325,19 +326,19 @@ public class ExprNodeConverter extends RexVisitorImpl<ExprNodeDesc> {
         return new ExprNodeConstantDesc(TypeInfoFactory.getTimestampTZTypeInfo(conf.getLocalTimeZone()),
             literal.getValueAs(TimestampString.class).toString() + " UTC");
       case BINARY:
-        return new ExprNodeConstantDesc(TypeInfoFactory.binaryTypeInfo, literal.getValue3());
+        return new ExprNodeConstantDesc(TypeInfoUtils.binaryTypeInfo, literal.getValue3());
       case DECIMAL:
         return new ExprNodeConstantDesc(TypeInfoFactory.getDecimalTypeInfo(lType.getPrecision(),
             lType.getScale()), HiveDecimal.create((BigDecimal)literal.getValue3()));
       case VARCHAR:
       case CHAR: {
-        return new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, literal.getValue3());
+        return new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, literal.getValue3());
       }
       case INTERVAL_YEAR:
       case INTERVAL_MONTH:
       case INTERVAL_YEAR_MONTH: {
         BigDecimal monthsBd = (BigDecimal) literal.getValue();
-        return new ExprNodeConstantDesc(TypeInfoFactory.intervalYearMonthTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.intervalYearMonthTypeInfo,
                 new HiveIntervalYearMonth(monthsBd.intValue()));
       }
       case INTERVAL_DAY:
@@ -353,11 +354,11 @@ public class ExprNodeConverter extends RexVisitorImpl<ExprNodeDesc> {
         BigDecimal millisBd = (BigDecimal) literal.getValue();
         // Calcite literal is in millis, we need to convert to seconds
         BigDecimal secsBd = millisBd.divide(BigDecimal.valueOf(1000));
-        return new ExprNodeConstantDesc(TypeInfoFactory.intervalDayTimeTypeInfo,
+        return new ExprNodeConstantDesc(TypeInfoUtils.intervalDayTimeTypeInfo,
                 new HiveIntervalDayTime(secsBd));
       }
       default:
-        return new ExprNodeConstantDesc(TypeInfoFactory.voidTypeInfo, literal.getValue3());
+        return new ExprNodeConstantDesc(TypeInfoUtils.voidTypeInfo, literal.getValue3());
       }
     }
   }

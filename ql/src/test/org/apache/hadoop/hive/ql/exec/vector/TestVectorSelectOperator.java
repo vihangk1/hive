@@ -21,9 +21,7 @@ package org.apache.hadoop.hive.ql.exec.vector;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.hadoop.hive.ql.CompilationOpContext;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.VectorExpression;
@@ -39,7 +37,7 @@ import org.apache.hadoop.hive.ql.plan.VectorSelectDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPPlus;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 
 /**
@@ -109,7 +107,7 @@ public class TestVectorSelectOperator {
     children.add(colDesc1);
     children.add(colDesc2);
     plusDesc.setChildren(children);
-    plusDesc.setTypeInfo(TypeInfoFactory.longTypeInfo);
+    plusDesc.setTypeInfo(TypeInfoUtils.longTypeInfo);
 
     colList.add(plusDesc);
     colList.add(colDesc3);

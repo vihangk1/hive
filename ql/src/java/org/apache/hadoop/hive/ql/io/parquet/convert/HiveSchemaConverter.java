@@ -23,7 +23,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.ListTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.parquet.schema.ConversionPatterns;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.MessageType;
@@ -59,30 +59,30 @@ public class HiveSchemaConverter {
   private static Type convertType(final String name, final TypeInfo typeInfo,
                                   final Repetition repetition) {
     if (typeInfo.getCategory().equals(Category.PRIMITIVE)) {
-      if (typeInfo.equals(TypeInfoFactory.stringTypeInfo)) {
+      if (typeInfo.equals(TypeInfoUtils.stringTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.BINARY, repetition).as(OriginalType.UTF8)
           .named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.intTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.intTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.INT32, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.shortTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.shortTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.INT32, repetition)
             .as(OriginalType.INT_16).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.byteTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.byteTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.INT32, repetition)
             .as(OriginalType.INT_8).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.longTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.longTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.INT64, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.doubleTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.doubleTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.DOUBLE, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.floatTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.floatTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.FLOAT, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.booleanTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.booleanTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.BOOLEAN, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.binaryTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.binaryTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.BINARY, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.timestampTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.timestampTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.INT96, repetition).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.voidTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.voidTypeInfo)) {
         throw new UnsupportedOperationException("Void type not implemented");
       } else if (typeInfo.getTypeName().toLowerCase().startsWith(
           serdeConstants.CHAR_TYPE_NAME)) {
@@ -99,10 +99,10 @@ public class HiveSchemaConverter {
         int bytes = ParquetHiveSerDe.PRECISION_TO_BYTE_COUNT[prec - 1];
         return Types.optional(PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY).length(bytes).as(OriginalType.DECIMAL).
             scale(scale).precision(prec).named(name);
-      } else if (typeInfo.equals(TypeInfoFactory.dateTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.dateTypeInfo)) {
         return Types.primitive(PrimitiveTypeName.INT32, repetition).as(OriginalType.DATE).named
             (name);
-      } else if (typeInfo.equals(TypeInfoFactory.unknownTypeInfo)) {
+      } else if (typeInfo.equals(TypeInfoUtils.unknownTypeInfo)) {
         throw new UnsupportedOperationException("Unknown type not implemented");
       } else {
         throw new IllegalArgumentException("Unknown type: " + typeInfo);

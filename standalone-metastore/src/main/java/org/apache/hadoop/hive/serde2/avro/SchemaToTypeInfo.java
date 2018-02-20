@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.avro.Schema;
+import org.apache.hadoop.hive.metastore.ColumnType;
 import org.apache.hadoop.hive.metastore.avro.utils.AvroSchemaUtils;
 import org.apache.hadoop.hive.metastore.avro.utils.AvroSerDeConstants;
 import org.apache.hadoop.hive.metastore.avro.utils.InstanceCache;
@@ -176,14 +177,14 @@ public class SchemaToTypeInfo {
       return TypeInfoFactory.getVarcharTypeInfo(maxLength);
     }
 
-    if (type == INT &&
-        AvroSerDeConstants.DATE_TYPE_NAME.equals(schema.getProp(AvroSerDeConstants.AVRO_PROP_LOGICAL_TYPE))) {
-      return TypeInfoFactory.dateTypeInfo;
+    if (type == INT && AvroSerDeConstants.DATE_TYPE_NAME
+        .equals(schema.getProp(AvroSerDeConstants.AVRO_PROP_LOGICAL_TYPE))) {
+      return TypeInfoFactory.getPrimitiveTypeInfo(ColumnType.DATE_TYPE_NAME);
     }
 
-    if (type == LONG &&
-        AvroSerDeConstants.AVRO_TIMESTAMP_TYPE_NAME.equals(schema.getProp(AvroSerDeConstants.AVRO_PROP_LOGICAL_TYPE))) {
-      return TypeInfoFactory.timestampTypeInfo;
+    if (type == LONG && AvroSerDeConstants.AVRO_TIMESTAMP_TYPE_NAME
+        .equals(schema.getProp(AvroSerDeConstants.AVRO_PROP_LOGICAL_TYPE))) {
+      return TypeInfoFactory.getPrimitiveTypeInfo(ColumnType.TIMESTAMP_TYPE_NAME);
     }
 
     return typeInfoCache.retrieve(schema, seenSchemas);

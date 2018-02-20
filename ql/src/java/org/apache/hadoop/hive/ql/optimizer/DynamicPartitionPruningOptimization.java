@@ -76,7 +76,7 @@ import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFBloomFilter.GenericUDAFBloomFilterEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,7 +248,7 @@ public class DynamicPartitionPruningOptimization implements NodeProcessor {
           bloomFilterArgs.add(ctx.parent.getChildren().get(0));
           bloomFilterArgs.add(new ExprNodeDynamicValueDesc(
                   new DynamicValue(keyBaseAlias + "_bloom_filter",
-                          TypeInfoFactory.binaryTypeInfo)));
+                          TypeInfoUtils.binaryTypeInfo)));
           ExprNodeDesc bloomFilterNode = ExprNodeGenericFuncDesc.newInstance(
                   FunctionRegistry.getFunctionInfo("in_bloom_filter").
                           getGenericUDF(), bloomFilterArgs);
@@ -614,7 +614,7 @@ public class DynamicPartitionPruningOptimization implements NodeProcessor {
     }
 
     // Bloom Filter uses binary
-    ExprNodeColumnDesc colExpr = new ExprNodeColumnDesc(TypeInfoFactory.binaryTypeInfo,
+    ExprNodeColumnDesc colExpr = new ExprNodeColumnDesc(TypeInfoUtils.binaryTypeInfo,
             gbOutputNames.get(colPos++), "", false);
     rsValueCols.add(colExpr);
 
@@ -721,7 +721,7 @@ public class DynamicPartitionPruningOptimization implements NodeProcessor {
     }
 
     // Bloom Filter uses binary
-    ExprNodeColumnDesc colBFExpr = new ExprNodeColumnDesc(TypeInfoFactory.binaryTypeInfo,
+    ExprNodeColumnDesc colBFExpr = new ExprNodeColumnDesc(TypeInfoUtils.binaryTypeInfo,
             gbOutputNames.get(colPos++), "", false);
     rsValueCols.add(colBFExpr);
 

@@ -21,8 +21,6 @@ package org.apache.hadoop.hive.ql.exec.vector.expressions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
@@ -30,8 +28,7 @@ import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.exec.vector.util.VectorizedRowGroupGenUtil;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 
 /**
@@ -41,13 +38,13 @@ public class TestConstantVectorExpression {
 
   @Test
   public void testConstantExpression() throws Exception {
-    ConstantVectorExpression longCve = new ConstantVectorExpression(0, 17, TypeInfoFactory.longTypeInfo);
-    ConstantVectorExpression doubleCve = new ConstantVectorExpression(1, 17.34, TypeInfoFactory.doubleTypeInfo);
+    ConstantVectorExpression longCve = new ConstantVectorExpression(0, 17, TypeInfoUtils.longTypeInfo);
+    ConstantVectorExpression doubleCve = new ConstantVectorExpression(1, 17.34, TypeInfoUtils.doubleTypeInfo);
     String str = "alpha";
-    ConstantVectorExpression bytesCve = new ConstantVectorExpression(2, str.getBytes(), TypeInfoFactory.stringTypeInfo);
+    ConstantVectorExpression bytesCve = new ConstantVectorExpression(2, str.getBytes(), TypeInfoUtils.stringTypeInfo);
     HiveDecimal decVal = HiveDecimal.create("25.8");
-    ConstantVectorExpression decimalCve = new ConstantVectorExpression(3, decVal, PrimitiveObjectInspectorFactory.decimalTypeInfo);
-    ConstantVectorExpression nullCve = new ConstantVectorExpression(4, TypeInfoFactory.stringTypeInfo, true);
+    ConstantVectorExpression decimalCve = new ConstantVectorExpression(3, decVal, TypeInfoUtils.decimalTypeInfo);
+    ConstantVectorExpression nullCve = new ConstantVectorExpression(4, TypeInfoUtils.stringTypeInfo, true);
 
     int size = 20;
     VectorizedRowBatch vrg = VectorizedRowGroupGenUtil.getVectorizedRowBatch(size, 5, 0);

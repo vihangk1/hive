@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.LazySimpleStructObject
 import org.apache.hadoop.hive.serde2.lazydio.LazyDioInteger;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,9 +54,9 @@ public class TestLazyAccumuloRow {
   @Test
   public void testExpectedDeserializationOfColumns() throws Exception {
     List<String> columns = Arrays.asList("row", "given_name", "surname", "age", "weight", "height");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo);
 
     LazySimpleStructObjectInspector objectInspector = (LazySimpleStructObjectInspector) LazyFactory
         .createLazyStructInspector(columns, types, LazySerDeParameters.DefaultSeparators, new Text(
@@ -114,9 +115,9 @@ public class TestLazyAccumuloRow {
   @Test
   public void testDeserializationOfBinaryEncoding() throws Exception {
     List<String> columns = Arrays.asList("row", "given_name", "surname", "age", "weight", "height");
-    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo, TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo, TypeInfoFactory.intTypeInfo);
+    List<TypeInfo> types = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo, TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo, TypeInfoUtils.intTypeInfo);
 
     LazySimpleStructObjectInspector objectInspector = (LazySimpleStructObjectInspector) LazyFactory
         .createLazyStructInspector(columns, types, LazySerDeParameters.DefaultSeparators, new Text(

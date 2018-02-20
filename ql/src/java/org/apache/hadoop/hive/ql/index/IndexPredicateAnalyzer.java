@@ -52,8 +52,8 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToDecimal;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToUnixTimeStamp;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToUtcTimestamp;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToVarchar;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBaseCompare;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * IndexPredicateAnalyzer decomposes predicates, separating the parts
@@ -220,7 +220,7 @@ public class IndexPredicateAnalyzer {
         return residuals.get(0);
       } else if (residuals.size() > 1) {
         return new ExprNodeGenericFuncDesc(
-            TypeInfoFactory.booleanTypeInfo,
+            TypeInfoUtils.booleanTypeInfo,
             FunctionRegistry.getGenericUDFForAnd(),
             residuals);
       }
@@ -320,7 +320,7 @@ public class IndexPredicateAnalyzer {
       children.add(expr);
       children.add(searchCondition.getIndexExpr());
       expr = new ExprNodeGenericFuncDesc(
-        TypeInfoFactory.booleanTypeInfo,
+        TypeInfoUtils.booleanTypeInfo,
         FunctionRegistry.getGenericUDFForAnd(),
         children);
     }
@@ -348,7 +348,7 @@ public class IndexPredicateAnalyzer {
       children.add(expr);
       children.add(searchCondition.getOriginalExpr());
       expr = new ExprNodeGenericFuncDesc(
-        TypeInfoFactory.booleanTypeInfo,
+        TypeInfoUtils.booleanTypeInfo,
         FunctionRegistry.getGenericUDFForAnd(),
         children);
     }

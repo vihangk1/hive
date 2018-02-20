@@ -38,7 +38,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBridge;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 
 /*
@@ -65,7 +65,7 @@ public class TestVectorUDFAdaptor {
 
     // create a syntax tree for a simple function call "longudf(col0)"
     ExprNodeGenericFuncDesc funcDesc;
-    TypeInfo typeInfo = TypeInfoFactory.longTypeInfo;
+    TypeInfo typeInfo = TypeInfoUtils.longTypeInfo;
     GenericUDFBridge genericUDFBridge = new GenericUDFBridge("longudf", false,
         LongUDF.class.getName());
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
@@ -128,9 +128,9 @@ public class TestVectorUDFAdaptor {
 
     // create a syntax tree for a function call "testudf(col0, col1, col2)"
     ExprNodeGenericFuncDesc funcDesc;
-    TypeInfo typeInfoStr = TypeInfoFactory.stringTypeInfo;
-    TypeInfo typeInfoLong = TypeInfoFactory.longTypeInfo;
-    TypeInfo typeInfoDbl = TypeInfoFactory.doubleTypeInfo;
+    TypeInfo typeInfoStr = TypeInfoUtils.stringTypeInfo;
+    TypeInfo typeInfoLong = TypeInfoUtils.longTypeInfo;
+    TypeInfo typeInfoDbl = TypeInfoUtils.doubleTypeInfo;
     GenericUDFBridge genericUDFBridge = new GenericUDFBridge("testudf", false,
         ConcatTextLongDoubleUDF.class.getName());
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
@@ -251,7 +251,7 @@ public class TestVectorUDFAdaptor {
     // create a syntax tree for a function call 'myisnull(col0, "UNKNOWN")'
     ExprNodeGenericFuncDesc funcDesc;
     GenericUDF genericUDF = new GenericUDFIsNull();
-    TypeInfo typeInfoStr = TypeInfoFactory.stringTypeInfo;
+    TypeInfo typeInfoStr = TypeInfoUtils.stringTypeInfo;
 
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     children.add(new ExprNodeColumnDesc(typeInfoStr, "col0", "tablename", false));

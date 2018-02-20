@@ -36,6 +36,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -59,7 +60,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(4L, res.get());
   }
@@ -77,7 +78,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(74L, res.get());
   }
@@ -95,7 +96,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(-747L, res.get());
   }
@@ -113,7 +114,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(3234747L, res.get());
   }
@@ -131,7 +132,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(-324L, res.get());
   }
@@ -149,7 +150,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(32300L, res.get());
   }
@@ -186,7 +187,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(32300L, res.get());
   }
@@ -206,7 +207,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(32300L, res.get());
   }
@@ -226,7 +227,7 @@ public class TestGenericUDFFloor {
     };
 
     PrimitiveObjectInspector oi = (PrimitiveObjectInspector) udf.initialize(inputOIs);
-    Assert.assertEquals(TypeInfoFactory.longTypeInfo, oi.getTypeInfo());
+    Assert.assertEquals(TypeInfoUtils.longTypeInfo, oi.getTypeInfo());
     LongWritable res = (LongWritable) udf.evaluate(args);
     Assert.assertEquals(32300L, res.get());
   }

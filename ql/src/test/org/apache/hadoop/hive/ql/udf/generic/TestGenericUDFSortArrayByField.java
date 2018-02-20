@@ -30,7 +30,7 @@ import org.apache.hadoop.hive.serde2.io.HiveVarcharWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
@@ -185,11 +185,11 @@ public class TestGenericUDFSortArrayByField {
         .getStandardListObjectInspector(PrimitiveObjectInspectorFactory.writableIntObjectInspector));
 
     ObjectInspector field =
-        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo,
+        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo,
             new Text("Scores"));
 
     ObjectInspector orderField =
-        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo,
+        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo,
             new Text("desc"));
 
     ObjectInspector[] inputOIs =

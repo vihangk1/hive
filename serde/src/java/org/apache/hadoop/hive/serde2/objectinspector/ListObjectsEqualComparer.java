@@ -25,7 +25,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.IntObjectInspecto
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
@@ -64,8 +63,8 @@ public class ListObjectsEqualComparer {
 
       TypeInfo type0 = TypeInfoUtils.getTypeInfoFromObjectInspector(oi0);
       TypeInfo type1 = TypeInfoUtils.getTypeInfoFromObjectInspector(oi1);
-      if (type0.equals(TypeInfoFactory.stringTypeInfo) &&
-          type1.equals(TypeInfoFactory.stringTypeInfo)) {
+      if (type0.equals(TypeInfoUtils.stringTypeInfo) &&
+          type1.equals(TypeInfoUtils.stringTypeInfo)) {
         soi0 = (StringObjectInspector) oi0;
         soi1 = (StringObjectInspector) oi1;
         if (soi0.preferWritable() || soi1.preferWritable()) {
@@ -73,23 +72,23 @@ public class ListObjectsEqualComparer {
         } else {
           compareType = CompareType.COMPARE_STRING;
         }
-      } else if (type0.equals(TypeInfoFactory.intTypeInfo) &&
-          type1.equals(TypeInfoFactory.intTypeInfo)) {
+      } else if (type0.equals(TypeInfoUtils.intTypeInfo) &&
+          type1.equals(TypeInfoUtils.intTypeInfo)) {
         compareType = CompareType.COMPARE_INT;
         ioi0 = (IntObjectInspector) oi0;
         ioi1 = (IntObjectInspector) oi1;
-      } else if (type0.equals(TypeInfoFactory.longTypeInfo) &&
-          type1.equals(TypeInfoFactory.longTypeInfo)) {
+      } else if (type0.equals(TypeInfoUtils.longTypeInfo) &&
+          type1.equals(TypeInfoUtils.longTypeInfo)) {
         compareType = CompareType.COMPARE_LONG;
         loi0 = (LongObjectInspector) oi0;
         loi1 = (LongObjectInspector) oi1;
-      } else if (type0.equals(TypeInfoFactory.byteTypeInfo) &&
-          type1.equals(TypeInfoFactory.byteTypeInfo)) {
+      } else if (type0.equals(TypeInfoUtils.byteTypeInfo) &&
+          type1.equals(TypeInfoUtils.byteTypeInfo)) {
         compareType = CompareType.COMPARE_BYTE;
         byoi0 = (ByteObjectInspector) oi0;
         byoi1 = (ByteObjectInspector) oi1;
-      } else if (type0.equals(TypeInfoFactory.booleanTypeInfo) &&
-          type1.equals(TypeInfoFactory.booleanTypeInfo)) {
+      } else if (type0.equals(TypeInfoUtils.booleanTypeInfo) &&
+          type1.equals(TypeInfoUtils.booleanTypeInfo)) {
         compareType = CompareType.COMPARE_BOOL;
         boi0 = (BooleanObjectInspector) oi0;
         boi1 = (BooleanObjectInspector) oi1;

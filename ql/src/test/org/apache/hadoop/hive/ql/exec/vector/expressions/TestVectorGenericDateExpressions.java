@@ -28,7 +28,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,11 +65,11 @@ public class TestVectorGenericDateExpressions {
   private TypeInfo primitiveCategoryToTypeInfo(PrimitiveCategory primitiveCategory) {
     switch (primitiveCategory) {
     case DATE:
-      return TypeInfoFactory.dateTypeInfo;
+      return TypeInfoUtils.dateTypeInfo;
     case STRING:
-      return TypeInfoFactory.stringTypeInfo;
+      return TypeInfoUtils.stringTypeInfo;
     case TIMESTAMP:
-      return TypeInfoFactory.timestampTypeInfo;
+      return TypeInfoUtils.timestampTypeInfo;
     default:
       throw new RuntimeException("Unexpected primitive category " + primitiveCategory);
     }
@@ -120,7 +120,7 @@ public class TestVectorGenericDateExpressions {
     } else {
       udf = new VectorUDFDateSubColScalar(0, scalar2, 1);
     }
-    udf.setInputTypeInfos(new TypeInfo[] {primitiveCategoryToTypeInfo(colType1), TypeInfoFactory.voidTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] {primitiveCategoryToTypeInfo(colType1), TypeInfoUtils.voidTypeInfo});
     udf.transientInit();
     udf.evaluate(batch);
     LongColumnVector output = (LongColumnVector) batch.cols[1];
@@ -184,7 +184,7 @@ public class TestVectorGenericDateExpressions {
       testDateAddColScalar(colType1, true);
 
     VectorExpression udf = new VectorUDFDateAddColScalar(0, 0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
     batch.cols[0] = new BytesColumnVector(1);
@@ -204,7 +204,7 @@ public class TestVectorGenericDateExpressions {
       testDateAddColScalar(colType1, false);
 
     VectorExpression udf = new VectorUDFDateSubColScalar(0, 0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
     batch.cols[0] = new BytesColumnVector(1);
@@ -255,7 +255,7 @@ public class TestVectorGenericDateExpressions {
           throw new Error("Invalid input type: " + colType1.name());
       }
     }
-    udf.setInputTypeInfos(new TypeInfo[] {primitiveCategoryToTypeInfo(colType1), TypeInfoFactory.voidTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] {primitiveCategoryToTypeInfo(colType1), TypeInfoUtils.voidTypeInfo});
     udf.transientInit();
     udf.evaluate(batch);
 
@@ -301,7 +301,7 @@ public class TestVectorGenericDateExpressions {
       testDateAddScalarCol(scalarType1, true);
 
     VectorExpression udf = new VectorUDFDateAddScalarCol("error".getBytes(utf8), 0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
     batch.cols[0] = new LongColumnVector(1);
@@ -316,7 +316,7 @@ public class TestVectorGenericDateExpressions {
       testDateAddScalarCol(scalarType1, false);
 
     VectorExpression udf = new VectorUDFDateSubScalarCol("error".getBytes(utf8), 0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
     batch.cols[0] = new LongColumnVector(1);
@@ -335,7 +335,7 @@ public class TestVectorGenericDateExpressions {
     } else {
       udf = new VectorUDFDateSubColCol(0, 1, 2);
     }
-    udf.setInputTypeInfos(new TypeInfo[] {primitiveCategoryToTypeInfo(colType1), TypeInfoFactory.voidTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] {primitiveCategoryToTypeInfo(colType1), TypeInfoUtils.voidTypeInfo});
     udf.transientInit();
     udf.evaluate(batch);
     LongColumnVector output = (LongColumnVector) batch.cols[2];
@@ -390,7 +390,7 @@ public class TestVectorGenericDateExpressions {
     BytesColumnVector bcv;
     byte[] bytes = "error".getBytes(utf8);
 
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     batch.cols[0] = new BytesColumnVector(1);
     batch.cols[1] = new LongColumnVector(1);
@@ -413,7 +413,7 @@ public class TestVectorGenericDateExpressions {
     BytesColumnVector bcv;
     byte[] bytes = "error".getBytes(utf8);
 
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     batch.cols[0] = new BytesColumnVector(1);
     batch.cols[1] = new LongColumnVector(1);
@@ -480,7 +480,7 @@ public class TestVectorGenericDateExpressions {
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
 
     udf = new VectorUDFDateDiffScalarCol(new Timestamp(0), 0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.stringTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.stringTypeInfo});
     udf.transientInit();
     batch.cols[0] = new BytesColumnVector(1);
     batch.cols[1] = new LongColumnVector(1);
@@ -493,7 +493,7 @@ public class TestVectorGenericDateExpressions {
     Assert.assertEquals(batch.cols[1].isNull[0], true);
 
     udf = new VectorUDFDateDiffScalarCol(bytes, 0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     batch.cols[0] = new LongColumnVector(1);
     batch.cols[1] = new LongColumnVector(1);
@@ -551,7 +551,7 @@ public class TestVectorGenericDateExpressions {
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
 
     udf = new VectorUDFDateDiffColScalar(0, 0L, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.stringTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.stringTypeInfo});
     batch.cols[0] = new BytesColumnVector(1);
     batch.cols[1] = new LongColumnVector(1);
 
@@ -563,7 +563,7 @@ public class TestVectorGenericDateExpressions {
     Assert.assertEquals(batch.cols[1].isNull[0], true);
 
     udf = new VectorUDFDateDiffColScalar(0, bytes, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.stringTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.stringTypeInfo});
     udf.transientInit();
     batch.cols[0] = new LongColumnVector(1);
     batch.cols[1] = new LongColumnVector(1);
@@ -617,7 +617,7 @@ public class TestVectorGenericDateExpressions {
     BytesColumnVector bcv;
     byte[] bytes = "error".getBytes(utf8);
 
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo, TypeInfoFactory.timestampTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo, TypeInfoUtils.timestampTypeInfo});
     udf.transientInit();
     batch.cols[0] = new BytesColumnVector(1);
     batch.cols[1] = new TimestampColumnVector(1);
@@ -629,7 +629,7 @@ public class TestVectorGenericDateExpressions {
     udf.evaluate(batch);
     Assert.assertEquals(batch.cols[2].isNull[0], true);
 
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.timestampTypeInfo, TypeInfoFactory.stringTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.timestampTypeInfo, TypeInfoUtils.stringTypeInfo});
     udf.transientInit();
     batch.cols[0] = new TimestampColumnVector(1);
     batch.cols[1] = new BytesColumnVector(1);
@@ -691,7 +691,7 @@ public class TestVectorGenericDateExpressions {
     }
 
     VectorExpression udf = new VectorUDFDateString(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     udf.transientInit();
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
     batch.cols[0] = new BytesColumnVector(1);
@@ -751,7 +751,7 @@ public class TestVectorGenericDateExpressions {
     }
 
     VectorExpression udf = new CastStringToDate(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.stringTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.stringTypeInfo});
     udf.transientInit();
     VectorizedRowBatch batch = new VectorizedRowBatch(2, 1);
     batch.cols[0] = new BytesColumnVector(1);

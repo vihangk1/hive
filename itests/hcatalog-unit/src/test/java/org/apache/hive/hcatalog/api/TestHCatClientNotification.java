@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.apache.hadoop.hive.metastore.TableType;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hive.hcatalog.messaging.AddPartitionMessage;
 import org.apache.hive.hcatalog.messaging.CreateDatabaseMessage;
 import org.apache.hive.hcatalog.messaging.CreateTableMessage;
@@ -38,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.NotificationEvent;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hive.hcatalog.common.HCatConstants;
 import org.apache.hive.hcatalog.data.schema.HCatFieldSchema;
 import org.apache.hive.hcatalog.listener.DbNotificationListener;
@@ -121,7 +121,7 @@ public class TestHCatClientNotification {
     String dbName = "default";
     String tableName = "hcatcreatetable";
     HCatTable table = new HCatTable(dbName, tableName);
-    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoFactory.stringTypeInfo, "")));
+    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoUtils.stringTypeInfo, "")));
     hCatClient.createTable(HCatCreateTableDesc.create(table).build());
 
     List<HCatNotificationEvent> events = hCatClient.getNextNotification(firstEventId, 0, null);
@@ -152,7 +152,7 @@ public class TestHCatClientNotification {
     String dbName = "default";
     String tableName = "hcatdroptable";
     HCatTable table = new HCatTable(dbName, tableName);
-    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoFactory.stringTypeInfo, "")));
+    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoUtils.stringTypeInfo, "")));
     hCatClient.createTable(HCatCreateTableDesc.create(table).build());
     hCatClient.dropTable(dbName, tableName, false);
 
@@ -178,8 +178,8 @@ public class TestHCatClientNotification {
     String tableName = "hcataddparttable";
     String partColName = "pc";
     HCatTable table = new HCatTable(dbName, tableName);
-    table.partCol(new HCatFieldSchema(partColName, TypeInfoFactory.stringTypeInfo, ""));
-    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoFactory.stringTypeInfo, "")));
+    table.partCol(new HCatFieldSchema(partColName, TypeInfoUtils.stringTypeInfo, ""));
+    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoUtils.stringTypeInfo, "")));
     hCatClient.createTable(HCatCreateTableDesc.create(table).build());
     String partName = "testpart";
     Map<String, String> partSpec = new HashMap<String, String>(1);
@@ -222,8 +222,8 @@ public class TestHCatClientNotification {
     String tableName = "hcatdropparttable";
     String partColName = "pc";
     HCatTable table = new HCatTable(dbName, tableName);
-    table.partCol(new HCatFieldSchema(partColName, TypeInfoFactory.stringTypeInfo, ""));
-    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoFactory.stringTypeInfo, "")));
+    table.partCol(new HCatFieldSchema(partColName, TypeInfoUtils.stringTypeInfo, ""));
+    table.cols(Arrays.asList(new HCatFieldSchema("onecol", TypeInfoUtils.stringTypeInfo, "")));
     hCatClient.createTable(HCatCreateTableDesc.create(table).build());
     String partName = "testpart";
     Map<String, String> partSpec = new HashMap<String, String>(1);

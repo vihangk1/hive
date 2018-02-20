@@ -22,6 +22,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -30,8 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.hadoop.hive.common.type.HiveChar;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.common.type.HiveVarchar;
+import org.apache.hadoop.hive.metastore.ColumnType;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.MapObjectInspector;
@@ -57,6 +60,73 @@ import org.slf4j.LoggerFactory;
  */
 public final class TypeInfoUtils {
 
+  // In case of parameterized typeInfos below we keep a final reference to
+  // the default typeInfos for these types. This types are initialized in the static block
+  // below which also populates the TypeInfoFactory cache with these types
+  // these are here instead of TypeInfoFactory because they rely on attributes which
+  // are implementation specific and defined in Hive source code. The TypeInfoFactory in
+  // standalone-metastore cannot depend on type implementations.
+  public static final PrimitiveTypeInfo voidTypeInfo = new PrimitiveTypeInfo(serdeConstants.VOID_TYPE_NAME);
+  public static final PrimitiveTypeInfo booleanTypeInfo = new PrimitiveTypeInfo(serdeConstants.BOOLEAN_TYPE_NAME);
+  public static final PrimitiveTypeInfo intTypeInfo = new PrimitiveTypeInfo(serdeConstants.INT_TYPE_NAME);
+  public static final PrimitiveTypeInfo longTypeInfo = new PrimitiveTypeInfo(ColumnType.BIGINT_TYPE_NAME);
+  public static final PrimitiveTypeInfo stringTypeInfo = new PrimitiveTypeInfo(ColumnType.STRING_TYPE_NAME);
+  public static final PrimitiveTypeInfo floatTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.FLOAT_TYPE_NAME);
+  public static final PrimitiveTypeInfo doubleTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.DOUBLE_TYPE_NAME);
+  public static final PrimitiveTypeInfo byteTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.TINYINT_TYPE_NAME);
+  public static final PrimitiveTypeInfo shortTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.SMALLINT_TYPE_NAME);
+  public static final PrimitiveTypeInfo dateTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.DATE_TYPE_NAME);
+  public static final PrimitiveTypeInfo timestampTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.TIMESTAMP_TYPE_NAME);
+  public static final PrimitiveTypeInfo intervalYearMonthTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.INTERVAL_YEAR_MONTH_TYPE_NAME);
+  public static final PrimitiveTypeInfo intervalDayTimeTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.INTERVAL_DAY_TIME_TYPE_NAME);
+  public static final PrimitiveTypeInfo binaryTypeInfo =
+      new PrimitiveTypeInfo(ColumnType.BINARY_TYPE_NAME);
+
+  public static final PrimitiveTypeInfo decimalTypeInfo =
+      new DecimalTypeInfo(HiveDecimal.SYSTEM_DEFAULT_PRECISION, HiveDecimal.SYSTEM_DEFAULT_SCALE);
+  public static final PrimitiveTypeInfo varcharTypeInfo =
+      new VarcharTypeInfo(HiveVarchar.MAX_VARCHAR_LENGTH);
+  public static final PrimitiveTypeInfo charTypeInfo = new CharTypeInfo(HiveChar.MAX_CHAR_LENGTH);
+  /**
+   * A TimestampTZTypeInfo with system default time zone.
+   */
+  public static final TimestampLocalTZTypeInfo timestampLocalTZTypeInfo =
+      new TimestampLocalTZTypeInfo(ZoneId.systemDefault().getId());
+  public static final PrimitiveTypeInfo unknownTypeInfo = new PrimitiveTypeInfo("unknown");
+
+  static {
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.VOID_TYPE_NAME, voidTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.BOOLEAN_TYPE_NAME, booleanTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.INT_TYPE_NAME, intTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.BIGINT_TYPE_NAME, longTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.STRING_TYPE_NAME, stringTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.FLOAT_TYPE_NAME, floatTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.DOUBLE_TYPE_NAME, doubleTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.TINYINT_TYPE_NAME, byteTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.SMALLINT_TYPE_NAME, shortTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.DATE_TYPE_NAME, dateTypeInfo);
+    TypeInfoFactory
+        .registerPrimitiveTypeInfo(serdeConstants.TIMESTAMP_TYPE_NAME, timestampTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.INTERVAL_YEAR_MONTH_TYPE_NAME,
+        intervalYearMonthTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME,
+        intervalDayTimeTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.BINARY_TYPE_NAME, binaryTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(serdeConstants.TIMESTAMPLOCALTZ_TYPE_NAME,
+        timestampLocalTZTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(decimalTypeInfo.getQualifiedName(), decimalTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(charTypeInfo.getQualifiedName(), decimalTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo(varcharTypeInfo.getQualifiedName(), decimalTypeInfo);
+    TypeInfoFactory.registerPrimitiveTypeInfo("unknown", unknownTypeInfo);
+  }
   protected static final Logger LOG = LoggerFactory.getLogger(TypeInfoUtils.class);
 
   public static List<PrimitiveCategory> numericTypeList = new ArrayList<PrimitiveCategory>();
@@ -102,7 +172,7 @@ public final class TypeInfoUtils {
   private static TypeInfo getExtendedTypeInfoFromJavaType(Type t, Method m) {
 
     if (t == Object.class) {
-      return TypeInfoFactory.unknownTypeInfo;
+      return unknownTypeInfo;
     }
 
     if (t instanceof ParameterizedType) {

@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.apache.hadoop.hive.ql.exec.vector.expressions.VectorExpression;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 
 import com.google.common.base.Preconditions;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * VectorGroupByDesc.
@@ -64,19 +64,19 @@ public class VectorMapJoinDesc extends AbstractVectorDesc  {
     public PrimitiveTypeInfo getPrimitiveTypeInfo() {
       switch (this) {
       case BOOLEAN:
-        return TypeInfoFactory.booleanTypeInfo;
+        return TypeInfoUtils.booleanTypeInfo;
       case BYTE:
-        return TypeInfoFactory.byteTypeInfo;
+        return TypeInfoUtils.byteTypeInfo;
       case INT:
-        return TypeInfoFactory.intTypeInfo;
+        return TypeInfoUtils.intTypeInfo;
       case LONG:
-        return TypeInfoFactory.longTypeInfo;
+        return TypeInfoUtils.longTypeInfo;
       case NONE:
-        return TypeInfoFactory.voidTypeInfo;
+        return TypeInfoUtils.voidTypeInfo;
       case SHORT:
-        return TypeInfoFactory.shortTypeInfo;
+        return TypeInfoUtils.shortTypeInfo;
       case STRING:
-        return TypeInfoFactory.stringTypeInfo;
+        return TypeInfoUtils.stringTypeInfo;
       case MULTI_KEY:
       default:
         return null;

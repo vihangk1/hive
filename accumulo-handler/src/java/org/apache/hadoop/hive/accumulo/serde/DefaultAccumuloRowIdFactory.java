@@ -34,7 +34,7 @@ import org.apache.hadoop.hive.serde2.lazy.LazySerDeParameters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * Default implementation of the AccumuloRowIdFactory which uses the normal
@@ -77,7 +77,7 @@ public class DefaultAccumuloRowIdFactory implements AccumuloRowIdFactory {
 //    return LazyFactory.createLazyObject(inspector,
 //            ColumnEncoding.BINARY == rowIdMapping.getEncoding());
     return LazyFactory.createLazyObject(inspector,
-            !TypeInfoFactory.stringTypeInfo.getTypeName().equals(inspector.getTypeName())
+            !TypeInfoUtils.stringTypeInfo.getTypeName().equals(inspector.getTypeName())
             && ColumnEncoding.BINARY == rowIdMapping.getEncoding());
   }
 

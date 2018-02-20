@@ -54,6 +54,7 @@ import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyStringOb
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
 import org.junit.Before;
@@ -371,13 +372,13 @@ public class TestAccumuloSerDe {
   public void testStructOfMapSerialization() throws IOException, SerDeException {
     List<String> columns = Arrays.asList("row", "col");
     List<String> structColNames = Arrays.asList("map1", "map2");
-    TypeInfo mapTypeInfo = TypeInfoFactory.getMapTypeInfo(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo);
+    TypeInfo mapTypeInfo = TypeInfoFactory.getMapTypeInfo(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo);
 
     // struct<map1:map<string,string>,map2:map<string,string>>,string
     List<TypeInfo> types = Arrays.<TypeInfo> asList(
         TypeInfoFactory.getStructTypeInfo(structColNames, Arrays.asList(mapTypeInfo, mapTypeInfo)),
-        TypeInfoFactory.stringTypeInfo);
+        TypeInfoUtils.stringTypeInfo);
 
     Properties tableProperties = new Properties();
     tableProperties.setProperty(AccumuloSerDeParameters.COLUMN_MAPPINGS, ":rowid,cf:cq");

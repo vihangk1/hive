@@ -24,7 +24,7 @@ import org.apache.hadoop.hive.ql.exec.vector.mapjoin.MapJoinTestDescription.Smal
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.MapJoinTestDescription.SmallTableGenerationParameters.ValueOption;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.VectorMapJoinVariation;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public abstract class MapJoinMultiKeyBenchBase extends AbstractMapJoin {
   
@@ -40,14 +40,14 @@ public abstract class MapJoinMultiKeyBenchBase extends AbstractMapJoin {
     String[] bigTableColumnNames = new String[] {"b1", "b2", "b3"};
     TypeInfo[] bigTableTypeInfos =
         new TypeInfo[] {
-            TypeInfoFactory.intTypeInfo,
-            TypeInfoFactory.longTypeInfo,
-            TypeInfoFactory.stringTypeInfo};
+            TypeInfoUtils.intTypeInfo,
+            TypeInfoUtils.longTypeInfo,
+            TypeInfoUtils.stringTypeInfo};
     int[] bigTableKeyColumnNums = new int[] {0, 1, 2};
 
     String[] smallTableValueColumnNames = new String[] {"sv1"};
     TypeInfo[] smallTableValueTypeInfos =
-        new TypeInfo[] {TypeInfoFactory.stringTypeInfo};
+        new TypeInfo[] { TypeInfoUtils.stringTypeInfo};
 
     int[] bigTableRetainColumnNums = new int[] {0, 1, 2};
 

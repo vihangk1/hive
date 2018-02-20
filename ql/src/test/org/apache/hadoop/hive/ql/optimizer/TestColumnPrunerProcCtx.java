@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBridge;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFPower;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -56,12 +57,12 @@ public class TestColumnPrunerProcCtx {
     ns.add("a");
     ns.add("b");
     List<TypeInfo> tis = new ArrayList<>();
-    TypeInfo aType = TypeInfoFactory.booleanTypeInfo;
-    TypeInfo bType = TypeInfoFactory.doubleTypeInfo;
+    TypeInfo aType = TypeInfoUtils.booleanTypeInfo;
+    TypeInfo bType = TypeInfoUtils.doubleTypeInfo;
     tis.add(aType);
     tis.add(bType);
     col1Type = TypeInfoFactory.getStructTypeInfo(ns, tis);
-    col2Type = TypeInfoFactory.doubleTypeInfo;
+    col2Type = TypeInfoUtils.doubleTypeInfo;
 
     List<String> names = new ArrayList<>();
     names.add("col1");
@@ -80,7 +81,7 @@ public class TestColumnPrunerProcCtx {
 
     ExprNodeDesc colDesc = new ExprNodeColumnDesc(col3Type, "root", "test", false);
     ExprNodeDesc col1 = new ExprNodeFieldDesc(col1Type, colDesc, "col1", false);
-    ExprNodeDesc fieldDesc = new ExprNodeFieldDesc(TypeInfoFactory.booleanTypeInfo, col1, "a", false);
+    ExprNodeDesc fieldDesc = new ExprNodeFieldDesc(TypeInfoUtils.booleanTypeInfo, col1, "a", false);
     final List<FieldNode> paths = Arrays.asList(new FieldNode("_col0"));
 
     SelectOperator selectOperator = buildSelectOperator(Arrays.asList(fieldDesc), paths);
@@ -134,14 +135,14 @@ public class TestColumnPrunerProcCtx {
   public void testGetSelectNestedColPathsFromChildren5(){
     ColumnPrunerProcCtx ctx = new ColumnPrunerProcCtx(null);
 
-    ExprNodeConstantDesc constADesc = new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, "a");
-    ExprNodeConstantDesc constBDesc = new ExprNodeConstantDesc(TypeInfoFactory.doubleTypeInfo, "b");
+    ExprNodeConstantDesc constADesc = new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, "a");
+    ExprNodeConstantDesc constBDesc = new ExprNodeConstantDesc(TypeInfoUtils.doubleTypeInfo, "b");
     List<ExprNodeDesc> list = new ArrayList<>();
     list.add(constADesc);
     list.add(constBDesc);
     GenericUDF udf = mock(GenericUDF.class);
     ExprNodeDesc funcDesc = new ExprNodeGenericFuncDesc(col1Type, udf, "named_struct", list);
-    ExprNodeDesc fieldDesc = new ExprNodeFieldDesc(TypeInfoFactory.doubleTypeInfo, funcDesc, "foo",
+    ExprNodeDesc fieldDesc = new ExprNodeFieldDesc(TypeInfoUtils.doubleTypeInfo, funcDesc, "foo",
       false);
 
     final List<FieldNode> paths = Arrays.asList(new FieldNode("_col0"));
@@ -159,7 +160,7 @@ public class TestColumnPrunerProcCtx {
 
     ExprNodeDesc colDesc = new ExprNodeColumnDesc(col3Type, "root", "test", false);
     ExprNodeDesc col1 = new ExprNodeFieldDesc(col1Type, colDesc, "col1", false);
-    ExprNodeDesc fieldDesc = new ExprNodeFieldDesc(TypeInfoFactory.doubleTypeInfo, col1, "b",
+    ExprNodeDesc fieldDesc = new ExprNodeFieldDesc(TypeInfoUtils.doubleTypeInfo, col1, "b",
       false);
     final List<FieldNode> paths = Arrays.asList(new FieldNode("_col0"));
 
@@ -167,7 +168,7 @@ public class TestColumnPrunerProcCtx {
 
     List<ExprNodeDesc> list = new ArrayList<>();
     list.add(fieldDesc);
-    ExprNodeDesc funcDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.binaryTypeInfo, udf, "abs",
+    ExprNodeDesc funcDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.binaryTypeInfo, udf, "abs",
       list);
 
     SelectOperator selectOperator = buildSelectOperator(Arrays.asList(funcDesc), paths);
@@ -184,7 +185,7 @@ public class TestColumnPrunerProcCtx {
     ExprNodeDesc colDesc = new ExprNodeColumnDesc(col3Type, "root", "test", false);
     ExprNodeDesc col1 = new ExprNodeFieldDesc(col1Type, colDesc, "col1", false);
     ExprNodeDesc fieldDesc1 =
-      new ExprNodeFieldDesc(TypeInfoFactory.doubleTypeInfo, col1, "b", false);
+      new ExprNodeFieldDesc(TypeInfoUtils.doubleTypeInfo, col1, "b", false);
 
     colDesc = new ExprNodeColumnDesc(col3Type, "root", "test", false);
     ExprNodeDesc col2 = new ExprNodeFieldDesc(col2Type, colDesc, "col2", false);
@@ -195,7 +196,7 @@ public class TestColumnPrunerProcCtx {
     List<ExprNodeDesc> list = new ArrayList<>();
     list.add(fieldDesc1);
     list.add(col2);
-    ExprNodeDesc funcDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.doubleTypeInfo, udf, "pow",
+    ExprNodeDesc funcDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.doubleTypeInfo, udf, "pow",
       list);
 
     SelectOperator selectOperator = buildSelectOperator(Arrays.asList(funcDesc), paths);

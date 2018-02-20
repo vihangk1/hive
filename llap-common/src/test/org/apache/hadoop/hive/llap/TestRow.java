@@ -23,12 +23,7 @@ import java.util.Random;
 
 import org.apache.commons.lang.RandomStringUtils;
 
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -76,10 +71,10 @@ public class TestRow {
     List<FieldDesc> colDescs = new ArrayList<FieldDesc>();
 
     colDescs.add(new FieldDesc("col0",
-        TypeInfoFactory.stringTypeInfo));
+        TypeInfoUtils.stringTypeInfo));
 
     colDescs.add(new FieldDesc("col1",
-        TypeInfoFactory.intTypeInfo));
+        TypeInfoUtils.intTypeInfo));
 
     Schema schema = new Schema(colDescs);
     return schema;

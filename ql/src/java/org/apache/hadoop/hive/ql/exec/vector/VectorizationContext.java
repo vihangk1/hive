@@ -82,7 +82,6 @@ import org.apache.hadoop.hive.serde2.typeinfo.HiveDecimalUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -648,7 +647,7 @@ public class VectorizationContext {
 
             // Ok, try the UDF.
             castToBooleanExpr = getVectorExpressionForUdf(null, UDFToBoolean.class, exprAsList,
-                VectorExpressionDescriptor.Mode.PROJECTION, TypeInfoFactory.booleanTypeInfo);
+                VectorExpressionDescriptor.Mode.PROJECTION, TypeInfoUtils.booleanTypeInfo);
             if (castToBooleanExpr == null) {
               throw new HiveException("Cannot vectorize converting expression " +
                   exprDesc.getExprString() + " to boolean");
@@ -942,7 +941,7 @@ public class VectorizationContext {
       for (ExprNodeDesc child : children) {
         TypeInfo castType = commonType;
         if (i++ == 0) {
-          castType = isIntFamily(child.getTypeString()) ? child.getTypeInfo() : TypeInfoFactory.intTypeInfo;
+          castType = isIntFamily(child.getTypeString()) ? child.getTypeInfo() : TypeInfoUtils.intTypeInfo;
         }
         ExprNodeDesc castExpression = getImplicitCastExpression(genericUDF, child, castType);
         if (castExpression != null) {
@@ -1496,7 +1495,7 @@ public class VectorizationContext {
         checkExprNodeDescForDecimal64(childExpr.get(0)) &&
         checkExprNodeDescForDecimal64(childExpr.get(1)) &&
         (checkTypeInfoForDecimal64(returnType) ||
-            returnType.equals(TypeInfoFactory.booleanTypeInfo)));
+            returnType.equals(TypeInfoUtils.booleanTypeInfo)));
   }
 
   private VectorExpression getDecimal64VectorExpressionForUdf(GenericUDF genericUdf,
@@ -2267,7 +2266,7 @@ public class VectorizationContext {
 
     // Create a single child representing the scratch column where we will
     // generate the serialized keys of the batch.
-    int scratchBytesCol = ocm.allocateOutputColumn(TypeInfoFactory.stringTypeInfo);
+    int scratchBytesCol = ocm.allocateOutputColumn(TypeInfoUtils.stringTypeInfo);
 
     Class<?> cl = (mode == VectorExpressionDescriptor.Mode.FILTER ? FilterStructColumnInList.class : StructColumnInList.class);
 
@@ -2751,7 +2750,7 @@ public class VectorizationContext {
     String inputType = inputTypeInfo.toString();
     if (child instanceof ExprNodeConstantDesc) {
       if (null == ((ExprNodeConstantDesc)child).getValue()) {
-        return getConstantVectorExpression(null, TypeInfoFactory.booleanTypeInfo, VectorExpressionDescriptor.Mode.PROJECTION);
+        return getConstantVectorExpression(null, TypeInfoUtils.booleanTypeInfo, VectorExpressionDescriptor.Mode.PROJECTION);
       }
       // Don't do constant folding here.  Wait until the optimizer is changed to do it.
       // Family of related JIRAs: HIVE-7421, HIVE-7422, and HIVE-7424.
@@ -2761,7 +2760,7 @@ public class VectorizationContext {
     if (isStringFamily(inputType)) {
 
       VectorExpression lenExpr = createVectorExpression(CastStringToBoolean.class, childExpr,
-          VectorExpressionDescriptor.Mode.PROJECTION, TypeInfoFactory.booleanTypeInfo);
+          VectorExpressionDescriptor.Mode.PROJECTION, TypeInfoUtils.booleanTypeInfo);
 
       return lenExpr;
     }
@@ -2776,7 +2775,7 @@ public class VectorizationContext {
         // Return a constant vector expression
         Object constantValue = ((ExprNodeConstantDesc) child).getValue();
         Long longValue = castConstantToLong(constantValue, child.getTypeInfo(), integerPrimitiveCategory);
-        return getConstantVectorExpression(longValue, TypeInfoFactory.longTypeInfo, VectorExpressionDescriptor.Mode.PROJECTION);
+        return getConstantVectorExpression(longValue, TypeInfoUtils.longTypeInfo, VectorExpressionDescriptor.Mode.PROJECTION);
     }
     // Float family, timestamp are handled via descriptor based lookup, int family needs
     // special handling.
@@ -2952,7 +2951,7 @@ public class VectorizationContext {
 
       resultExpr.setInputTypeInfos(
           whenExpr.getOutputTypeInfo(),
-          TypeInfoFactory.voidTypeInfo,
+          TypeInfoUtils.voidTypeInfo,
           elseExpr.getOutputTypeInfo());
       resultExpr.setInputDataTypePhysicalVariations(
           whenExpr.getOutputDataTypePhysicalVariation(),
@@ -2981,7 +2980,7 @@ public class VectorizationContext {
       resultExpr.setInputTypeInfos(
           whenExpr.getOutputTypeInfo(),
           thenExpr.getOutputTypeInfo(),
-          TypeInfoFactory.voidTypeInfo);
+          TypeInfoUtils.voidTypeInfo);
       resultExpr.setInputDataTypePhysicalVariations(
           whenExpr.getOutputDataTypePhysicalVariation(),
           thenExpr.getOutputDataTypePhysicalVariation(),

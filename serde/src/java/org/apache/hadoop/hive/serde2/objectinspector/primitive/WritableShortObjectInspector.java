@@ -18,7 +18,7 @@
 package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * A WritableShortObjectInspector inspects a ShortWritable Object.
@@ -28,7 +28,7 @@ public class WritableShortObjectInspector extends
     SettableShortObjectInspector {
 
   WritableShortObjectInspector() {
-    super(TypeInfoFactory.shortTypeInfo);
+    super(TypeInfoUtils.shortTypeInfo);
   }
 
   @Override

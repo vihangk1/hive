@@ -34,7 +34,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.C
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -81,8 +81,8 @@ public abstract class GenericUDFBaseUnary extends GenericUDF {
 
     inputOI = (PrimitiveObjectInspector) arguments[0];
     if (!FunctionRegistry.isNumericType(inputOI.getTypeInfo())
-        && (inputOI.getTypeInfo() != TypeInfoFactory.intervalDayTimeTypeInfo)
-        && (inputOI.getTypeInfo() != TypeInfoFactory.intervalYearMonthTypeInfo)) {
+        && (inputOI.getTypeInfo() != TypeInfoUtils.intervalDayTimeTypeInfo)
+        && (inputOI.getTypeInfo() != TypeInfoUtils.intervalYearMonthTypeInfo)) {
       throw new UDFArgumentTypeException(0, "The "
           + GenericUDFUtils.getOrdinal(1)
           + " argument of " + opName + "  is expected to be a "
@@ -101,7 +101,7 @@ public abstract class GenericUDFBaseUnary extends GenericUDF {
     case STRING:
     case VARCHAR:
     case CHAR:
-      return TypeInfoFactory.doubleTypeInfo;
+      return TypeInfoUtils.doubleTypeInfo;
     default:
       return typeInfo;
     }

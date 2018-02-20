@@ -36,7 +36,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.LongObjectInspect
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BooleanWritable;
 
@@ -88,9 +87,9 @@ public abstract class GenericUDFBaseCompare extends GenericUDFBaseBinary {
     }
 
     if (TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[0]).equals(
-      TypeInfoFactory.stringTypeInfo) &&
+      TypeInfoUtils.stringTypeInfo) &&
       TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[1]).equals(
-      TypeInfoFactory.stringTypeInfo)) {
+      TypeInfoUtils.stringTypeInfo)) {
       soi0 = (StringObjectInspector) arguments[0];
       soi1 = (StringObjectInspector) arguments[1];
       if (soi0.preferWritable() || soi1.preferWritable()) {
@@ -99,30 +98,30 @@ public abstract class GenericUDFBaseCompare extends GenericUDFBaseBinary {
         compareType = CompareType.COMPARE_STRING;
       }
     } else if (TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[0]).equals(
-      TypeInfoFactory.intTypeInfo) &&
+      TypeInfoUtils.intTypeInfo) &&
       TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[1]).equals(
-        TypeInfoFactory.intTypeInfo)) {
+        TypeInfoUtils.intTypeInfo)) {
       compareType = CompareType.COMPARE_INT;
       ioi0 = (IntObjectInspector) arguments[0];
       ioi1 = (IntObjectInspector) arguments[1];
     } else if (TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[0]).equals(
-        TypeInfoFactory.longTypeInfo) &&
+        TypeInfoUtils.longTypeInfo) &&
         TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[1]).equals(
-          TypeInfoFactory.longTypeInfo)) {
+          TypeInfoUtils.longTypeInfo)) {
         compareType = CompareType.COMPARE_LONG;
         loi0 = (LongObjectInspector) arguments[0];
         loi1 = (LongObjectInspector) arguments[1];
     } else if (TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[0]).equals(
-        TypeInfoFactory.byteTypeInfo) &&
+        TypeInfoUtils.byteTypeInfo) &&
         TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[1]).equals(
-          TypeInfoFactory.byteTypeInfo)) {
+          TypeInfoUtils.byteTypeInfo)) {
         compareType = CompareType.COMPARE_BYTE;
         byoi0 = (ByteObjectInspector) arguments[0];
         byoi1 = (ByteObjectInspector) arguments[1];
     } else if (TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[0]).equals(
-        TypeInfoFactory.booleanTypeInfo) &&
+        TypeInfoUtils.booleanTypeInfo) &&
         TypeInfoUtils.getTypeInfoFromObjectInspector(arguments[1]).equals(
-          TypeInfoFactory.booleanTypeInfo)) {
+          TypeInfoUtils.booleanTypeInfo)) {
       compareType = CompareType.COMPARE_BOOL;
       boi0 = (BooleanObjectInspector) arguments[0];
       boi1 = (BooleanObjectInspector) arguments[1];
@@ -141,7 +140,7 @@ public abstract class GenericUDFBaseCompare extends GenericUDFBaseBinary {
         // For now, we always convert to double if we can't find a common type
         compareOI = TypeInfoUtils.getStandardWritableObjectInspectorFromTypeInfo(
             (compareType == null) ?
-            TypeInfoFactory.doubleTypeInfo : compareType);
+            TypeInfoUtils.doubleTypeInfo : compareType);
 
         converter0 = ObjectInspectorConverters.getConverter(arguments[0], compareOI);
         converter1 = ObjectInspectorConverters.getConverter(arguments[1], compareOI);

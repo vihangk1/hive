@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * Resolver for Numeric UDAFs like sum and avg. If the input argument is string
@@ -52,9 +52,9 @@ public class NumericUDAFEvaluatorResolver extends DefaultUDAFEvaluatorResolver {
     // looking for doubles
     ArrayList<TypeInfo> args = new ArrayList<TypeInfo>();
     for (TypeInfo arg : argTypeInfos) {
-      if (arg.equals(TypeInfoFactory.voidTypeInfo)
-          || arg.equals(TypeInfoFactory.stringTypeInfo)) {
-        args.add(TypeInfoFactory.doubleTypeInfo);
+      if (arg.equals(TypeInfoUtils.voidTypeInfo)
+          || arg.equals(TypeInfoUtils.stringTypeInfo)) {
+        args.add(TypeInfoUtils.doubleTypeInfo);
       } else {
         args.add(arg);
       }

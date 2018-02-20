@@ -49,7 +49,6 @@ import org.apache.hadoop.hive.serde2.typeinfo.BaseCharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 
@@ -242,7 +241,7 @@ public final class GenericUDFUtils {
     if (commonTypeInfo instanceof DecimalTypeInfo) {
       if ((!FunctionRegistry.isExactNumericType((PrimitiveTypeInfo)ti)) ||
           (!FunctionRegistry.isExactNumericType((PrimitiveTypeInfo)returnType))) {
-        return TypeInfoFactory.doubleTypeInfo;
+        return TypeInfoUtils.doubleTypeInfo;
       }
     }
     return commonTypeInfo;

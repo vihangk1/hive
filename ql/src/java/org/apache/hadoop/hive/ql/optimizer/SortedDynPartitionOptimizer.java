@@ -66,7 +66,7 @@ import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.plan.ReduceSinkDesc;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -262,9 +262,10 @@ public class SortedDynPartitionOptimizer extends Transform {
       }
       RowSchema selRS = new RowSchema(fsParent.getSchema());
       if (!bucketColumns.isEmpty()) {
-        descs.add(new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, ReduceField.KEY.toString()+".'"+BUCKET_NUMBER_COL_NAME+"'", null, false));
+        descs.add(new ExprNodeColumnDesc(
+            TypeInfoUtils.stringTypeInfo, ReduceField.KEY.toString()+".'"+BUCKET_NUMBER_COL_NAME+"'", null, false));
         colNames.add("'"+BUCKET_NUMBER_COL_NAME+"'");
-        ColumnInfo ci = new ColumnInfo(BUCKET_NUMBER_COL_NAME, TypeInfoFactory.stringTypeInfo, selRS.getSignature().get(0).getTabAlias(), true, true);
+        ColumnInfo ci = new ColumnInfo(BUCKET_NUMBER_COL_NAME, TypeInfoUtils.stringTypeInfo, selRS.getSignature().get(0).getTabAlias(), true, true);
         selRS.getSignature().add(ci);
         fsParent.getSchema().getSignature().add(ci);
       }
@@ -513,7 +514,7 @@ public class SortedDynPartitionOptimizer extends Transform {
       // corresponding with bucket number and hence their OIs
       for (Integer idx : keyColsPosInVal) {
         if (idx < 0) {
-          ExprNodeConstantDesc bucketNumCol = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, BUCKET_NUMBER_COL_NAME);
+          ExprNodeConstantDesc bucketNumCol = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, BUCKET_NUMBER_COL_NAME);
           keyCols.add(bucketNumCol);
           colExprMap.put(Utilities.ReduceField.KEY + ".'" +BUCKET_NUMBER_COL_NAME+"'", bucketNumCol);
         } else {

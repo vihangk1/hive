@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.LongWritable;
 
 public abstract class GenericUDFFloorCeilBase extends GenericUDF {
@@ -84,7 +85,7 @@ public abstract class GenericUDFFloorCeilBase extends GenericUDF {
       ObjectInspector decimalOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(decTypeInfo);
       converter =  ObjectInspectorConverters.getConverter(inputOI, decimalOI);
     } else {
-      resultTypeInfo = TypeInfoFactory.longTypeInfo;
+      resultTypeInfo = TypeInfoUtils.longTypeInfo;
       ObjectInspector doubleObjectInspector = PrimitiveObjectInspectorFactory.writableDoubleObjectInspector;
       converter = ObjectInspectorConverters.getConverter(inputOI, doubleObjectInspector);
     }

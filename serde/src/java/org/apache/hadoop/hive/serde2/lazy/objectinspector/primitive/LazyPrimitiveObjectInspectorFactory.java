@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TimestampLocalTZTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 
 /**
@@ -190,7 +191,7 @@ public final class LazyPrimitiveObjectInspectorFactory {
 
   public static LazyStringObjectInspector getLazyStringObjectInspector(boolean escaped, byte escapeChar) {
     ArrayList<Object> signature = new ArrayList<Object>();
-    signature.add(TypeInfoFactory.stringTypeInfo);
+    signature.add(TypeInfoUtils.stringTypeInfo);
     signature.add(Boolean.valueOf(escaped));
     signature.add(Byte.valueOf(escapeChar));
     LazyStringObjectInspector result = (LazyStringObjectInspector) cachedLazyStringTypeOIs
@@ -248,11 +249,11 @@ public final class LazyPrimitiveObjectInspectorFactory {
       List<String> tsFormats) {
     if (tsFormats == null) {
       // No timestamp format specified, just use default lazy inspector
-      return (LazyTimestampObjectInspector) getLazyObjectInspector(TypeInfoFactory.timestampTypeInfo);
+      return (LazyTimestampObjectInspector) getLazyObjectInspector(TypeInfoUtils.timestampTypeInfo);
     }
 
     ArrayList<Object> signature = new ArrayList<Object>();
-    signature.add(TypeInfoFactory.timestampTypeInfo);
+    signature.add(TypeInfoUtils.timestampTypeInfo);
     signature.add(tsFormats);
     LazyTimestampObjectInspector result = (LazyTimestampObjectInspector) cachedLazyStringTypeOIs
         .get(signature);

@@ -23,6 +23,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -45,10 +46,10 @@ public class RecordIdentifier implements WritableComparable<RecordIdentifier> {
    */
   public enum Field {
     //note the enum names match field names in the struct
-    transactionId(TypeInfoFactory.longTypeInfo,
+    transactionId(TypeInfoUtils.longTypeInfo,
       PrimitiveObjectInspectorFactory.javaLongObjectInspector),
-    bucketId(TypeInfoFactory.intTypeInfo, PrimitiveObjectInspectorFactory.javaIntObjectInspector),
-    rowId(TypeInfoFactory.longTypeInfo, PrimitiveObjectInspectorFactory.javaLongObjectInspector);
+    bucketId(TypeInfoUtils.intTypeInfo, PrimitiveObjectInspectorFactory.javaIntObjectInspector),
+    rowId(TypeInfoUtils.longTypeInfo, PrimitiveObjectInspectorFactory.javaLongObjectInspector);
     public final TypeInfo fieldType;
     public final ObjectInspector fieldOI;
     Field(TypeInfo fieldType, ObjectInspector fieldOI) {

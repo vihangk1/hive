@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.exec.AbstractMapJoinOperator;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
 import org.apache.hadoop.hive.ql.exec.CommonJoinOperator;
@@ -97,7 +96,7 @@ import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -509,14 +508,14 @@ public class StatsRulesProcFactory {
       // We transform the BETWEEN clause to AND clause (with NOT on top in invert is true).
       // This is more straightforward, as the evaluateExpression method will deal with
       // generating the final row count relying on the basic comparator evaluation methods
-      final ExprNodeDesc leftComparator = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      final ExprNodeDesc leftComparator = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           new GenericUDFOPEqualOrGreaterThan(), Lists.newArrayList(comparisonExpression, leftExpression));
-      final ExprNodeDesc rightComparator = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      final ExprNodeDesc rightComparator = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           new GenericUDFOPEqualOrLessThan(), Lists.newArrayList(comparisonExpression, rightExpression));
-      ExprNodeDesc newExpression = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      ExprNodeDesc newExpression = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           new GenericUDFOPAnd(), Lists.newArrayList(leftComparator, rightComparator));
       if (invert) {
-        newExpression = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+        newExpression = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           new GenericUDFOPNot(), Lists.newArrayList(newExpression));
       }
 
@@ -1558,7 +1557,7 @@ public class StatsRulesProcFactory {
                 !jop.getConf().getResidualFilterExprs().isEmpty()) {
           ExprNodeDesc pred;
           if (jop.getConf().getResidualFilterExprs().size() > 1) {
-            pred = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+            pred = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
                     FunctionRegistry.getGenericUDFForAnd(),
                     jop.getConf().getResidualFilterExprs());
           } else {
@@ -1650,7 +1649,7 @@ public class StatsRulesProcFactory {
           long joinRowCount = newNumRows;
           ExprNodeDesc pred;
           if (jop.getConf().getResidualFilterExprs().size() > 1) {
-            pred = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+            pred = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
                     FunctionRegistry.getGenericUDFForAnd(),
                     jop.getConf().getResidualFilterExprs());
           } else {

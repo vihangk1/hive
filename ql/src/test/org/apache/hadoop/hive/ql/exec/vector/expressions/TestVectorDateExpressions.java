@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.exec.vector.expressions;
 
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Assert;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
@@ -32,13 +33,11 @@ import org.apache.hadoop.hive.ql.udf.UDFYear;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -51,7 +50,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 public class TestVectorDateExpressions {
 
@@ -118,7 +116,7 @@ public class TestVectorDateExpressions {
   private void verifyUDFYear(VectorizedRowBatch batch) {
     VectorExpression udf = null;
     udf = new VectorUDFYearDate(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.dateTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.dateTypeInfo});
     udf.evaluate(batch);
     final int in = 0;
     final int out = 1;
@@ -180,7 +178,7 @@ public class TestVectorDateExpressions {
   private void verifyUDFDayOfMonth(VectorizedRowBatch batch) {
     VectorExpression udf = null;
     udf = new VectorUDFDayOfMonthDate(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.dateTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.dateTypeInfo});
     udf.evaluate(batch);
     final int in = 0;
     final int out = 1;
@@ -242,7 +240,7 @@ public class TestVectorDateExpressions {
   private void verifyUDFMonth(VectorizedRowBatch batch) {
     VectorExpression udf;
     udf = new VectorUDFMonthDate(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.dateTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.dateTypeInfo});
     udf.evaluate(batch);
     final int in = 0;
     final int out = 1;
@@ -318,7 +316,7 @@ public class TestVectorDateExpressions {
   private void verifyUDFUnixTimeStamp(VectorizedRowBatch batch) {
     VectorExpression udf;
     udf = new VectorUDFUnixTimeStampDate(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.dateTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.dateTypeInfo});
     udf.evaluate(batch);
     final int in = 0;
     final int out = 1;
@@ -380,7 +378,7 @@ public class TestVectorDateExpressions {
   private void verifyUDFWeekOfYear(VectorizedRowBatch batch) throws HiveException {
     VectorExpression udf;
     udf = new VectorUDFWeekOfYearDate(0, 1);
-    udf.setInputTypeInfos(new TypeInfo[] {TypeInfoFactory.dateTypeInfo});
+    udf.setInputTypeInfos(new TypeInfo[] { TypeInfoUtils.dateTypeInfo});
     udf.transientInit();
     udf.evaluate(batch);
     final int in = 0;

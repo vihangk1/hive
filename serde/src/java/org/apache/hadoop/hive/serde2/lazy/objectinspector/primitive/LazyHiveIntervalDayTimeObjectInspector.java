@@ -22,14 +22,14 @@ import org.apache.hadoop.hive.common.type.HiveIntervalDayTime;
 import org.apache.hadoop.hive.serde2.io.HiveIntervalDayTimeWritable;
 import org.apache.hadoop.hive.serde2.lazy.LazyHiveIntervalDayTime;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.HiveIntervalDayTimeObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class LazyHiveIntervalDayTimeObjectInspector
     extends AbstractPrimitiveLazyObjectInspector<HiveIntervalDayTimeWritable>
     implements HiveIntervalDayTimeObjectInspector{
 
   LazyHiveIntervalDayTimeObjectInspector() {
-    super(TypeInfoFactory.intervalDayTimeTypeInfo);
+    super(TypeInfoUtils.intervalDayTimeTypeInfo);
   }
 
   @Override

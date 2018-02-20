@@ -48,7 +48,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveUnion;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.SqlFunctionConverter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.TypeConverter;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,12 +121,12 @@ public class HiveIntersectRewriteRule extends RelOptRule {
       final ImmutableBitSet groupSet = ImmutableBitSet.of(groupSetPositions);
 
       List<AggregateCall> aggregateCalls = Lists.newArrayList();
-      RelDataType aggFnRetType = TypeConverter.convert(TypeInfoFactory.longTypeInfo,
+      RelDataType aggFnRetType = TypeConverter.convert(TypeInfoUtils.longTypeInfo,
           cluster.getTypeFactory());
       
       // count(1), 1's position is input.getRowType().getFieldList().size()
       AggregateCall aggregateCall = HiveCalciteUtil.createSingleArgAggCall("count", cluster,
-          TypeInfoFactory.longTypeInfo, input.getRowType().getFieldList().size(), aggFnRetType);
+          TypeInfoUtils.longTypeInfo, input.getRowType().getFieldList().size(), aggFnRetType);
       aggregateCalls.add(aggregateCall);
       
       HiveRelNode aggregateRel = new HiveAggregate(cluster,
@@ -149,15 +149,15 @@ public class HiveIntersectRewriteRule extends RelOptRule {
     }
 
     List<AggregateCall> aggregateCalls = Lists.newArrayList();
-    RelDataType aggFnRetType = TypeConverter.convert(TypeInfoFactory.longTypeInfo,
+    RelDataType aggFnRetType = TypeConverter.convert(TypeInfoUtils.longTypeInfo,
         cluster.getTypeFactory());
     
     AggregateCall aggregateCall = HiveCalciteUtil.createSingleArgAggCall("count", cluster,
-        TypeInfoFactory.longTypeInfo, cInd, aggFnRetType);
+        TypeInfoUtils.longTypeInfo, cInd, aggFnRetType);
     aggregateCalls.add(aggregateCall);
     if (hiveIntersect.all) {
       aggregateCall = HiveCalciteUtil.createSingleArgAggCall("min", cluster,
-          TypeInfoFactory.longTypeInfo, cInd, aggFnRetType);
+          TypeInfoUtils.longTypeInfo, cInd, aggFnRetType);
       aggregateCalls.add(aggregateCall);
     }
     
@@ -173,16 +173,16 @@ public class HiveIntersectRewriteRule extends RelOptRule {
     childRexNodeLst.add(ref);
     childRexNodeLst.add(literal);
     ImmutableList.Builder<RelDataType> calciteArgTypesBldr = new ImmutableList.Builder<RelDataType>();
-    calciteArgTypesBldr.add(TypeConverter.convert(TypeInfoFactory.longTypeInfo,
+    calciteArgTypesBldr.add(TypeConverter.convert(TypeInfoUtils.longTypeInfo,
         cluster.getTypeFactory()));
-    calciteArgTypesBldr.add(TypeConverter.convert(TypeInfoFactory.longTypeInfo,
+    calciteArgTypesBldr.add(TypeConverter.convert(TypeInfoUtils.longTypeInfo,
         cluster.getTypeFactory()));
     RexNode factoredFilterExpr = null;
     try {
       factoredFilterExpr = rexBuilder
           .makeCall(
               SqlFunctionConverter.getCalciteFn("=", calciteArgTypesBldr.build(),
-                  TypeConverter.convert(TypeInfoFactory.longTypeInfo, cluster.getTypeFactory()),
+                  TypeConverter.convert(TypeInfoUtils.longTypeInfo, cluster.getTypeFactory()),
                   true, false), childRexNodeLst);
     } catch (CalciteSemanticException e) {
       LOG.debug(e.toString());

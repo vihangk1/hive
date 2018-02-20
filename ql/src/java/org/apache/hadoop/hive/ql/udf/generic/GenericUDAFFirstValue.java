@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.udf.generic;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -28,8 +29,6 @@ import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.exec.WindowFunctionDescription;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.ql.parse.WindowingSpec.BoundarySpec;
-import org.apache.hadoop.hive.ql.plan.ptf.BoundaryDef;
 import org.apache.hadoop.hive.ql.plan.ptf.WindowFrameDef;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer;
 import org.apache.hadoop.hive.ql.util.JavaDataModel;
@@ -39,7 +38,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.Object
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 
 @WindowFunctionDescription(
   description = @Description(
@@ -59,7 +57,7 @@ public class GenericUDAFFirstValue extends AbstractGenericUDAFResolver {
     if (parameters.length > 2) {
       throw new UDFArgumentTypeException(2, "At most 2 arguments expected");
     }
-    if (parameters.length > 1 && !parameters[1].equals(TypeInfoFactory.booleanTypeInfo)) {
+    if (parameters.length > 1 && !parameters[1].equals(TypeInfoUtils.booleanTypeInfo)) {
       throw new UDFArgumentTypeException(1, "second argument must be a boolean expression");
     }
     return createEvaluator();

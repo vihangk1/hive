@@ -54,7 +54,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveGroupingID;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveProject;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveRelNode;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.TypeConverter;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,11 +260,11 @@ public final class HiveExpandDistinctAggregatesRule extends RelOptRule {
 
     // create the aggregate
     List<AggregateCall> aggregateCalls = Lists.newArrayList();
-    RelDataType aggFnRetType = TypeConverter.convert(TypeInfoFactory.longTypeInfo,
+    RelDataType aggFnRetType = TypeConverter.convert(TypeInfoUtils.longTypeInfo,
         cluster.getTypeFactory());
     for (int i = 0; i < cleanArgList.size(); i++) {
       AggregateCall aggregateCall = HiveCalciteUtil.createSingleArgAggCall("count", cluster,
-          TypeInfoFactory.longTypeInfo, i, aggFnRetType);
+          TypeInfoUtils.longTypeInfo, i, aggFnRetType);
       aggregateCalls.add(aggregateCall);
     }
     Aggregate aggregate = new HiveAggregate(cluster, cluster.traitSetOf(HiveRelNode.CONVENTION), gbInputRel,

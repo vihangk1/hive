@@ -23,7 +23,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,9 +38,9 @@ public class TestCreateMacroDesc {
     colNames = new ArrayList<String>();
     colTypes = new ArrayList<TypeInfo>();
     colNames.add("x");
-    colTypes.add(TypeInfoFactory.intTypeInfo);
+    colTypes.add(TypeInfoUtils.intTypeInfo);
     colNames.add("y");
-    colTypes.add(TypeInfoFactory.intTypeInfo);
+    colTypes.add(TypeInfoUtils.intTypeInfo);
     bodyDesc = new ExprNodeConstantDesc(1);
   }
   @Test

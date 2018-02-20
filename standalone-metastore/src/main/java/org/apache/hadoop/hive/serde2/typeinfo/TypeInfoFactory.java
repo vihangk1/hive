@@ -40,66 +40,11 @@ public final class TypeInfoFactory {
     // prevent instantiation
   }
 
-  public static final PrimitiveTypeInfo voidTypeInfo = new PrimitiveTypeInfo(ColumnType.VOID_TYPE_NAME);
-  public static final PrimitiveTypeInfo booleanTypeInfo = new PrimitiveTypeInfo(ColumnType.BOOLEAN_TYPE_NAME);
-  public static final PrimitiveTypeInfo intTypeInfo = new PrimitiveTypeInfo(ColumnType.INT_TYPE_NAME);
-  public static final PrimitiveTypeInfo longTypeInfo = new PrimitiveTypeInfo(ColumnType.BIGINT_TYPE_NAME);
-  public static final PrimitiveTypeInfo stringTypeInfo = new PrimitiveTypeInfo(ColumnType.STRING_TYPE_NAME);
-  //this doesn't really need to be cached here since the cache will be populated after the first put
-  //we don't want to depend on the Type implementations in standalone-metastore
-  //public static final PrimitiveTypeInfo charTypeInfo = new CharTypeInfo(HiveChar.MAX_CHAR_LENGTH);
-  //public static final PrimitiveTypeInfo varcharTypeInfo = new VarcharTypeInfo(HiveVarchar.MAX_VARCHAR_LENGTH);
-  public static final PrimitiveTypeInfo floatTypeInfo = new PrimitiveTypeInfo(ColumnType.FLOAT_TYPE_NAME);
-  public static final PrimitiveTypeInfo doubleTypeInfo = new PrimitiveTypeInfo(ColumnType.DOUBLE_TYPE_NAME);
-  public static final PrimitiveTypeInfo byteTypeInfo = new PrimitiveTypeInfo(ColumnType.TINYINT_TYPE_NAME);
-  public static final PrimitiveTypeInfo shortTypeInfo = new PrimitiveTypeInfo(ColumnType.SMALLINT_TYPE_NAME);
-  public static final PrimitiveTypeInfo dateTypeInfo = new PrimitiveTypeInfo(ColumnType.DATE_TYPE_NAME);
-  public static final PrimitiveTypeInfo timestampTypeInfo = new PrimitiveTypeInfo(ColumnType.TIMESTAMP_TYPE_NAME);
-  public static final PrimitiveTypeInfo intervalYearMonthTypeInfo = new PrimitiveTypeInfo(ColumnType.INTERVAL_YEAR_MONTH_TYPE_NAME);
-  public static final PrimitiveTypeInfo intervalDayTimeTypeInfo = new PrimitiveTypeInfo(ColumnType.INTERVAL_DAY_TIME_TYPE_NAME);
-  public static final PrimitiveTypeInfo binaryTypeInfo = new PrimitiveTypeInfo(ColumnType.BINARY_TYPE_NAME);
-
-  /**
-   * A DecimalTypeInfo instance that has max precision and max scale.
-   */
-  //TODO this just works because HiveDecimal is in storage-api which standalone-metastore can access
-  //Ideally standalone-metastore should not depend on type implementations. We can remove this from cache
-  //since it automatically gets populated in the runtime the first time its created
-  //public static final DecimalTypeInfo decimalTypeInfo = new DecimalTypeInfo(HiveDecimal.SYSTEM_DEFAULT_PRECISION,
-  //    HiveDecimal.SYSTEM_DEFAULT_SCALE);
-
-  /**
-   * A TimestampTZTypeInfo with system default time zone.
-   */
-  public static final TimestampLocalTZTypeInfo timestampLocalTZTypeInfo = new TimestampLocalTZTypeInfo(
-      ZoneId.systemDefault().getId());
-
-  public static final PrimitiveTypeInfo unknownTypeInfo = new PrimitiveTypeInfo("unknown");
-
   // Map from type name (such as int or varchar(40) to the corresponding PrimitiveTypeInfo
   // instance.
   private static ConcurrentHashMap<String, PrimitiveTypeInfo> cachedPrimitiveTypeInfo =
       new ConcurrentHashMap<String, PrimitiveTypeInfo>();
 
-  static {
-    cachedPrimitiveTypeInfo.put(ColumnType.VOID_TYPE_NAME, voidTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.BOOLEAN_TYPE_NAME, booleanTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.INT_TYPE_NAME, intTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.BIGINT_TYPE_NAME, longTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.STRING_TYPE_NAME, stringTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.FLOAT_TYPE_NAME, floatTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.DOUBLE_TYPE_NAME, doubleTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.TINYINT_TYPE_NAME, byteTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.SMALLINT_TYPE_NAME, shortTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.DATE_TYPE_NAME, dateTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.TIMESTAMP_TYPE_NAME, timestampTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.TIMESTAMPLOCALTZ_TYPE_NAME, timestampLocalTZTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.INTERVAL_YEAR_MONTH_TYPE_NAME, intervalYearMonthTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.INTERVAL_DAY_TIME_TYPE_NAME, intervalDayTimeTypeInfo);
-    cachedPrimitiveTypeInfo.put(ColumnType.BINARY_TYPE_NAME, binaryTypeInfo);
-    //cachedPrimitiveTypeInfo.put(decimalTypeInfo.getQualifiedName(), decimalTypeInfo);
-    cachedPrimitiveTypeInfo.put("unknown", unknownTypeInfo);
-  }
   /**
    * Register a Primitive Type. This registers primitiveTypeInfo to the TypeInfoFactory which
    * is cached and re-used whenever getPrimitiveTypeInfo is called with the same typename
@@ -110,7 +55,6 @@ public final class TypeInfoFactory {
       final PrimitiveTypeInfo primitiveTypeInfo) {
     cachedPrimitiveTypeInfo.putIfAbsent(typeName, primitiveTypeInfo);
   }
-
   /**
    * Get PrimitiveTypeInfo instance for the given type name of a type
    * including types with parameters, such as varchar(20).

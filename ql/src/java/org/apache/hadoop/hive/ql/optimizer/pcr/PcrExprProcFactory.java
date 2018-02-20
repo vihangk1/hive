@@ -53,7 +53,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.objectinspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -308,7 +308,7 @@ public final class PcrExprProcFactory {
 
       if (has_part_col && fd.getTypeInfo().getCategory() == Category.PRIMITIVE) {
         //  we need to evaluate result for every pruned partition
-        if (fd.getTypeInfo().equals(TypeInfoFactory.booleanTypeInfo)) {
+        if (fd.getTypeInfo().equals(TypeInfoUtils.booleanTypeInfo)) {
           // if the return type of the GenericUDF is boolean and all partitions agree on
           // a result, we update the state of the node to be TRUE of FALSE
           Boolean[] results = new Boolean[ctx.getPartList().size()];

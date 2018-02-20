@@ -25,12 +25,11 @@ import java.util.List;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.WindowingSpec.BoundarySpec;
 import org.apache.hadoop.hive.ql.udaf.TestStreamingSum.TypeHandler;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFMax;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFMin;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.junit.Test;
 
@@ -40,7 +39,7 @@ public class TestStreamingMin {
       int numFollowing, Iterator<Long> outVals) throws HiveException {
 
     GenericUDAFMin fnR = new GenericUDAFMin();
-    TypeInfo[] inputTypes = { TypeInfoFactory.longTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.longTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableLongObjectInspector };
 
     LongWritable[] in = new LongWritable[1];

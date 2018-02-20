@@ -42,7 +42,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.Object
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.apache.hive.common.util.ReflectionUtil;
@@ -333,7 +333,7 @@ public class JoinUtil {
       if (!noFilter) {
         colNames.append("filtered");
         colNames.append(',');
-        colTypes.append(TypeInfoFactory.shortTypeInfo.getTypeName());
+        colTypes.append(TypeInfoUtils.shortTypeInfo.getTypeName());
         colTypes.append(',');
       }
       // remove the last ','

@@ -537,7 +537,7 @@ public class HCatClientHMSImpl extends HCatClient {
 
     private Object getTypeAppropriateValueFor(PrimitiveTypeInfo type, String value) {
       ObjectInspectorConverters.Converter converter = ObjectInspectorConverters.getConverter(
-          TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(TypeInfoFactory.stringTypeInfo),
+          TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(TypeInfoUtils.stringTypeInfo),
           TypeInfoUtils.getStandardJavaObjectInspectorFromTypeInfo(type));
 
       return converter.convert(value);
@@ -554,7 +554,7 @@ public class HCatClientHMSImpl extends HCatClient {
     }
 
     public ExprNodeGenericFuncDesc binaryPredicate(String function, ExprNodeDesc lhs, ExprNodeDesc rhs) throws SemanticException {
-      return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           FunctionRegistry.getFunctionInfo(function).getGenericUDF(),
           Lists.newArrayList(lhs, rhs));
     }

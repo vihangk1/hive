@@ -24,7 +24,6 @@ import org.apache.hadoop.hive.accumulo.AccumuloHiveConstants;
 import org.apache.hadoop.hive.accumulo.TestAccumuloDefaultIndexScanner;
 import org.apache.hadoop.hive.accumulo.columns.ColumnEncoding;
 import org.apache.hadoop.hive.accumulo.columns.HiveAccumuloRowIdColumnMapping;
-import org.apache.hadoop.hive.accumulo.serde.AccumuloSerDeParameters;
 import org.apache.hadoop.hive.ql.lib.DefaultGraphWalker;
 import org.apache.hadoop.hive.ql.lib.DefaultRuleDispatcher;
 import org.apache.hadoop.hive.ql.lib.Dispatcher;
@@ -46,8 +45,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPEqualOrLessThan;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPLessThan;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPOr;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPPlus;
-import org.apache.hadoop.hive.serde.serdeConstants;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,30 +72,30 @@ public class TestAccumuloRangeGenerator {
   public void setup() {
     handler = AccumuloPredicateHandler.getInstance();
     rowIdMapping = new HiveAccumuloRowIdColumnMapping(AccumuloHiveConstants.ROWID,
-        ColumnEncoding.STRING,"row", TypeInfoFactory.stringTypeInfo.toString());
+        ColumnEncoding.STRING,"row", TypeInfoUtils.stringTypeInfo.toString());
     conf = new Configuration(true);
   }
 
   @Test
   public void testRangeConjunction() throws Exception {
     // rowId >= 'f'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "f");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "f");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // rowId <= 'm'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "m");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "m");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
@@ -105,7 +103,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     // Should generate [f,m]
@@ -137,23 +135,23 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testRangeDisjunction() throws Exception {
     // rowId >= 'f'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "f");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "f");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // rowId <= 'm'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "m");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "m");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
@@ -161,7 +159,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPOr(), bothFilters);
 
     // Should generate (-inf,+inf)
@@ -192,34 +190,34 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testRangeConjunctionWithDisjunction() throws Exception {
     // rowId >= 'h'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "h");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "h");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // rowId <= 'd'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "d");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "d");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
     // rowId >= 'q'
-    ExprNodeDesc column3 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column3 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant3 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "q");
+    ExprNodeDesc constant3 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "q");
     List<ExprNodeDesc> children3 = Lists.newArrayList();
     children3.add(column3);
     children3.add(constant3);
-    ExprNodeDesc node3 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node3 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children3);
     assertNotNull(node3);
 
@@ -227,14 +225,14 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> orFilters = Lists.newArrayList();
     orFilters.add(node2);
     orFilters.add(node3);
-    ExprNodeGenericFuncDesc orNode = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc orNode = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPOr(), orFilters);
 
     // And UDF, (rowId >= 'h' and (rowId <= 'd' or rowId >= 'q'))
     List<ExprNodeDesc> andFilters = Lists.newArrayList();
     andFilters.add(node);
     andFilters.add(orNode);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), andFilters);
 
     // Should generate ['q', +inf)
@@ -265,23 +263,23 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testPartialRangeConjunction() throws Exception {
     // rowId >= 'f'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "f");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "f");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // anythingElse <= 'foo'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "anythingElse",
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "anythingElse",
         null, false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "foo");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "foo");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
@@ -289,7 +287,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     // Should generate [f,+inf)
@@ -320,25 +318,25 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testDateRangeConjunction() throws Exception {
     // rowId >= '2014-01-01'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.dateTypeInfo,
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.dateTypeInfo,
         Date.valueOf("2014-01-01"));
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // rowId <= '2014-07-01'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.dateTypeInfo,
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.dateTypeInfo,
         Date.valueOf("2014-07-01"));
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPLessThan(), children2);
     assertNotNull(node2);
 
@@ -346,7 +344,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     // Should generate [2014-01-01, 2014-07-01)
@@ -378,27 +376,27 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testCastExpression() throws Exception {
     // 40 and 50
-    ExprNodeDesc fourty = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo,
-        40), fifty = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 50);
+    ExprNodeDesc fourty = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo,
+        40), fifty = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 50);
 
     // +
     GenericUDFOPPlus plus = new GenericUDFOPPlus();
 
     // 40 + 50
-    ExprNodeGenericFuncDesc addition = new ExprNodeGenericFuncDesc(TypeInfoFactory.intTypeInfo, plus, Arrays.asList(fourty, fifty));
+    ExprNodeGenericFuncDesc addition = new ExprNodeGenericFuncDesc(TypeInfoUtils.intTypeInfo, plus, Arrays.asList(fourty, fifty));
 
     // cast(.... as string)
     UDFToString stringCast = new UDFToString();
     GenericUDFBridge stringCastBridge = new GenericUDFBridge("cast", false, stringCast.getClass().getName());
 
     // cast (40 + 50 as string)
-    ExprNodeGenericFuncDesc cast = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc cast = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         stringCastBridge, "cast", Collections.<ExprNodeDesc> singletonList(addition));
 
-    ExprNodeDesc key = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "key", null,
+    ExprNodeDesc key = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "key", null,
         false);
 
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), Arrays.asList(key, cast));
 
     AccumuloRangeGenerator rangeGenerator = new AccumuloRangeGenerator(conf, handler, rowIdMapping, "key");
@@ -423,23 +421,23 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testRangeOverNonRowIdField() throws Exception {
     // foo >= 'f'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "foo", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "f");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "foo", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "f");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // foo <= 'm'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "foo", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "foo", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "m");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "m");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
@@ -447,7 +445,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     AccumuloRangeGenerator rangeGenerator = new AccumuloRangeGenerator(conf, handler, rowIdMapping, "rid");
@@ -472,23 +470,23 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testRangeOverStringIndexedField() throws Exception {
     // age >= '10'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "age", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "10");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "age", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "10");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // age <= '50'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "age", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "age", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "50");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "50");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
@@ -496,7 +494,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     AccumuloRangeGenerator rangeGenerator = new AccumuloRangeGenerator(conf, handler, rowIdMapping, "rid");
@@ -530,23 +528,23 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testRangeOverIntegerIndexedField() throws Exception {
     // cars >= 2
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "cars", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 2);
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "cars", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 2);
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.intTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.intTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     //  cars <= 9
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "cars", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "cars", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 9);
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 9);
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.intTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.intTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
@@ -554,7 +552,7 @@ public class TestAccumuloRangeGenerator {
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     AccumuloRangeGenerator rangeGenerator = new AccumuloRangeGenerator(conf, handler, rowIdMapping, "rid");
@@ -588,12 +586,12 @@ public class TestAccumuloRangeGenerator {
   @Test
   public void testRangeOverBooleanIndexedField() throws Exception {
     // mgr == true
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.booleanTypeInfo, "mgr", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, true);
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.booleanTypeInfo, "mgr", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, true);
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.intTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.intTypeInfo,
         new GenericUDFOPEqual(), children);
     assertNotNull(node);
 

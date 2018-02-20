@@ -31,13 +31,11 @@ import org.apache.hadoop.hive.ql.exec.vector.expressions.BRoundWithNumDigitsDoub
 import org.apache.hadoop.hive.ql.exec.vector.expressions.ColAndCol;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.ColOrCol;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.DoubleColumnInList;
-import org.apache.hadoop.hive.ql.exec.vector.expressions.DynamicValueVectorExpression;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.FilterExprAndExpr;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.FilterExprOrExpr;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.FuncLogWithBaseDoubleToDouble;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.FuncLogWithBaseLongToDouble;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.FuncPowerDoubleToDouble;
-import org.apache.hadoop.hive.ql.exec.vector.expressions.IdentityExpression;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.IfExprCharScalarStringGroupColumn;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.IfExprDoubleColumnDoubleColumn;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.IfExprLongColumnLongColumn;
@@ -149,6 +147,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPPlus;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFToUnixTimeStamp;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFTimestamp;
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.junit.Assert;
@@ -209,19 +208,19 @@ public class TestVectorizationContext {
     GenericUDFOPMod udf5 = new GenericUDFOPMod();
 
     ExprNodeGenericFuncDesc sumExpr = new ExprNodeGenericFuncDesc();
-    sumExpr.setTypeInfo(TypeInfoFactory.intTypeInfo);
+    sumExpr.setTypeInfo(TypeInfoUtils.intTypeInfo);
     sumExpr.setGenericUDF(udf1);
     ExprNodeGenericFuncDesc minusExpr = new ExprNodeGenericFuncDesc();
-    minusExpr.setTypeInfo(TypeInfoFactory.intTypeInfo);
+    minusExpr.setTypeInfo(TypeInfoUtils.intTypeInfo);
     minusExpr.setGenericUDF(udf2);
     ExprNodeGenericFuncDesc multiplyExpr = new ExprNodeGenericFuncDesc();
-    multiplyExpr.setTypeInfo(TypeInfoFactory.intTypeInfo);
+    multiplyExpr.setTypeInfo(TypeInfoUtils.intTypeInfo);
     multiplyExpr.setGenericUDF(udf3);
     ExprNodeGenericFuncDesc sum2Expr = new ExprNodeGenericFuncDesc();
-    sum2Expr.setTypeInfo(TypeInfoFactory.intTypeInfo);
+    sum2Expr.setTypeInfo(TypeInfoUtils.intTypeInfo);
     sum2Expr.setGenericUDF(udf4);
     ExprNodeGenericFuncDesc modExpr = new ExprNodeGenericFuncDesc();
-    modExpr.setTypeInfo(TypeInfoFactory.intTypeInfo);
+    modExpr.setTypeInfo(TypeInfoUtils.intTypeInfo);
     modExpr.setGenericUDF(udf5);
 
     ExprNodeColumnDesc col1Expr = new  ExprNodeColumnDesc(Long.class, "col1", "table", false);
@@ -439,7 +438,7 @@ public class TestVectorizationContext {
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
     children1.add(constDesc);
-    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.doubleTypeInfo, udf,
+    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.doubleTypeInfo, udf,
         children1);
 
     List<String> columns = new ArrayList<String>();
@@ -448,7 +447,7 @@ public class TestVectorizationContext {
 
     VectorExpression ve = vc.getVectorExpression(exprDesc, VectorExpressionDescriptor.Mode.PROJECTION);
 
-    assertTrue(ve.getOutputTypeInfo().equals(TypeInfoFactory.doubleTypeInfo));
+    assertTrue(ve.getOutputTypeInfo().equals(TypeInfoUtils.doubleTypeInfo));
   }
 
   @Test
@@ -458,7 +457,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -470,7 +469,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPLessThan udf2 = new GenericUDFOPLessThan();
     ExprNodeGenericFuncDesc lessExprDesc = new ExprNodeGenericFuncDesc();
-    lessExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    lessExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     lessExprDesc.setGenericUDF(udf2);
     List<ExprNodeDesc> children2 = new ArrayList<ExprNodeDesc>(2);
     children2.add(col2Expr);
@@ -479,7 +478,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPAnd andUdf = new GenericUDFOPAnd();
     ExprNodeGenericFuncDesc andExprDesc = new ExprNodeGenericFuncDesc();
-    andExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    andExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     andExprDesc.setGenericUDF(andUdf);
     List<ExprNodeDesc> children3 = new ArrayList<ExprNodeDesc>(2);
     children3.add(greaterExprDesc);
@@ -500,7 +499,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPOr orUdf = new GenericUDFOPOr();
     ExprNodeGenericFuncDesc orExprDesc = new ExprNodeGenericFuncDesc();
-    orExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    orExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     orExprDesc.setGenericUDF(orUdf);
     List<ExprNodeDesc> children4 = new ArrayList<ExprNodeDesc>(2);
     children4.add(greaterExprDesc);
@@ -519,7 +518,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -531,7 +530,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPLessThan udf2 = new GenericUDFOPLessThan();
     ExprNodeGenericFuncDesc lessExprDesc = new ExprNodeGenericFuncDesc();
-    lessExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    lessExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     lessExprDesc.setGenericUDF(udf2);
     List<ExprNodeDesc> children2 = new ArrayList<ExprNodeDesc>(2);
     children2.add(col2Expr);
@@ -543,7 +542,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf3 = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc3 = new ExprNodeGenericFuncDesc();
-    greaterExprDesc3.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc3.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc3.setGenericUDF(udf3);
     List<ExprNodeDesc> children3 = new ArrayList<ExprNodeDesc>(2);
     children3.add(col3Expr);
@@ -552,7 +551,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPAnd andUdf = new GenericUDFOPAnd();
     ExprNodeGenericFuncDesc andExprDesc = new ExprNodeGenericFuncDesc();
-    andExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    andExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     andExprDesc.setGenericUDF(andUdf);
     List<ExprNodeDesc> children4 = new ArrayList<ExprNodeDesc>(2);
     children4.add(greaterExprDesc);
@@ -576,7 +575,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPOr orUdf = new GenericUDFOPOr();
     ExprNodeGenericFuncDesc orExprDesc = new ExprNodeGenericFuncDesc();
-    orExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    orExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     orExprDesc.setGenericUDF(orUdf);
     List<ExprNodeDesc> children5 = new ArrayList<ExprNodeDesc>(2);
     children5.add(greaterExprDesc);
@@ -597,7 +596,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -608,7 +607,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPAnd andUdf = new GenericUDFOPAnd();
     ExprNodeGenericFuncDesc andExprDesc = new ExprNodeGenericFuncDesc();
-    andExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    andExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     andExprDesc.setGenericUDF(andUdf);
     List<ExprNodeDesc> children3 = new ArrayList<ExprNodeDesc>(2);
     children3.add(greaterExprDesc);
@@ -633,7 +632,7 @@ public class TestVectorizationContext {
     //OR
     GenericUDFOPOr orUdf = new GenericUDFOPOr();
     ExprNodeGenericFuncDesc orExprDesc = new ExprNodeGenericFuncDesc();
-    orExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    orExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     orExprDesc.setGenericUDF(orUdf);
     List<ExprNodeDesc> children4 = new ArrayList<ExprNodeDesc>(2);
     children4.add(greaterExprDesc);
@@ -661,7 +660,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -669,7 +668,7 @@ public class TestVectorizationContext {
     greaterExprDesc.setChildren(children1);
 
     ExprNodeGenericFuncDesc notExpr = new ExprNodeGenericFuncDesc();
-    notExpr.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    notExpr.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     GenericUDFOPNot notUdf = new GenericUDFOPNot();
     notExpr.setGenericUDF(notUdf);
     List<ExprNodeDesc> childOfNot = new ArrayList<ExprNodeDesc>();
@@ -699,7 +698,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -707,7 +706,7 @@ public class TestVectorizationContext {
     greaterExprDesc.setChildren(children1);
 
     ExprNodeGenericFuncDesc isNullExpr = new ExprNodeGenericFuncDesc();
-    isNullExpr.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    isNullExpr.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     GenericUDFOPNull isNullUdf = new GenericUDFOPNull();
     isNullExpr.setGenericUDF(isNullUdf);
     List<ExprNodeDesc> childOfIsNull = new ArrayList<ExprNodeDesc>();
@@ -738,7 +737,7 @@ public class TestVectorizationContext {
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
-    greaterExprDesc.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    greaterExprDesc.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     greaterExprDesc.setGenericUDF(udf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(col1Expr);
@@ -746,7 +745,7 @@ public class TestVectorizationContext {
     greaterExprDesc.setChildren(children1);
 
     ExprNodeGenericFuncDesc isNotNullExpr = new ExprNodeGenericFuncDesc();
-    isNotNullExpr.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    isNotNullExpr.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     GenericUDFOPNotNull notNullUdf = new GenericUDFOPNotNull();
     isNotNullExpr.setGenericUDF(notNullUdf);
     List<ExprNodeDesc> childOfNot = new ArrayList<ExprNodeDesc>();
@@ -772,13 +771,13 @@ public class TestVectorizationContext {
   public void testVectorizeScalarColumnExpression() throws HiveException {
     GenericUDFOPMinus gudf = new GenericUDFOPMinus();
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(2);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(TypeInfoFactory.longTypeInfo, 20);
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(TypeInfoUtils.longTypeInfo, 20);
     ExprNodeColumnDesc colDesc = new ExprNodeColumnDesc(Long.class, "a", "table", false);
 
     children.add(constDesc);
     children.add(colDesc);
 
-    ExprNodeGenericFuncDesc scalarMinusConstant = new ExprNodeGenericFuncDesc(TypeInfoFactory.longTypeInfo,
+    ExprNodeGenericFuncDesc scalarMinusConstant = new ExprNodeGenericFuncDesc(TypeInfoUtils.longTypeInfo,
         gudf, children);
 
     List<String> columns = new ArrayList<String>();
@@ -819,7 +818,7 @@ public class TestVectorizationContext {
     GenericUDF gudf = new GenericUDFOPNegative();
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(1);
     children.add(col1Expr);
-    ExprNodeGenericFuncDesc negExprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.longTypeInfo, gudf,
+    ExprNodeGenericFuncDesc negExprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.longTypeInfo, gudf,
         children);
     List<String> columns = new ArrayList<String>();
     columns.add("col0");
@@ -837,7 +836,7 @@ public class TestVectorizationContext {
     GenericUDF gudf = new GenericUDFOPNegative();
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(1);
     children.add(col1Expr);
-    ExprNodeGenericFuncDesc negExprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.doubleTypeInfo, gudf,
+    ExprNodeGenericFuncDesc negExprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.doubleTypeInfo, gudf,
         children);
     List<String> columns = new ArrayList<String>();
     columns.add("col0");
@@ -856,7 +855,7 @@ public class TestVectorizationContext {
     scalarGreaterColExpr.setGenericUDF(gudf);
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(2);
     ExprNodeConstantDesc constDesc =
-        new ExprNodeConstantDesc(TypeInfoFactory.longTypeInfo, 20);
+        new ExprNodeConstantDesc(TypeInfoUtils.longTypeInfo, 20);
     ExprNodeColumnDesc colDesc =
         new ExprNodeColumnDesc(Long.class, "a", "table", false);
 
@@ -879,7 +878,7 @@ public class TestVectorizationContext {
     colEqualScalar.setGenericUDF(gudf);
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(2);
     ExprNodeConstantDesc constDesc =
-        new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, 20);
+        new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, 20);
     ExprNodeColumnDesc colDesc =
         new ExprNodeColumnDesc(Boolean.class, "a", "table", false);
 
@@ -903,7 +902,7 @@ public class TestVectorizationContext {
     colEqualScalar.setGenericUDF(gudf);
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>(2);
     ExprNodeConstantDesc constDesc =
-        new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, 20);
+        new ExprNodeConstantDesc(TypeInfoUtils.booleanTypeInfo, 20);
     ExprNodeColumnDesc colDesc =
         new ExprNodeColumnDesc(Boolean.class, "a", "table", false);
 
@@ -911,7 +910,7 @@ public class TestVectorizationContext {
     children.add(constDesc);
 
     colEqualScalar.setChildren(children);
-    colEqualScalar.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    colEqualScalar.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
 
     List<String> columns = new ArrayList<String>();
     columns.add("a");
@@ -923,7 +922,7 @@ public class TestVectorizationContext {
   @Test
   public void testUnaryStringExpressions() throws HiveException {
     ExprNodeGenericFuncDesc stringUnary = new ExprNodeGenericFuncDesc();
-    stringUnary.setTypeInfo(TypeInfoFactory.stringTypeInfo);
+    stringUnary.setTypeInfo(TypeInfoUtils.stringTypeInfo);
     ExprNodeColumnDesc colDesc = new ExprNodeColumnDesc(String.class, "a", "table", false);
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     children.add(colDesc);
@@ -944,7 +943,7 @@ public class TestVectorizationContext {
     vc = new VectorizationContext("name", columns);
 
     ExprNodeGenericFuncDesc anotherUnary = new ExprNodeGenericFuncDesc();
-    anotherUnary.setTypeInfo(TypeInfoFactory.stringTypeInfo);
+    anotherUnary.setTypeInfo(TypeInfoUtils.stringTypeInfo);
     List<ExprNodeDesc> children2 = new ArrayList<ExprNodeDesc>();
     children2.add(stringUnary);
     anotherUnary.setChildren(children2);
@@ -963,7 +962,7 @@ public class TestVectorizationContext {
   @Test
   public void testMathFunctions() throws HiveException {
     ExprNodeGenericFuncDesc mathFuncExpr = new ExprNodeGenericFuncDesc();
-    mathFuncExpr.setTypeInfo(TypeInfoFactory.doubleTypeInfo);
+    mathFuncExpr.setTypeInfo(TypeInfoUtils.doubleTypeInfo);
     ExprNodeColumnDesc colDesc1 = new ExprNodeColumnDesc(Integer.class, "a", "table", false);
     ExprNodeColumnDesc colDesc2 = new ExprNodeColumnDesc(Double.class, "b", "table", false);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>();
@@ -1068,9 +1067,9 @@ public class TestVectorizationContext {
   @Test
   public void testTimeStampUdfs() throws HiveException {
     ExprNodeGenericFuncDesc tsFuncExpr = new ExprNodeGenericFuncDesc();
-    tsFuncExpr.setTypeInfo(TypeInfoFactory.intTypeInfo);
+    tsFuncExpr.setTypeInfo(TypeInfoUtils.intTypeInfo);
     ExprNodeColumnDesc colDesc1 = new ExprNodeColumnDesc(
-        TypeInfoFactory.timestampTypeInfo, "a", "table", false);
+        TypeInfoUtils.timestampTypeInfo, "a", "table", false);
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
     children.add(colDesc1);
 
@@ -1089,7 +1088,7 @@ public class TestVectorizationContext {
     //GenericUDFToUnixTimeStamp
     GenericUDFToUnixTimeStamp gudf = new GenericUDFToUnixTimeStamp();
     tsFuncExpr.setGenericUDF(gudf);
-    tsFuncExpr.setTypeInfo(TypeInfoFactory.longTypeInfo);
+    tsFuncExpr.setTypeInfo(TypeInfoUtils.longTypeInfo);
     ve = vc.getVectorExpression(tsFuncExpr);
     Assert.assertEquals(VectorUDFUnixTimeStampTimestamp.class, ve.getClass());
   }
@@ -1108,7 +1107,7 @@ public class TestVectorizationContext {
     children1.add(col1Expr);
     children1.add(constDesc);
     children1.add(constDesc2);
-    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo, udf,
+    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo, udf,
         children1);
 
     List<String> columns = new ArrayList<String>();
@@ -1138,7 +1137,7 @@ public class TestVectorizationContext {
     children1.add(col1Expr);
     children1.add(constDesc);
     children1.add(constDesc2);
-    exprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo, udf,
+    exprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo, udf,
         children1);
 
     vc = new VectorizationContext("name", columns);
@@ -1163,7 +1162,7 @@ public class TestVectorizationContext {
     children1.add(col1Expr);
     children1.add(constDesc);
     children1.add(constDesc2);
-    exprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo, udf,
+    exprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo, udf,
         children1);
 
     vc = new VectorizationContext("name", columns);
@@ -1228,7 +1227,7 @@ public class TestVectorizationContext {
     children1.add(col1Expr);
     children1.add(constDesc);
     children1.add(constDesc2);
-    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
         udf, children1);
 
     List<String> columns = new ArrayList<String>();
@@ -1282,7 +1281,7 @@ public class TestVectorizationContext {
     children1.add(col1Expr);
     children1.add(col2Expr);
     children1.add(col3Expr);
-    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo, udf,
+    ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo, udf,
         children1);
 
     List<String> columns = new ArrayList<String>();
@@ -1356,7 +1355,7 @@ public class TestVectorizationContext {
     // timestamp column/scalar IF where scalar is really a CAST of a constant to timestamp.
     ExprNodeGenericFuncDesc f = new ExprNodeGenericFuncDesc();
     f.setGenericUDF(new GenericUDFTimestamp());
-    f.setTypeInfo(TypeInfoFactory.timestampTypeInfo);
+    f.setTypeInfo(TypeInfoUtils.timestampTypeInfo);
     List<ExprNodeDesc> children2 = new ArrayList<ExprNodeDesc>();
     f.setChildren(children2);
     children2.add(new ExprNodeConstantDesc("2013-11-05 00:00:00.000"));
@@ -1586,11 +1585,11 @@ public class TestVectorizationContext {
   public void testInBloomFilter() throws Exception {
     // Setup InBloomFilter() UDF
     ExprNodeColumnDesc colExpr = new ExprNodeColumnDesc(TypeInfoFactory.getDecimalTypeInfo(10, 5), "a", "table", false);
-    ExprNodeDesc bfExpr = new ExprNodeDynamicValueDesc(new DynamicValue("id1", TypeInfoFactory.binaryTypeInfo));
+    ExprNodeDesc bfExpr = new ExprNodeDynamicValueDesc(new DynamicValue("id1", TypeInfoUtils.binaryTypeInfo));
 
     ExprNodeGenericFuncDesc inBloomFilterExpr = new ExprNodeGenericFuncDesc();
     GenericUDF inBloomFilterUdf = new GenericUDFInBloomFilter();
-    inBloomFilterExpr.setTypeInfo(TypeInfoFactory.booleanTypeInfo);
+    inBloomFilterExpr.setTypeInfo(TypeInfoUtils.booleanTypeInfo);
     inBloomFilterExpr.setGenericUDF(inBloomFilterUdf);
     List<ExprNodeDesc> children1 = new ArrayList<ExprNodeDesc>(2);
     children1.add(colExpr);

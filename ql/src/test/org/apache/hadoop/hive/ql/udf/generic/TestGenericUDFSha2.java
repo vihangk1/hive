@@ -24,7 +24,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredJavaObject;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -36,7 +36,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     IntWritable lenWr = new IntWritable(0);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -54,7 +54,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     IntWritable lenWr = new IntWritable(0);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -72,7 +72,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     IntWritable lenWr = new IntWritable(200);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -85,7 +85,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     IntWritable lenWr = new IntWritable(200);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -98,7 +98,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     IntWritable lenWr = new IntWritable(256);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -116,7 +116,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     IntWritable lenWr = new IntWritable(256);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -134,7 +134,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     IntWritable lenWr = new IntWritable(384);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -158,7 +158,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     IntWritable lenWr = new IntWritable(384);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -182,7 +182,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     IntWritable lenWr = new IntWritable(512);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -206,7 +206,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     IntWritable lenWr = new IntWritable(512);
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -230,7 +230,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     IntWritable lenWr = null;
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -243,7 +243,7 @@ public class TestGenericUDFSha2 extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     IntWritable lenWr = null;
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, lenWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, lenWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);

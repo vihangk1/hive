@@ -21,101 +21,31 @@ package org.apache.hadoop.hive.ql.exec.vector.mapjoin;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.ql.CompilationOpContext;
 import org.apache.hadoop.hive.ql.exec.MapJoinOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
-import org.apache.hadoop.hive.ql.exec.persistence.MapJoinBytesTableContainer;
-import org.apache.hadoop.hive.ql.exec.persistence.MapJoinObjectSerDeContext;
-import org.apache.hadoop.hive.ql.exec.persistence.MapJoinTableContainer;
-import org.apache.hadoop.hive.ql.exec.persistence.MapJoinTableContainerSerDe;
-import org.apache.hadoop.hive.ql.exec.util.collectoroperator.CollectorTestOperator;
 import org.apache.hadoop.hive.ql.exec.util.collectoroperator.CountCollectorTestOperator;
-import org.apache.hadoop.hive.ql.exec.util.collectoroperator.CountVectorCollectorTestOperator;
 import org.apache.hadoop.hive.ql.exec.util.collectoroperator.RowCollectorTestOperator;
-import org.apache.hadoop.hive.ql.exec.util.collectoroperator.RowCollectorTestOperatorBase;
 import org.apache.hadoop.hive.ql.exec.util.collectoroperator.RowVectorCollectorTestOperator;
 import org.apache.hadoop.hive.ql.exec.util.rowobjects.RowTestObjects;
 import org.apache.hadoop.hive.ql.exec.util.rowobjects.RowTestObjectsMultiSet;
-import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorBatchDebug;
-import org.apache.hadoop.hive.ql.exec.vector.VectorColumnOutputMapping;
-import org.apache.hadoop.hive.ql.exec.vector.VectorColumnSourceMapping;
 import org.apache.hadoop.hive.ql.exec.vector.VectorExtractRow;
-import org.apache.hadoop.hive.ql.exec.vector.VectorMapJoinOperator;
-import org.apache.hadoop.hive.ql.exec.vector.VectorMapJoinOuterFilteredOperator;
-import org.apache.hadoop.hive.ql.exec.vector.VectorRandomRowSource;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizationContext;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedBatchUtil;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatchCtx;
 import org.apache.hadoop.hive.ql.exec.vector.util.batchgen.VectorBatchGenerateStream;
-import org.apache.hadoop.hive.ql.exec.vector.util.batchgen.VectorBatchGenerator;
-import org.apache.hadoop.hive.ql.exec.vector.util.batchgen.VectorBatchGenerator.GenerateType;
-import org.apache.hadoop.hive.ql.exec.vector.util.batchgen.VectorBatchGenerator.GenerateType.GenerateCategory;
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.MapJoinTestConfig.MapJoinTestImplementation;
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.MapJoinTestDescription.SmallTableGenerationParameters;
-import org.apache.hadoop.hive.ql.exec.vector.mapjoin.fast.VectorMapJoinFastMultiKeyHashMap;
-import org.apache.hadoop.hive.ql.exec.vector.mapjoin.fast.VectorMapJoinFastTableContainer;
-import org.apache.hadoop.hive.ql.exec.vector.mapjoin.fast.VerifyFastRow;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.ql.plan.ExprNodeColumnDesc;
-import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
-import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
-import org.apache.hadoop.hive.ql.plan.JoinCondDesc;
-import org.apache.hadoop.hive.ql.plan.JoinDesc;
 import org.apache.hadoop.hive.ql.plan.MapJoinDesc;
 import org.apache.hadoop.hive.ql.plan.OperatorDesc;
-import org.apache.hadoop.hive.ql.plan.PlanUtils;
-import org.apache.hadoop.hive.ql.plan.TableDesc;
-import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc;
-import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.HashTableImplementationType;
-import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.HashTableKeyType;
-import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.HashTableKind;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.VectorMapJoinVariation;
-import org.apache.hadoop.hive.ql.plan.VectorMapJoinInfo;
-import org.apache.hadoop.hive.ql.plan.api.OperatorType;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPEqual;
-import org.apache.hadoop.hive.serde2.AbstractSerDe;
-import org.apache.hadoop.hive.serde2.ByteStream.Output;
-import org.apache.hadoop.hive.serde2.SerDeException;
-import org.apache.hadoop.hive.serde2.SerDeUtils;
-import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableSerializeWrite;
-import org.apache.hadoop.hive.serde2.lazybinary.fast.LazyBinarySerializeWrite;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
-import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.Writable;
-import org.apache.hive.common.util.HashCodeUtil;
-import org.apache.hive.common.util.ReflectionUtil;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import junit.framework.Assert;
 
 public class TestMapJoinOperator {
 
@@ -181,9 +111,9 @@ public class TestMapJoinOperator {
     }
   }
   private static KeyConfig[] longKeyConfigs = new KeyConfig[] {
-    new KeyConfig(234882L, TypeInfoFactory.longTypeInfo),
-    new KeyConfig(4600L, TypeInfoFactory.intTypeInfo),
-    new KeyConfig(98743L, TypeInfoFactory.shortTypeInfo)};
+    new KeyConfig(234882L, TypeInfoUtils.longTypeInfo),
+    new KeyConfig(4600L, TypeInfoUtils.intTypeInfo),
+    new KeyConfig(98743L, TypeInfoUtils.shortTypeInfo)};
 
   @Test
   public void testLong() throws Exception {
@@ -207,12 +137,12 @@ public class TestMapJoinOperator {
     String[] bigTableColumnNames = new String[] {"number1"};
     TypeInfo[] bigTableTypeInfos =
         new TypeInfo[] {
-            TypeInfoFactory.longTypeInfo};
+            TypeInfoUtils.longTypeInfo};
     int[] bigTableKeyColumnNums = new int[] {0};
 
     String[] smallTableValueColumnNames = new String[] {"sv1", "sv2"};
     TypeInfo[] smallTableValueTypeInfos =
-        new TypeInfo[] {TypeInfoFactory.dateTypeInfo, TypeInfoFactory.stringTypeInfo};
+        new TypeInfo[] { TypeInfoUtils.dateTypeInfo, TypeInfoUtils.stringTypeInfo};
 
     int[] bigTableRetainColumnNums = new int[] {0};
 
@@ -260,14 +190,14 @@ public class TestMapJoinOperator {
     String[] bigTableColumnNames = new String[] {"b1", "b2", "b3"};
     TypeInfo[] bigTableTypeInfos =
         new TypeInfo[] {
-            TypeInfoFactory.intTypeInfo,
-            TypeInfoFactory.longTypeInfo,
-            TypeInfoFactory.stringTypeInfo};
+            TypeInfoUtils.intTypeInfo,
+            TypeInfoUtils.longTypeInfo,
+            TypeInfoUtils.stringTypeInfo};
     int[] bigTableKeyColumnNums = new int[] {0, 1, 2};
 
     String[] smallTableValueColumnNames = new String[] {"sv1"};
     TypeInfo[] smallTableValueTypeInfos =
-        new TypeInfo[] {TypeInfoFactory.stringTypeInfo};
+        new TypeInfo[] { TypeInfoUtils.stringTypeInfo};
 
     int[] bigTableRetainColumnNums = new int[] {0, 1, 2};
 
@@ -315,12 +245,12 @@ public class TestMapJoinOperator {
     String[] bigTableColumnNames = new String[] {"b1"};
     TypeInfo[] bigTableTypeInfos =
         new TypeInfo[] {
-            TypeInfoFactory.stringTypeInfo};
+            TypeInfoUtils.stringTypeInfo};
     int[] bigTableKeyColumnNums = new int[] {0};
 
     String[] smallTableValueColumnNames = new String[] {"sv1", "sv2"};
     TypeInfo[] smallTableValueTypeInfos =
-        new TypeInfo[] {TypeInfoFactory.dateTypeInfo, TypeInfoFactory.timestampTypeInfo};
+        new TypeInfo[] { TypeInfoUtils.dateTypeInfo, TypeInfoUtils.timestampTypeInfo};
 
     int[] bigTableRetainColumnNums = new int[] {0};
 

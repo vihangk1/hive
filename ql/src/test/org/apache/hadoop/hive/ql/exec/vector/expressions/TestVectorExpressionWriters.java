@@ -49,6 +49,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.FloatWritable;
@@ -74,9 +75,9 @@ public class TestVectorExpressionWriters {
   }
 
   private Writable getWritableValue(TypeInfo ti, double value) {
-    if (ti.equals(TypeInfoFactory.floatTypeInfo)) {
+    if (ti.equals(TypeInfoUtils.floatTypeInfo)) {
       return new FloatWritable((float) value);
-    } else if (ti.equals(TypeInfoFactory.doubleTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.doubleTypeInfo)) {
       return new DoubleWritable(value);
     }
     return null;
@@ -92,29 +93,29 @@ public class TestVectorExpressionWriters {
   }
 
   private Writable getWritableValue(TypeInfo ti, byte[] value) {
-    if (ti.equals(TypeInfoFactory.stringTypeInfo)) {
+    if (ti.equals(TypeInfoUtils.stringTypeInfo)) {
       return new Text(value);
-    } else if (ti.equals(PrimitiveObjectInspectorFactory.varcharTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.varcharTypeInfo)) {
       return new HiveVarcharWritable(
           new HiveVarchar(new Text(value).toString(), -1));
-    } else if (ti.equals(TypeInfoFactory.binaryTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.binaryTypeInfo)) {
       return new BytesWritable(value);
     }
     return null;
   }
 
   private Writable getWritableValue(TypeInfo ti, long value) {
-    if (ti.equals(TypeInfoFactory.byteTypeInfo)) {
+    if (ti.equals(TypeInfoUtils.byteTypeInfo)) {
       return new ByteWritable((byte) value);
-    } else if (ti.equals(TypeInfoFactory.shortTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.shortTypeInfo)) {
       return new ShortWritable((short) value);
-    } else if (ti.equals(TypeInfoFactory.intTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.intTypeInfo)) {
       return new IntWritable( (int) value);
-    } else if (ti.equals(TypeInfoFactory.longTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.longTypeInfo)) {
       return new LongWritable( (long) value);
-    } else if (ti.equals(TypeInfoFactory.booleanTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.booleanTypeInfo)) {
       return new BooleanWritable( value == 0 ? false : true);
-    } else if (ti.equals(TypeInfoFactory.timestampTypeInfo)) {
+    } else if (ti.equals(TypeInfoUtils.timestampTypeInfo)) {
       Timestamp ts = new Timestamp(value);
       TimestampWritable tw = new TimestampWritable(ts);
       return tw;
@@ -381,27 +382,27 @@ public class TestVectorExpressionWriters {
   
   @Test
   public void testVectorExpressionWriterDouble() throws HiveException {
-    testWriterDouble(TypeInfoFactory.doubleTypeInfo);
+    testWriterDouble(TypeInfoUtils.doubleTypeInfo);
   }
 
   @Test
   public void testVectorExpressionSetterDouble() throws HiveException {
-    testSetterDouble(TypeInfoFactory.doubleTypeInfo);
+    testSetterDouble(TypeInfoUtils.doubleTypeInfo);
   }  
 
   @Test
   public void testVectorExpressionWriterFloat() throws HiveException {
-    testWriterDouble(TypeInfoFactory.floatTypeInfo);
+    testWriterDouble(TypeInfoUtils.floatTypeInfo);
   }
 
   @Test
   public void testVectorExpressionSetterFloat() throws HiveException {
-    testSetterDouble(TypeInfoFactory.floatTypeInfo);
+    testSetterDouble(TypeInfoUtils.floatTypeInfo);
   }
   
   @Test
   public void testVectorExpressionWriterLong() throws HiveException {
-    testWriterLong(TypeInfoFactory.longTypeInfo);
+    testWriterLong(TypeInfoUtils.longTypeInfo);
   }
 
   @Test
@@ -418,92 +419,92 @@ public class TestVectorExpressionWriters {
 
   @Test
   public void testVectorExpressionSetterLong() throws HiveException {
-    testSetterLong(TypeInfoFactory.longTypeInfo);
+    testSetterLong(TypeInfoUtils.longTypeInfo);
   }
   
   @Test
   public void testVectorExpressionStructLong() throws HiveException {
-    testStructLong(TypeInfoFactory.longTypeInfo);
+    testStructLong(TypeInfoUtils.longTypeInfo);
   }
   
   @Test
   public void testVectorExpressionWriterInt() throws HiveException {
-    testWriterLong(TypeInfoFactory.intTypeInfo);
+    testWriterLong(TypeInfoUtils.intTypeInfo);
   }
 
   @Test
   public void testVectorExpressionSetterInt() throws HiveException {
-    testSetterLong(TypeInfoFactory.intTypeInfo);
+    testSetterLong(TypeInfoUtils.intTypeInfo);
   }
 
   @Test
   public void testVectorExpressionWriterShort() throws HiveException {
-    testWriterLong(TypeInfoFactory.shortTypeInfo);
+    testWriterLong(TypeInfoUtils.shortTypeInfo);
   }
 
   @Test
   public void testVectorExpressionSetterShort() throws HiveException {
-    testSetterLong(TypeInfoFactory.shortTypeInfo);
+    testSetterLong(TypeInfoUtils.shortTypeInfo);
   }
 
   
   @Test
   public void testVectorExpressionWriterBoolean() throws HiveException {
-    testWriterLong(TypeInfoFactory.booleanTypeInfo);
+    testWriterLong(TypeInfoUtils.booleanTypeInfo);
   }
   
   @Test
   public void testVectorExpressionSetterBoolean() throws HiveException {
-    testSetterLong(TypeInfoFactory.booleanTypeInfo);
+    testSetterLong(TypeInfoUtils.booleanTypeInfo);
   }
 
   @Test
   public void testVectorExpressionWriterTimestamp() throws HiveException {
-    testWriterTimestamp(TypeInfoFactory.timestampTypeInfo);
+    testWriterTimestamp(TypeInfoUtils.timestampTypeInfo);
   }
 
   @Test
   public void testVectorExpressionSetterTimestamp() throws HiveException {
-    testSetterTimestamp(TypeInfoFactory.timestampTypeInfo);
+    testSetterTimestamp(TypeInfoUtils.timestampTypeInfo);
   }
 
   @Test
   public void testVectorExpressionWriterByte() throws HiveException {
-    testWriterLong(TypeInfoFactory.byteTypeInfo);
+    testWriterLong(TypeInfoUtils.byteTypeInfo);
   }
   
   @Test
   public void testVectorExpressionSetterByte() throws HiveException {
-    testSetterLong(TypeInfoFactory.byteTypeInfo);
+    testSetterLong(TypeInfoUtils.byteTypeInfo);
   }
 
   @Test
   public void testVectorExpressionWriterString() throws HiveException {
-    testWriterText(TypeInfoFactory.stringTypeInfo);
+    testWriterText(TypeInfoUtils.stringTypeInfo);
   }
   
   @Test
   public void testVectorExpressionSetterString() throws HiveException {
-    testSetterText(TypeInfoFactory.stringTypeInfo);
+    testSetterText(TypeInfoUtils.stringTypeInfo);
   }
   
   @Test
   public void testVectorExpressionWriterVarchar() throws HiveException {
-    testWriterText(PrimitiveObjectInspectorFactory.varcharTypeInfo);
+    testWriterText(TypeInfoUtils.varcharTypeInfo);
   }
   
   @Test
   public void testVectorExpressionSetterVarchar() throws HiveException {
-    testSetterText(PrimitiveObjectInspectorFactory.varcharTypeInfo);
+    testSetterText(TypeInfoUtils.varcharTypeInfo);
   }    
 
   @Test
   public void testVectorExpressionWriterBinary() throws HiveException {
-    testWriterText(TypeInfoFactory.binaryTypeInfo);
+    testWriterText(TypeInfoUtils.binaryTypeInfo);
   }
 
   @Test
   public void testVectorExpressionSetterBinary() throws HiveException {
-    testSetterText(TypeInfoFactory.binaryTypeInfo);
+    testSetterText(TypeInfoUtils.binaryTypeInfo);
   }
 }

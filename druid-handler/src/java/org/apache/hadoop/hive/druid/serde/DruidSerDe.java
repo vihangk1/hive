@@ -73,6 +73,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TimestampLocalTZTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.FloatWritable;
@@ -329,7 +330,7 @@ public class DruidSerDe extends AbstractSerDe {
     // different types for post-aggregation functions
     for (PostAggregator pa : query.getPostAggregatorSpecs()) {
       columnNames.add(pa.getName());
-      columnTypes.add(TypeInfoFactory.floatTypeInfo);
+      columnTypes.add(TypeInfoUtils.floatTypeInfo);
     }
   }
 
@@ -342,7 +343,7 @@ public class DruidSerDe extends AbstractSerDe {
     columnTypes.add(timeColumnTypeInfo);
     // Dimension column
     columnNames.add(query.getDimensionSpec().getOutputName());
-    columnTypes.add(TypeInfoFactory.stringTypeInfo);
+    columnTypes.add(TypeInfoUtils.stringTypeInfo);
     // Aggregator columns
     for (AggregatorFactory af : query.getAggregatorSpecs()) {
       columnNames.add(af.getName());
@@ -360,7 +361,7 @@ public class DruidSerDe extends AbstractSerDe {
     // different types for post-aggregation functions
     for (PostAggregator pa : query.getPostAggregatorSpecs()) {
       columnNames.add(pa.getName());
-      columnTypes.add(TypeInfoFactory.floatTypeInfo);
+      columnTypes.add(TypeInfoUtils.floatTypeInfo);
     }
   }
 
@@ -375,7 +376,7 @@ public class DruidSerDe extends AbstractSerDe {
     // Dimension columns
     for (DimensionSpec ds : query.getDimensions()) {
       columnNames.add(ds.getOutputName());
-      columnTypes.add(TypeInfoFactory.stringTypeInfo);
+      columnTypes.add(TypeInfoUtils.stringTypeInfo);
     }
     // The type for metric columns is not explicit in the query, thus in this case
     // we need to emit a metadata query to know their type
@@ -436,7 +437,7 @@ public class DruidSerDe extends AbstractSerDe {
     // different types for post-aggregation functions
     for (PostAggregator pa : query.getPostAggregatorSpecs()) {
       columnNames.add(pa.getName());
-      columnTypes.add(TypeInfoFactory.floatTypeInfo);
+      columnTypes.add(TypeInfoUtils.floatTypeInfo);
     }
   }
 

@@ -20,14 +20,14 @@ package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 
 import org.apache.hadoop.hive.common.type.HiveIntervalDayTime;
 import org.apache.hadoop.hive.serde2.io.HiveIntervalDayTimeWritable;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class JavaHiveIntervalDayTimeObjectInspector
     extends AbstractPrimitiveJavaObjectInspector
     implements SettableHiveIntervalDayTimeObjectInspector{
 
   public JavaHiveIntervalDayTimeObjectInspector() {
-    super(TypeInfoFactory.intervalDayTimeTypeInfo);
+    super(TypeInfoUtils.intervalDayTimeTypeInfo);
   }
 
   @Override

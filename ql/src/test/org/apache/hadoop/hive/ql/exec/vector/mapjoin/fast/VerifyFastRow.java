@@ -54,7 +54,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.MapTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.UnionTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.BooleanWritable;
@@ -63,7 +63,6 @@ import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 
 /**
  * (Copy of VerifyFast from serde).
@@ -684,7 +683,7 @@ public class VerifyFastRow {
           unionObj = null;
         } else {
           // Get the tag value.
-          tagObj = getComplexField(deserializeRead, TypeInfoFactory.intTypeInfo);
+          tagObj = getComplexField(deserializeRead, TypeInfoUtils.intTypeInfo);
           tag = ((IntWritable) tagObj).get();
 
           isNull = !deserializeRead.readComplexField();

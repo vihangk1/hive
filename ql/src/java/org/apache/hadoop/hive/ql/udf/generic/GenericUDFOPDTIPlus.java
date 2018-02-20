@@ -44,7 +44,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 @Description(name = "+", value = "a _FUNC_ b - Returns a+b")
 public class GenericUDFOPDTIPlus extends GenericUDFBaseDTI {
@@ -116,44 +116,44 @@ public class GenericUDFOPDTIPlus extends GenericUDFBaseDTI {
       intervalArg1Idx = 0;
       intervalArg2Idx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.intervalYearMonthTypeInfo);
+          TypeInfoUtils.intervalYearMonthTypeInfo);
     } else if (checkArgs(PrimitiveCategory.DATE, PrimitiveCategory.INTERVAL_YEAR_MONTH)) {
       plusOpType = OperationType.INTERVALYM_PLUS_DATE;
       dtArgIdx = 0;
       intervalArg1Idx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.dateTypeInfo);
+          TypeInfoUtils.dateTypeInfo);
     } else if (checkArgs(PrimitiveCategory.INTERVAL_YEAR_MONTH, PrimitiveCategory.DATE)) {
       plusOpType = OperationType.INTERVALYM_PLUS_DATE;
       intervalArg1Idx = 0;
       dtArgIdx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.dateTypeInfo);
+          TypeInfoUtils.dateTypeInfo);
     } else if (checkArgs(PrimitiveCategory.TIMESTAMP, PrimitiveCategory.INTERVAL_YEAR_MONTH)) {
       plusOpType = OperationType.INTERVALYM_PLUS_TIMESTAMP;
       dtArgIdx = 0;
       intervalArg1Idx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.timestampTypeInfo);
+          TypeInfoUtils.timestampTypeInfo);
     } else if (checkArgs(PrimitiveCategory.INTERVAL_YEAR_MONTH, PrimitiveCategory.TIMESTAMP)) {
       plusOpType = OperationType.INTERVALYM_PLUS_TIMESTAMP;
       intervalArg1Idx = 0;
       dtArgIdx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.timestampTypeInfo);
+          TypeInfoUtils.timestampTypeInfo);
     } else if (checkArgs(PrimitiveCategory.INTERVAL_DAY_TIME, PrimitiveCategory.INTERVAL_DAY_TIME)) {
       plusOpType = OperationType.INTERVALDT_PLUS_INTERVALDT;
       intervalArg1Idx = 0;
       intervalArg2Idx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.intervalDayTimeTypeInfo);
+          TypeInfoUtils.intervalDayTimeTypeInfo);
     } else if (checkArgs(PrimitiveCategory.INTERVAL_DAY_TIME, PrimitiveCategory.DATE)
         || checkArgs(PrimitiveCategory.INTERVAL_DAY_TIME, PrimitiveCategory.TIMESTAMP)) {
       plusOpType = OperationType.INTERVALDT_PLUS_TIMESTAMP;
       intervalArg1Idx = 0;
       dtArgIdx = 1;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.timestampTypeInfo);
+          TypeInfoUtils.timestampTypeInfo);
       dtConverter = ObjectInspectorConverters.getConverter(leftOI, resultOI);
     } else if (checkArgs(PrimitiveCategory.DATE, PrimitiveCategory.INTERVAL_DAY_TIME)
         || checkArgs(PrimitiveCategory.TIMESTAMP, PrimitiveCategory.INTERVAL_DAY_TIME)) {
@@ -161,7 +161,7 @@ public class GenericUDFOPDTIPlus extends GenericUDFBaseDTI {
       intervalArg1Idx = 1;
       dtArgIdx = 0;
       resultOI = PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(
-          TypeInfoFactory.timestampTypeInfo);
+          TypeInfoUtils.timestampTypeInfo);
       dtConverter = ObjectInspectorConverters.getConverter(leftOI, resultOI);
     } else {
       // Unsupported types - error

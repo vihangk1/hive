@@ -3890,12 +3890,12 @@ public class DDLSemanticAnalyzer extends BaseSemanticAnalyzer {
 
   public static ExprNodeGenericFuncDesc makeBinaryPredicate(
       String fn, ExprNodeDesc left, ExprNodeDesc right) throws SemanticException {
-      return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           FunctionRegistry.getFunctionInfo(fn).getGenericUDF(), Lists.newArrayList(left, right));
   }
   public static ExprNodeGenericFuncDesc makeUnaryPredicate(
       String fn, ExprNodeDesc arg) throws SemanticException {
-      return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+      return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
           FunctionRegistry.getFunctionInfo(fn).getGenericUDF(), Lists.newArrayList(arg));
   }
   /**

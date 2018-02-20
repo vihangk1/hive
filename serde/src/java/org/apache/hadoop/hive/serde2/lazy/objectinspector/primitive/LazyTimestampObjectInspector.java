@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.hadoop.hive.serde2.io.TimestampWritable;
 import org.apache.hadoop.hive.serde2.lazy.LazyTimestamp;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.TimestampObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hive.common.util.TimestampParser;
 
 public class LazyTimestampObjectInspector
@@ -34,12 +34,12 @@ public class LazyTimestampObjectInspector
   protected TimestampParser timestampParser = null;
 
   LazyTimestampObjectInspector() {
-    super(TypeInfoFactory.timestampTypeInfo);
+    super(TypeInfoUtils.timestampTypeInfo);
     timestampParser = new TimestampParser();
   }
 
   LazyTimestampObjectInspector(List<String> tsFormats) {
-    super(TypeInfoFactory.timestampTypeInfo);
+    super(TypeInfoUtils.timestampTypeInfo);
     this.timestampFormats = tsFormats;
     timestampParser = new TimestampParser(tsFormats);
   }

@@ -36,7 +36,7 @@ import org.apache.hadoop.hive.ql.parse.TypeCheckProcFactory.DefaultExprProcessor
 import org.apache.hadoop.hive.ql.plan.ExprNodeColumnDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeConstantDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 public class QBSubQuery implements ISubQueryJoinInfo {
 
@@ -337,7 +337,7 @@ public class QBSubQuery implements ISubQueryJoinInfo {
       try {
         TypeCheckCtx tcCtx = new TypeCheckCtx(parentQueryRR);
         String str = BaseSemanticAnalyzer.unescapeIdentifier(node.getChild(1).getText());
-        ExprNodeDesc idDesc = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, str.toLowerCase());
+        ExprNodeDesc idDesc = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, str.toLowerCase());
         Object desc = defaultExprProcessor.process(node, stack, tcCtx, (Object) null, idDesc);
         if (desc != null && desc instanceof ExprNodeColumnDesc) {
           ExprNodeColumnDesc colDesc = (ExprNodeColumnDesc) desc;

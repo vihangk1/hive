@@ -44,7 +44,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.thrift.TException;
 
@@ -142,7 +142,7 @@ public class TestMetastoreExpr extends TestCase {
 
     // Apply isnull and instr (not supported by pushdown) via name filtering.
     checkExpr(4, dbName, tblName, e.val("p").strCol("p1")
-        .fn("instr", TypeInfoFactory.intTypeInfo, 2).val(0).pred("<=", 2).build());
+        .fn("instr", TypeInfoUtils.intTypeInfo, 2).val(0).pred("<=", 2).build());
     checkExpr(0, dbName, tblName, e.intCol("p2").pred("isnull", 1).build());
 
     // Cannot deserialize => throw the specific exception.
@@ -187,7 +187,7 @@ public class TestMetastoreExpr extends TestCase {
     }
 
     public ExprBuilder pred(String name, int args) throws Exception {
-      return fn(name, TypeInfoFactory.booleanTypeInfo, args);
+      return fn(name, TypeInfoUtils.booleanTypeInfo, args);
     }
 
     private ExprBuilder fn(String name, TypeInfo ti, int args) throws Exception {
@@ -201,10 +201,10 @@ public class TestMetastoreExpr extends TestCase {
     }
 
     public ExprBuilder strCol(String col) {
-      return colInternal(TypeInfoFactory.stringTypeInfo, col, true);
+      return colInternal(TypeInfoUtils.stringTypeInfo, col, true);
     }
     public ExprBuilder intCol(String col) {
-      return colInternal(TypeInfoFactory.intTypeInfo, col, true);
+      return colInternal(TypeInfoUtils.intTypeInfo, col, true);
     }
     private ExprBuilder colInternal(TypeInfo ti, String col, boolean part) {
       stack.push(new ExprNodeColumnDesc(ti, col, tblName, part));
@@ -212,13 +212,13 @@ public class TestMetastoreExpr extends TestCase {
     }
 
     public ExprBuilder val(String val) {
-      return valInternal(TypeInfoFactory.stringTypeInfo, val);
+      return valInternal(TypeInfoUtils.stringTypeInfo, val);
     }
     public ExprBuilder val(int val) {
-      return valInternal(TypeInfoFactory.intTypeInfo, val);
+      return valInternal(TypeInfoUtils.intTypeInfo, val);
     }
     public ExprBuilder val(boolean val) {
-      return valInternal(TypeInfoFactory.booleanTypeInfo, val);
+      return valInternal(TypeInfoUtils.booleanTypeInfo, val);
     }
     private ExprBuilder valInternal(TypeInfo ti, Object val) {
       stack.push(new ExprNodeConstantDesc(ti, val));

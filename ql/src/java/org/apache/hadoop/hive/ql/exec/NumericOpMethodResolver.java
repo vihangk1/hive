@@ -23,10 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
@@ -70,26 +67,26 @@ public class NumericOpMethodResolver implements UDFMethodResolver {
 
     // If either argument is a string, we convert to a double or decimal because a number
     // in string form should always be convertible into either of those
-    if (argTypeInfos.get(0).equals(TypeInfoFactory.stringTypeInfo)
-        || argTypeInfos.get(1).equals(TypeInfoFactory.stringTypeInfo)) {
+    if (argTypeInfos.get(0).equals(TypeInfoUtils.stringTypeInfo)
+        || argTypeInfos.get(1).equals(TypeInfoUtils.stringTypeInfo)) {
 
       // Default is double, but if one of the sides is already in decimal we
       // complete the operation in that type.
-      if (argTypeInfos.get(0).equals(PrimitiveObjectInspectorFactory.decimalTypeInfo)
-          || argTypeInfos.get(1).equals(PrimitiveObjectInspectorFactory.decimalTypeInfo)) {
-        modArgTypeInfos.add(PrimitiveObjectInspectorFactory.decimalTypeInfo);
-        modArgTypeInfos.add(PrimitiveObjectInspectorFactory.decimalTypeInfo);
+      if (argTypeInfos.get(0).equals(TypeInfoUtils.decimalTypeInfo)
+          || argTypeInfos.get(1).equals(TypeInfoUtils.decimalTypeInfo)) {
+        modArgTypeInfos.add(TypeInfoUtils.decimalTypeInfo);
+        modArgTypeInfos.add(TypeInfoUtils.decimalTypeInfo);
       } else {
-        modArgTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
-        modArgTypeInfos.add(TypeInfoFactory.doubleTypeInfo);
+        modArgTypeInfos.add(TypeInfoUtils.doubleTypeInfo);
+        modArgTypeInfos.add(TypeInfoUtils.doubleTypeInfo);
       }
     } else {
       // If it's a void, we change the type to a byte because once the types
       // are run through getCommonClass(), a byte and any other type T will
       // resolve to type T
       for (int i = 0; i < 2; i++) {
-        if (argTypeInfos.get(i).equals(TypeInfoFactory.voidTypeInfo)) {
-          modArgTypeInfos.add(TypeInfoFactory.byteTypeInfo);
+        if (argTypeInfos.get(i).equals(TypeInfoUtils.voidTypeInfo)) {
+          modArgTypeInfos.add(TypeInfoUtils.byteTypeInfo);
         } else {
           modArgTypeInfos.add(argTypeInfos.get(i));
         }

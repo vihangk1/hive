@@ -17,7 +17,7 @@
  */
 package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 
 /**
@@ -28,7 +28,7 @@ public class JavaFloatObjectInspector extends
     SettableFloatObjectInspector {
 
   JavaFloatObjectInspector() {
-    super(TypeInfoFactory.floatTypeInfo);
+    super(TypeInfoUtils.floatTypeInfo);
   }
 
   @Override

@@ -22,9 +22,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.hadoop.hive.common.type.HiveChar;
-import org.apache.hadoop.hive.common.type.HiveDecimal;
-import org.apache.hadoop.hive.common.type.HiveVarchar;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.io.ByteWritable;
 import org.apache.hadoop.hive.serde2.io.DateWritable;
@@ -45,6 +42,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TimestampLocalTZTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.VarcharTypeInfo;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
@@ -64,25 +62,6 @@ import org.apache.hadoop.io.Writable;
  * ObjectInspector.
  */
 public final class PrimitiveObjectInspectorFactory {
-
-  // In case of parameterized typeInfos below we keep a final reference to
-  // the default typeInfos for these types. This types are initialized in the static block
-  // below which also populates the TypeInfoFactor cache with these types
-  // these are here instead of TypeInfoFactory because they rely on attributes which
-  // are implementation specific and defined in Hive source code. The TypeInfoFactory in
-  // standalone-metastore cannot depend on type implementations.
-  public static final PrimitiveTypeInfo charTypeInfo;
-  public static final PrimitiveTypeInfo varcharTypeInfo;
-  public static final PrimitiveTypeInfo decimalTypeInfo;
-  static {
-    decimalTypeInfo = TypeInfoFactory.getPrimitiveTypeInfo(new DecimalTypeInfo(HiveDecimal.SYSTEM_DEFAULT_PRECISION,
-        HiveDecimal.SYSTEM_DEFAULT_SCALE).getQualifiedName());
-    varcharTypeInfo = TypeInfoFactory.getPrimitiveTypeInfo(
-        new VarcharTypeInfo(HiveVarchar.MAX_VARCHAR_LENGTH).getQualifiedName());
-    charTypeInfo = TypeInfoFactory
-        .getPrimitiveTypeInfo(new CharTypeInfo(HiveChar.MAX_CHAR_LENGTH).getQualifiedName());
-  }
-
   public static final WritableBooleanObjectInspector writableBooleanObjectInspector =
       new WritableBooleanObjectInspector();
   public static final WritableByteObjectInspector writableByteObjectInspector =
@@ -100,9 +79,9 @@ public final class PrimitiveObjectInspectorFactory {
   public static final WritableStringObjectInspector writableStringObjectInspector =
       new WritableStringObjectInspector();
   public static final WritableHiveCharObjectInspector writableHiveCharObjectInspector =
-      new WritableHiveCharObjectInspector((CharTypeInfo) charTypeInfo);
+      new WritableHiveCharObjectInspector((CharTypeInfo) TypeInfoUtils.charTypeInfo);
   public static final WritableHiveVarcharObjectInspector writableHiveVarcharObjectInspector =
-      new WritableHiveVarcharObjectInspector((VarcharTypeInfo) varcharTypeInfo);
+      new WritableHiveVarcharObjectInspector((VarcharTypeInfo) TypeInfoUtils.varcharTypeInfo);
   public static final WritableVoidObjectInspector writableVoidObjectInspector =
       new WritableVoidObjectInspector();
   public static final WritableDateObjectInspector writableDateObjectInspector =
@@ -110,7 +89,7 @@ public final class PrimitiveObjectInspectorFactory {
   public static final WritableTimestampObjectInspector writableTimestampObjectInspector =
       new WritableTimestampObjectInspector();
   public static final WritableTimestampLocalTZObjectInspector writableTimestampTZObjectInspector =
-      new WritableTimestampLocalTZObjectInspector(TypeInfoFactory.timestampLocalTZTypeInfo);
+      new WritableTimestampLocalTZObjectInspector(TypeInfoUtils.timestampLocalTZTypeInfo);
   public static final WritableHiveIntervalYearMonthObjectInspector writableHiveIntervalYearMonthObjectInspector =
       new WritableHiveIntervalYearMonthObjectInspector();
   public static final WritableHiveIntervalDayTimeObjectInspector writableHiveIntervalDayTimeObjectInspector =
@@ -118,7 +97,7 @@ public final class PrimitiveObjectInspectorFactory {
   public static final WritableBinaryObjectInspector writableBinaryObjectInspector =
       new WritableBinaryObjectInspector();
   public static final WritableHiveDecimalObjectInspector writableHiveDecimalObjectInspector =
-      new WritableHiveDecimalObjectInspector((DecimalTypeInfo) decimalTypeInfo);
+      new WritableHiveDecimalObjectInspector((DecimalTypeInfo) TypeInfoUtils.decimalTypeInfo);
 
   // Map from PrimitiveTypeInfo to AbstractPrimitiveWritableObjectInspector.
   private static ConcurrentHashMap<PrimitiveTypeInfo, AbstractPrimitiveWritableObjectInspector> cachedPrimitiveWritableInspectorCache =
@@ -140,22 +119,22 @@ public final class PrimitiveObjectInspectorFactory {
         writableDoubleObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.STRING_TYPE_NAME),
         writableStringObjectInspector);
-    cachedPrimitiveWritableInspectorCache.put(charTypeInfo, writableHiveCharObjectInspector);
-    cachedPrimitiveWritableInspectorCache.put(varcharTypeInfo, writableHiveVarcharObjectInspector);
+    cachedPrimitiveWritableInspectorCache.put(TypeInfoUtils.charTypeInfo, writableHiveCharObjectInspector);
+    cachedPrimitiveWritableInspectorCache.put(TypeInfoUtils.varcharTypeInfo, writableHiveVarcharObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.VOID_TYPE_NAME),
         writableVoidObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.DATE_TYPE_NAME),
         writableDateObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.TIMESTAMP_TYPE_NAME),
         writableTimestampObjectInspector);
-    cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.timestampLocalTZTypeInfo, writableTimestampTZObjectInspector);
+    cachedPrimitiveWritableInspectorCache.put(TypeInfoUtils.timestampLocalTZTypeInfo, writableTimestampTZObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.INTERVAL_YEAR_MONTH_TYPE_NAME),
         writableHiveIntervalYearMonthObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME),
         writableHiveIntervalDayTimeObjectInspector);
     cachedPrimitiveWritableInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.BINARY_TYPE_NAME),
         writableBinaryObjectInspector);
-    cachedPrimitiveWritableInspectorCache.put(decimalTypeInfo, writableHiveDecimalObjectInspector);
+    cachedPrimitiveWritableInspectorCache.put(TypeInfoUtils.decimalTypeInfo, writableHiveDecimalObjectInspector);
   }
 
   private static Map<PrimitiveCategory, AbstractPrimitiveWritableObjectInspector> primitiveCategoryToWritableOI =
@@ -198,9 +177,9 @@ public final class PrimitiveObjectInspectorFactory {
   public static final JavaStringObjectInspector javaStringObjectInspector =
       new JavaStringObjectInspector();
   public static final JavaHiveCharObjectInspector javaHiveCharObjectInspector =
-      new JavaHiveCharObjectInspector((CharTypeInfo) charTypeInfo);
+      new JavaHiveCharObjectInspector((CharTypeInfo) TypeInfoUtils.charTypeInfo);
   public static final JavaHiveVarcharObjectInspector javaHiveVarcharObjectInspector =
-      new JavaHiveVarcharObjectInspector((VarcharTypeInfo) varcharTypeInfo);
+      new JavaHiveVarcharObjectInspector((VarcharTypeInfo) TypeInfoUtils.varcharTypeInfo);
   public static final JavaVoidObjectInspector javaVoidObjectInspector =
       new JavaVoidObjectInspector();
   public static final JavaDateObjectInspector javaDateObjectInspector =
@@ -208,7 +187,7 @@ public final class PrimitiveObjectInspectorFactory {
   public static final JavaTimestampObjectInspector javaTimestampObjectInspector =
       new JavaTimestampObjectInspector();
   public static final JavaTimestampLocalTZObjectInspector javaTimestampTZObjectInspector =
-      new JavaTimestampLocalTZObjectInspector(TypeInfoFactory.timestampLocalTZTypeInfo);
+      new JavaTimestampLocalTZObjectInspector(TypeInfoUtils.timestampLocalTZTypeInfo);
   public static final JavaHiveIntervalYearMonthObjectInspector javaHiveIntervalYearMonthObjectInspector =
       new JavaHiveIntervalYearMonthObjectInspector();
   public static final JavaHiveIntervalDayTimeObjectInspector javaHiveIntervalDayTimeObjectInspector =
@@ -216,7 +195,7 @@ public final class PrimitiveObjectInspectorFactory {
   public static final JavaBinaryObjectInspector javaByteArrayObjectInspector =
       new JavaBinaryObjectInspector();
   public static final JavaHiveDecimalObjectInspector javaHiveDecimalObjectInspector =
-      new JavaHiveDecimalObjectInspector((DecimalTypeInfo) decimalTypeInfo);
+      new JavaHiveDecimalObjectInspector((DecimalTypeInfo) TypeInfoUtils.decimalTypeInfo);
 
   // Map from PrimitiveTypeInfo to AbstractPrimitiveJavaObjectInspector.
   private static ConcurrentHashMap<PrimitiveTypeInfo, AbstractPrimitiveJavaObjectInspector> cachedPrimitiveJavaInspectorCache =
@@ -238,22 +217,22 @@ public final class PrimitiveObjectInspectorFactory {
         javaDoubleObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.STRING_TYPE_NAME),
         javaStringObjectInspector);
-    cachedPrimitiveJavaInspectorCache.put(charTypeInfo, javaHiveCharObjectInspector);
-    cachedPrimitiveJavaInspectorCache.put(varcharTypeInfo, javaHiveVarcharObjectInspector);
+    cachedPrimitiveJavaInspectorCache.put(TypeInfoUtils.charTypeInfo, javaHiveCharObjectInspector);
+    cachedPrimitiveJavaInspectorCache.put(TypeInfoUtils.varcharTypeInfo, javaHiveVarcharObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.VOID_TYPE_NAME),
         javaVoidObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.DATE_TYPE_NAME),
         javaDateObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.TIMESTAMP_TYPE_NAME),
         javaTimestampObjectInspector);
-    cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.timestampLocalTZTypeInfo, javaTimestampTZObjectInspector);
+    cachedPrimitiveJavaInspectorCache.put(TypeInfoUtils.timestampLocalTZTypeInfo, javaTimestampTZObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.INTERVAL_YEAR_MONTH_TYPE_NAME),
         javaHiveIntervalYearMonthObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME),
         javaHiveIntervalDayTimeObjectInspector);
     cachedPrimitiveJavaInspectorCache.put(TypeInfoFactory.getPrimitiveTypeInfo(serdeConstants.BINARY_TYPE_NAME),
         javaByteArrayObjectInspector);
-    cachedPrimitiveJavaInspectorCache.put(decimalTypeInfo, javaHiveDecimalObjectInspector);
+    cachedPrimitiveJavaInspectorCache.put(TypeInfoUtils.decimalTypeInfo, javaHiveDecimalObjectInspector);
   }
 
   private static Map<PrimitiveCategory, AbstractPrimitiveJavaObjectInspector> primitiveCategoryToJavaOI =

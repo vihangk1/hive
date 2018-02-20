@@ -23,7 +23,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPAnd;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPNull;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPOr;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -45,11 +45,11 @@ public final class TestPositivePartitionPrunerCompactExpr {
   public static Iterable<Object[]> data() {
     ExprNodeDesc trueExpr = new ExprNodeConstantDesc(Boolean.TRUE);
     ExprNodeDesc falseExpr = new ExprNodeConstantDesc(Boolean.FALSE);
-    ExprNodeDesc col1Expr = new ExprNodeColumnDesc(TypeInfoFactory.booleanTypeInfo, "col1", "t1", true);
-    ExprNodeDesc col2Expr = new ExprNodeColumnDesc(TypeInfoFactory.booleanTypeInfo, "col2", "t1", true);
-    ExprNodeDesc udf1Expr = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    ExprNodeDesc col1Expr = new ExprNodeColumnDesc(TypeInfoUtils.booleanTypeInfo, "col1", "t1", true);
+    ExprNodeDesc col2Expr = new ExprNodeColumnDesc(TypeInfoUtils.booleanTypeInfo, "col2", "t1", true);
+    ExprNodeDesc udf1Expr = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
         new GenericUDFOPNull(), Arrays.<ExprNodeDesc>asList(col1Expr));
-    ExprNodeDesc udf2Expr = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    ExprNodeDesc udf2Expr = new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
         new GenericUDFOPNull(), Arrays.<ExprNodeDesc>asList(col2Expr));
 
     return Arrays.asList(new Object[][]{
@@ -104,12 +104,12 @@ public final class TestPositivePartitionPrunerCompactExpr {
   }
 
   private static ExprNodeDesc or(ExprNodeDesc left, ExprNodeDesc right) {
-    return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
         new GenericUDFOPOr(), Arrays.<ExprNodeDesc>asList(left, right));
   }
 
   private static ExprNodeDesc and(ExprNodeDesc left, ExprNodeDesc right) {
-    return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
+    return new ExprNodeGenericFuncDesc(TypeInfoUtils.booleanTypeInfo,
         new GenericUDFOPAnd(), Arrays.<ExprNodeDesc>asList(left, right));
   }
 }

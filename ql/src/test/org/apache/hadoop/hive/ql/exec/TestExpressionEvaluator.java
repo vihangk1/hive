@@ -69,12 +69,12 @@ public class TestExpressionEvaluator extends TestCase {
     col1.add(new Text("1"));
     col1.add(new Text("2"));
     col1.add(new Text("3"));
-    col1Type = TypeInfoFactory.getListTypeInfo(TypeInfoFactory.stringTypeInfo);
+    col1Type = TypeInfoFactory.getListTypeInfo(TypeInfoUtils.stringTypeInfo);
     cola = new ArrayList<Text>();
     cola.add(new Text("a"));
     cola.add(new Text("b"));
     cola.add(new Text("c"));
-    colaType = TypeInfoFactory.getListTypeInfo(TypeInfoFactory.stringTypeInfo);
+    colaType = TypeInfoFactory.getListTypeInfo(TypeInfoUtils.stringTypeInfo);
     try {
       data = new ArrayList<Object>();
       data.add(col1);

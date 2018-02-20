@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -96,14 +97,14 @@ public class TestGenericUDFRound extends BaseScalarUdfTest {
       exprs.add(OperatorTestUtils.getStringColumn(cols[i]));
     }
 
-    ExprNodeDesc[] scales = { new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, -2),
-        new ExprNodeConstantDesc(TypeInfoFactory.byteTypeInfo, (byte)0),
-        new ExprNodeConstantDesc(TypeInfoFactory.shortTypeInfo, (short)3),
-        new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 0),
-        new ExprNodeConstantDesc(TypeInfoFactory.longTypeInfo, -2L),
-        new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 0),
-        new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, -2),
-        new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 3) };
+    ExprNodeDesc[] scales = { new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, -2),
+        new ExprNodeConstantDesc(TypeInfoUtils.byteTypeInfo, (byte)0),
+        new ExprNodeConstantDesc(TypeInfoUtils.shortTypeInfo, (short)3),
+        new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 0),
+        new ExprNodeConstantDesc(TypeInfoUtils.longTypeInfo, -2L),
+        new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 0),
+        new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, -2),
+        new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 3) };
 
     List<ExprNodeDesc> earr = new ArrayList<ExprNodeDesc>();
     for (int j = 0; j < cols.length; j++) {
@@ -119,7 +120,7 @@ public class TestGenericUDFRound extends BaseScalarUdfTest {
     GenericUDFRound udf = new GenericUDFRound();
     ObjectInspector[] inputOIs = {
         PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(TypeInfoFactory.getDecimalTypeInfo(7, 3)),
-        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, new IntWritable(2))
+        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, new IntWritable(2))
     };
     PrimitiveObjectInspector outputOI = (PrimitiveObjectInspector) udf.initialize(inputOIs);
     DecimalTypeInfo outputTypeInfo = (DecimalTypeInfo)outputOI.getTypeInfo();
@@ -131,7 +132,7 @@ public class TestGenericUDFRound extends BaseScalarUdfTest {
     GenericUDFRound udf = new GenericUDFRound();
     ObjectInspector[] inputOIs = {
         PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(TypeInfoFactory.getDecimalTypeInfo(7, 3)),
-        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, new IntWritable(-2))
+        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, new IntWritable(-2))
     };
     PrimitiveObjectInspector outputOI = (PrimitiveObjectInspector) udf.initialize(inputOIs);
     DecimalTypeInfo outputTypeInfo = (DecimalTypeInfo)outputOI.getTypeInfo();
@@ -143,7 +144,7 @@ public class TestGenericUDFRound extends BaseScalarUdfTest {
     GenericUDFRound udf = new GenericUDFRound();
     ObjectInspector[] inputOIs = {
         PrimitiveObjectInspectorFactory.getPrimitiveWritableObjectInspector(TypeInfoFactory.getDecimalTypeInfo(7, 3)),
-        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, new IntWritable(5))
+        PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, new IntWritable(5))
     };
     PrimitiveObjectInspector outputOI = (PrimitiveObjectInspector) udf.initialize(inputOIs);
     DecimalTypeInfo outputTypeInfo = (DecimalTypeInfo)outputOI.getTypeInfo();

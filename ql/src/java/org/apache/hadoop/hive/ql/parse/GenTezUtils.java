@@ -45,7 +45,7 @@ import org.apache.hadoop.hive.ql.plan.*;
 import org.apache.hadoop.hive.ql.plan.TezEdgeProperty.EdgeType;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBetween;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFInBloomFilter;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -583,7 +583,7 @@ public class GenTezUtils {
     // replacing it with "true"
     LOG.debug("Removing ReduceSink " + rs + " and TableScan " + ts);
     ExprNodeDesc constNode = new ExprNodeConstantDesc(
-            TypeInfoFactory.booleanTypeInfo, Boolean.TRUE);
+            TypeInfoUtils.booleanTypeInfo, Boolean.TRUE);
     // TS operator
     DynamicValuePredicateContext filterDynamicValuePredicatesCollection =
             new DynamicValuePredicateContext();
@@ -665,7 +665,7 @@ public class GenTezUtils {
     // replacing it with "true"
     LOG.debug("Removing AppMasterEventOperator " + eventOp + " and TableScan " + ts);
     ExprNodeDesc constNode = new ExprNodeConstantDesc(
-            TypeInfoFactory.booleanTypeInfo, Boolean.TRUE);
+            TypeInfoUtils.booleanTypeInfo, Boolean.TRUE);
     // Retrieve generator
     DynamicPruningEventDesc dped = (DynamicPruningEventDesc) eventOp.getConf();
     // TS operator

@@ -74,6 +74,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.JavaIntObjectInsp
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.util.StringUtils;
@@ -96,8 +97,8 @@ public class TestAccumuloPredicateHandler {
     FunctionRegistry.getFunctionNames();
     conf = new JobConf();
     List<String> columnNames = Arrays.asList("field1", "rid");
-    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo);
     conf.set(serdeConstants.LIST_COLUMNS, Joiner.on(',').join(columnNames));
     conf.set(serdeConstants.LIST_COLUMN_TYPES, "string,string");
 
@@ -109,12 +110,12 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void testGetRowIDSearchCondition() {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "hi");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "hi");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqual(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -126,12 +127,12 @@ public class TestAccumuloPredicateHandler {
 
   @Test()
   public void testRangeEqual() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqual(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -149,12 +150,12 @@ public class TestAccumuloPredicateHandler {
 
   @Test()
   public void testRangeGreaterThan() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPGreaterThan(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -174,12 +175,12 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void rangeGreaterThanOrEqual() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -198,12 +199,12 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void rangeLessThan() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPLessThan(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -223,12 +224,12 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void rangeLessThanOrEqual() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -248,29 +249,29 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void testDisjointRanges() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children);
     assertNotNull(node);
 
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "bbb");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "bbb");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPGreaterThan(), children2);
     assertNotNull(node2);
 
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     String filterExpr = SerializationUtilities.serializeExpression(both);
@@ -284,29 +285,29 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void testMultipleRanges() throws SerDeException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "bbb");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "bbb");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPLessThan(), children2);
     assertNotNull(node2);
 
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     String filterExpr = SerializationUtilities.serializeExpression(both);
@@ -321,12 +322,12 @@ public class TestAccumuloPredicateHandler {
   @Test
   public void testPushdownTuple() throws SerDeException, NoSuchPrimitiveComparisonException,
       NoSuchCompareOpException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "field1", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 5);
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "field1", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 5);
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqual(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -347,13 +348,13 @@ public class TestAccumuloPredicateHandler {
   @Test(expected = NoSuchPrimitiveComparisonException.class)
   public void testPushdownColumnTypeNotSupported() throws SerDeException,
       NoSuchPrimitiveComparisonException, NoSuchCompareOpException {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.floatTypeInfo, "field1", null,
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.floatTypeInfo, "field1", null,
         false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.floatTypeInfo, 5.5f);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.floatTypeInfo, 5.5f);
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqual(), children);
     assertNotNull(node);
     String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -368,11 +369,11 @@ public class TestAccumuloPredicateHandler {
   @Test
   public void testPushdownComparisonOptNotSupported() {
     try {
-      ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "field1", null,
+      ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "field1", null,
           false);
       List<ExprNodeDesc> children = Lists.newArrayList();
       children.add(column);
-      ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+      ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
           new GenericUDFOPNotNull(), children);
       assertNotNull(node);
       String filterExpr = SerializationUtilities.serializeExpression(node);
@@ -392,29 +393,29 @@ public class TestAccumuloPredicateHandler {
 
   @Test
   public void testIteratorIgnoreRowIDFields() {
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children);
     assertNotNull(node);
 
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "bbb");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "bbb");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPGreaterThan(), children2);
     assertNotNull(node2);
 
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     String filterExpr = SerializationUtilities.serializeExpression(both);
@@ -432,8 +433,8 @@ public class TestAccumuloPredicateHandler {
     // Override what's placed in the Configuration by setup()
     conf = new JobConf();
     List<String> columnNames = Arrays.asList("field1", "field2", "rid");
-    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.stringTypeInfo);
     conf.set(serdeConstants.LIST_COLUMNS, Joiner.on(',').join(columnNames));
     conf.set(serdeConstants.LIST_COLUMN_TYPES, "string,int,string");
 
@@ -442,30 +443,30 @@ public class TestAccumuloPredicateHandler {
     columnMapper = new ColumnMapper(columnMappingStr, ColumnEncoding.STRING.getName(), columnNames,
         columnTypes);
 
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "field1", null,
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "field1", null,
         false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children);
     assertNotNull(node);
 
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "field2", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "field2", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 5);
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 5);
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPGreaterThan(), children2);
     assertNotNull(node2);
 
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     String filterExpr = SerializationUtilities.serializeExpression(both);
@@ -484,8 +485,8 @@ public class TestAccumuloPredicateHandler {
     // Override what's placed in the Configuration by setup()
     conf = new JobConf();
     List<String> columnNames = Arrays.asList("field1", "field2", "rid");
-    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.intTypeInfo, TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.intTypeInfo, TypeInfoUtils.stringTypeInfo);
     conf.set(serdeConstants.LIST_COLUMNS, Joiner.on(',').join(columnNames));
     conf.set(serdeConstants.LIST_COLUMN_TYPES, "string,int,string");
     conf.set(AccumuloSerDeParameters.DEFAULT_STORAGE_TYPE, ColumnEncoding.BINARY.getName());
@@ -494,30 +495,30 @@ public class TestAccumuloPredicateHandler {
     columnMapper = new ColumnMapper(columnMappingStr, ColumnEncoding.STRING.getName(), columnNames,
         columnTypes);
 
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "field1", null,
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "field1", null,
         false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "aaa");
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "aaa");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children);
     assertNotNull(node);
 
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "field2", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "field2", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 5);
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 5);
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPGreaterThan(), children2);
     assertNotNull(node2);
 
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     String filterExpr = SerializationUtilities.serializeExpression(both);
@@ -640,30 +641,30 @@ public class TestAccumuloPredicateHandler {
   @Test
   public void testRowRangeIntersection() throws SerDeException {
     // rowId >= 'f'
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "f");
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "f");
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(column);
     children.add(constant);
-    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrGreaterThan(), children);
     assertNotNull(node);
 
     // rowId <= 'm'
-    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, "rid", null,
+    ExprNodeDesc column2 = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, "rid", null,
         false);
-    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoFactory.stringTypeInfo, "m");
+    ExprNodeDesc constant2 = new ExprNodeConstantDesc(TypeInfoUtils.stringTypeInfo, "m");
     List<ExprNodeDesc> children2 = Lists.newArrayList();
     children2.add(column2);
     children2.add(constant2);
-    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeDesc node2 = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPEqualOrLessThan(), children2);
     assertNotNull(node2);
 
     List<ExprNodeDesc> bothFilters = Lists.newArrayList();
     bothFilters.add(node);
     bothFilters.add(node2);
-    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc both = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPAnd(), bothFilters);
 
     String filterExpr = SerializationUtilities.serializeExpression(both);
@@ -678,8 +679,8 @@ public class TestAccumuloPredicateHandler {
   @Test
   public void testRowRangeGeneration() throws SerDeException {
     List<String> columnNames = Arrays.asList("key", "column");
-    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoFactory.stringTypeInfo,
-        TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoUtils.stringTypeInfo,
+        TypeInfoUtils.stringTypeInfo);
     conf.set(serdeConstants.LIST_COLUMNS, Joiner.on(',').join(columnNames));
     conf.set(serdeConstants.LIST_COLUMN_TYPES, "string,string");
 
@@ -689,12 +690,12 @@ public class TestAccumuloPredicateHandler {
         columnTypes);
 
     // 100 < key
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "key", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, 100);
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "key", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, 100);
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(constant);
     children.add(column);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPLessThan(), children);
     assertNotNull(node);
 
@@ -710,8 +711,8 @@ public class TestAccumuloPredicateHandler {
   @Test
   public void testBinaryRangeGeneration() throws Exception {
     List<String> columnNames = Arrays.asList("key", "column");
-    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoFactory.intTypeInfo,
-        TypeInfoFactory.stringTypeInfo);
+    List<TypeInfo> columnTypes = Arrays.<TypeInfo> asList(TypeInfoUtils.intTypeInfo,
+        TypeInfoUtils.stringTypeInfo);
     conf.set(serdeConstants.LIST_COLUMNS, Joiner.on(',').join(columnNames));
     conf.set(serdeConstants.LIST_COLUMN_TYPES, "int,string");
 
@@ -730,12 +731,12 @@ public class TestAccumuloPredicateHandler {
     LazyUtils.writePrimitive(baos, intValue, intOI);
 
     // 100 < key
-    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoFactory.intTypeInfo, "key", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.intTypeInfo, intValue);
+    ExprNodeDesc column = new ExprNodeColumnDesc(TypeInfoUtils.intTypeInfo, "key", null, false);
+    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoUtils.intTypeInfo, intValue);
     List<ExprNodeDesc> children = Lists.newArrayList();
     children.add(constant);
     children.add(column);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.stringTypeInfo,
+    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoUtils.stringTypeInfo,
         new GenericUDFOPLessThan(), children);
     assertNotNull(node);
 

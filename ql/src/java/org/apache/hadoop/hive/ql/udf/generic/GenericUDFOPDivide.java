@@ -30,7 +30,7 @@ import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * Note that in SQL, the return type of divide is not necessarily the same
@@ -72,7 +72,7 @@ public class GenericUDFOPDivide extends GenericUDFBaseNumeric {
     // Non-decimal division should return double
     if (leftOI.getPrimitiveCategory() != PrimitiveCategory.DECIMAL
         && rightOI.getPrimitiveCategory() != PrimitiveCategory.DECIMAL) {
-      return TypeInfoFactory.doubleTypeInfo;
+      return TypeInfoUtils.doubleTypeInfo;
     }
 
     return deriveResultDecimalTypeInfo();
@@ -81,7 +81,7 @@ public class GenericUDFOPDivide extends GenericUDFBaseNumeric {
   @Override
   protected PrimitiveTypeInfo deriveResultApproxTypeInfo() {
     // Hive 0.12 behavior where double / decimal -> decimal is gone.
-    return TypeInfoFactory.doubleTypeInfo;
+    return TypeInfoUtils.doubleTypeInfo;
   }
 
   @Override

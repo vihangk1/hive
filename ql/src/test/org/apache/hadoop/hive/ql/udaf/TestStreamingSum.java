@@ -41,9 +41,8 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.junit.Test;
 
@@ -70,7 +69,7 @@ public class TestStreamingSum {
       int numFollowing, Iterator<Double> outVals) throws HiveException {
 
     GenericUDAFSum fnR = new GenericUDAFSum();
-    TypeInfo[] inputTypes = { TypeInfoFactory.doubleTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.doubleTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableDoubleObjectInspector };
 
     DoubleWritable[] in = new DoubleWritable[1];
@@ -85,7 +84,7 @@ public class TestStreamingSum {
       int numFollowing, Iterator<Long> outVals) throws HiveException {
 
     GenericUDAFSum fnR = new GenericUDAFSum();
-    TypeInfo[] inputTypes = { TypeInfoFactory.longTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.longTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableLongObjectInspector };
 
     LongWritable[] in = new LongWritable[1];
@@ -101,7 +100,7 @@ public class TestStreamingSum {
       throws HiveException {
 
     GenericUDAFSum fnR = new GenericUDAFSum();
-    TypeInfo[] inputTypes = { PrimitiveObjectInspectorFactory.decimalTypeInfo };
+    TypeInfo[] inputTypes = { TypeInfoUtils.decimalTypeInfo };
     ObjectInspector[] inputOIs = { PrimitiveObjectInspectorFactory.writableHiveDecimalObjectInspector };
 
     HiveDecimalWritable[] in = new HiveDecimalWritable[1];

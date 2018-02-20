@@ -60,9 +60,9 @@ import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 
 /**
  * TODO:<br>
@@ -787,13 +787,13 @@ public class HiveGBOpConvUtil {
     int groupingSetsPosition = -1;
     if (inclGrpSetInReduceSide(gbInfo) && gbInfo.grpIdFunctionNeeded) {
       groupingSetsPosition = gbKeys.size();
-      ExprNodeDesc grpSetColExpr = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo,
+      ExprNodeDesc grpSetColExpr = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo,
           rsColInfoLst.get(groupingSetsPosition).getInternalName(), null, false);
       gbKeys.add(grpSetColExpr);
       colOutputName = gbInfo.outputColNames.get(gbInfo.outputColNames.size() - 1);
       ;
       outputColNames.add(colOutputName);
-      colInfoLst.add(new ColumnInfo(colOutputName, TypeInfoFactory.stringTypeInfo, null, true));
+      colInfoLst.add(new ColumnInfo(colOutputName, TypeInfoUtils.stringTypeInfo, null, true));
       colExprMap.put(colOutputName, grpSetColExpr);
     }
 
@@ -877,7 +877,7 @@ public class HiveGBOpConvUtil {
         colOutputName = gbInfo.outputColNames.get(gbInfo.outputColNames.size() - 1);
       }
       outputColNames.add(colOutputName);
-      colInfoLst.add(new ColumnInfo(colOutputName, TypeInfoFactory.stringTypeInfo, null, true));
+      colInfoLst.add(new ColumnInfo(colOutputName, TypeInfoUtils.stringTypeInfo, null, true));
       colExprMap.put(colOutputName, gbKeys.get(groupingSetsColPosition));
     }
 
@@ -1187,7 +1187,7 @@ public class HiveGBOpConvUtil {
     if (createConstantExpr) {
       grpSetColExpr = new ExprNodeConstantDesc("0L");
     } else {
-      grpSetColExpr = new ExprNodeColumnDesc(TypeInfoFactory.stringTypeInfo, grpSetIDExprName,
+      grpSetColExpr = new ExprNodeColumnDesc(TypeInfoUtils.stringTypeInfo, grpSetIDExprName,
           null, false);
     }
     exprLst.add(grpSetColExpr);

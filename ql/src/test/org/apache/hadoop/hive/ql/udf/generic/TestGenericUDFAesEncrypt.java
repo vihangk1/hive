@@ -29,7 +29,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredJavaObject;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class TestGenericUDFAesEncrypt {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text keyWr = new Text("1234567890123456");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, keyWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, keyWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -65,7 +65,7 @@ public class TestGenericUDFAesEncrypt {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text keyWr = new Text("1234567890123456" + "1234567890123456");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, keyWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, keyWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -98,7 +98,7 @@ public class TestGenericUDFAesEncrypt {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     BytesWritable keyWr = new BytesWritable("1234567890123456".getBytes());
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.binaryTypeInfo, keyWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.binaryTypeInfo, keyWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -153,7 +153,7 @@ public class TestGenericUDFAesEncrypt {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text keyWr = null;
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, keyWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, keyWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);
@@ -180,7 +180,7 @@ public class TestGenericUDFAesEncrypt {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableBinaryObjectInspector;
     BytesWritable keyWr = null;
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.binaryTypeInfo, keyWr);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.binaryTypeInfo, keyWr);
     ObjectInspector[] arguments = { valueOI0, valueOI1 };
 
     udf.initialize(arguments);

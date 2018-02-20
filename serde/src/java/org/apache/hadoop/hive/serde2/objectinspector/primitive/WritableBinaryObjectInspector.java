@@ -21,7 +21,7 @@ package org.apache.hadoop.hive.serde2.objectinspector.primitive;
 import java.util.Arrays;
 
 import org.apache.hadoop.hive.serde2.lazy.LazyUtils;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BytesWritable;
 /**
  * A WritableBinaryObjectInspector inspects a BytesWritable Object.
@@ -30,7 +30,7 @@ public class WritableBinaryObjectInspector extends AbstractPrimitiveWritableObje
     implements SettableBinaryObjectInspector {
 
   WritableBinaryObjectInspector() {
-    super(TypeInfoFactory.binaryTypeInfo);
+    super(TypeInfoUtils.binaryTypeInfo);
   }
 
   @Override

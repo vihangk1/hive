@@ -24,7 +24,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredJavaObject;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 
@@ -67,10 +67,10 @@ public class TestGenericUDFSubstringIndex extends TestCase {
     ObjectInspector valueOI0 = PrimitiveObjectInspectorFactory.writableStringObjectInspector;
     Text delim = new Text(".");
     ObjectInspector valueOI1 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, delim);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.stringTypeInfo, delim);
     IntWritable count = new IntWritable(2);
     ObjectInspector valueOI2 = PrimitiveObjectInspectorFactory
-        .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo, count);
+        .getPrimitiveWritableConstantObjectInspector(TypeInfoUtils.intTypeInfo, count);
     ObjectInspector[] arguments = { valueOI0, valueOI1, valueOI2 };
 
     udf.initialize(arguments);

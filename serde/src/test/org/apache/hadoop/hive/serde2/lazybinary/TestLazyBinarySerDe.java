@@ -52,7 +52,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.JavaBinaryObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableBinaryObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BytesWritable;
 
 /**
@@ -523,7 +523,7 @@ public class TestLazyBinarySerDe extends TestCase {
     inpBARef.setData(inpBArray);
 
     AbstractPrimitiveLazyObjectInspector<?> binInspector = LazyPrimitiveObjectInspectorFactory
-    .getLazyObjectInspector(TypeInfoFactory.binaryTypeInfo, false, (byte)0);
+    .getLazyObjectInspector(TypeInfoUtils.binaryTypeInfo, false, (byte)0);
 
     //create LazyBinary initialed with inputBA
     LazyBinary lazyBin = (LazyBinary) LazyFactory.createLazyObject(binInspector);
