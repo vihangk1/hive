@@ -230,12 +230,12 @@ public class MapJoinOperator extends AbstractMapJoinOperator<MapJoinDesc> implem
 
         loadHashTable(getExecContext(), MapredContext.get());
       } else {
-        if (LOG.isDebugEnabled()) {
-          String s = "Using tables from cache: [";
+        if (LOG.isInfoEnabled()) {
+          String s = "Vihang : Using tables from cache: [";
           for (MapJoinTableContainer c : pair.getLeft()) {
             s += ((c == null) ? "null" : c.getClass().getSimpleName()) + ", ";
           }
-          LOG.debug(s + "]");
+          LOG.info(s + "]");
         }
         // let's use the table from the cache.
         mapJoinTables = pair.getLeft();

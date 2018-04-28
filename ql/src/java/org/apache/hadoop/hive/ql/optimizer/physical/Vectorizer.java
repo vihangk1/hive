@@ -3178,6 +3178,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       hashTableImplementationType = HashTableImplementationType.OPTIMIZED;
     }
 
+    LOG.info("Vihang : " + hashTableImplementationType.toString());
     int joinType = desc.getConds()[0].getType();
 
     boolean isInnerBigOnly = false;

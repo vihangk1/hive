@@ -39,9 +39,12 @@ import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hadoop.io.Writable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("deprecation")
 public class MapJoinTableContainerSerDe {
+  private static final Logger LOG = LoggerFactory.getLogger(MapJoinTableContainerSerDe.class);
 
   private final MapJoinObjectSerDeContext keyContext;
   private final MapJoinObjectSerDeContext valueContext;
@@ -130,6 +133,7 @@ public class MapJoinTableContainerSerDe {
       boolean useOptimizedContainer = HiveConf.getBoolVar(
           hconf, HiveConf.ConfVars.HIVEMAPJOINUSEOPTIMIZEDTABLE);
 
+      LOG.info("Vihang : useOptimizedContainer " + useOptimizedContainer);
       for (FileStatus fileStatus: fileStatuses) {
         Path filePath = fileStatus.getPath();
         if (ShimLoader.getHadoopShims().isDirectory(fileStatus)) {
@@ -310,6 +314,7 @@ public class MapJoinTableContainerSerDe {
           (Class<? extends MapJoinPersistableTableContainer>) JavaUtils.loadClass(name);
       Constructor<? extends MapJoinPersistableTableContainer> constructor =
           clazz.getDeclaredConstructor(Map.class);
+      LOG.info("Vihang : returning object of the type " + clazz.getName());
       return constructor.newInstance(metaData);
     } catch (Exception e) {
       String msg = "Error while attempting to create table container" +
@@ -321,6 +326,7 @@ public class MapJoinTableContainerSerDe {
   // Get an empty container when the small table is empty.
   private static MapJoinTableContainer getDefaultEmptyContainer(MapJoinObjectSerDeContext keyCtx,
       MapJoinObjectSerDeContext valCtx) throws SerDeException {
+    LOG.info("Vihang : returning default empty container : HashMapWrapper");
     MapJoinTableContainer container = new HashMapWrapper();
     container.setSerde(keyCtx, valCtx);
     container.seal();
