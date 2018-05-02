@@ -8,11 +8,16 @@ set hive.vectorized.execution.enabled=true;
 set hive.strict.checks.cartesian.product=false;
 
 -- SORT_QUERY_RESULTS
+set hive.auto.convert.join=true;
+set hive.auto.convert.join.noconditionaltask = true;
+set hive.auto.convert.join.noconditionaltask.size = 10000000;
+
+select distinct ds from srcpart;
+select distinct hr from srcpart;
 
 create table srcpart_date stored as orc as select ds as ds, ds as `date` from srcpart group by ds;
 create table srcpart_hour stored as orc as select hr as hr, hr as hour from srcpart group by hr;
 
-set hive.auto.convert.join=true;
 -- with static pruning
 EXPLAIN vectorization operator select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
 where srcpart_date.`date` = '2008-04-08' and srcpart.hr = 13;
