@@ -38,12 +38,16 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@srcpart_hour
 POSTHOOK: Lineage: srcpart_hour.hour SIMPLE [(srcpart)srcpart.FieldSchema(name:hr, type:string, comment:null), ]
 POSTHOOK: Lineage: srcpart_hour.hr SIMPLE [(srcpart)srcpart.FieldSchema(name:hr, type:string, comment:null), ]
-PREHOOK: query: EXPLAIN select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
+PREHOOK: query: EXPLAIN vectorization operator select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
 where srcpart_date.`date` = '2008-04-08' and srcpart.hr = 13
 PREHOOK: type: QUERY
-POSTHOOK: query: EXPLAIN select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
+POSTHOOK: query: EXPLAIN vectorization operator select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
 where srcpart_date.`date` = '2008-04-08' and srcpart.hr = 13
 POSTHOOK: type: QUERY
+PLAN VECTORIZATION:
+  enabled: true
+  enabledConditionsMet: [hive.vectorized.execution.enabled IS true]
+
 STAGE DEPENDENCIES:
   Stage-2 is a root stage
   Stage-1 depends on stages: Stage-2
@@ -60,18 +64,36 @@ STAGE PLANS:
                   alias: srcpart
                   filterExpr: ((UDFToDouble(hr) = 13.0D) and ds is not null) (type: boolean)
                   Statistics: Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE
+                  TableScan Vectorization:
+                      native: true
                   Filter Operator
+                    Filter Vectorization:
+                        className: VectorFilterOperator
+                        native: true
                     predicate: ((UDFToDouble(hr) = 13.0D) and ds is not null) (type: boolean)
                     Statistics: Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE
                     Select Operator
                       expressions: ds (type: string), hr (type: string)
                       outputColumnNames: _col0, _col1
+                      Select Vectorization:
+                          className: VectorSelectOperator
+                          native: true
                       Statistics: Num rows: 1 Data size: 0 Basic stats: PARTIAL Column stats: NONE
                       Spark HashTable Sink Operator
+                        Spark Hash Table Sink Vectorization:
+                            className: VectorSparkHashTableSinkOperator
+                            native: true
                         keys:
                           0 _col0 (type: string)
                           1 _col1 (type: string)
             Execution mode: vectorized
+            Map Vectorization:
+                enabled: true
+                inputFormatFeatureSupport: []
+                featureSupportInUse: []
+                allNative: true
+                usesVectorUDFAdaptor: false
+                vectorized: true
             Local Work:
               Map Reduce Local Work
         Map 4 
@@ -80,18 +102,38 @@ STAGE PLANS:
                   alias: srcpart_date
                   filterExpr: ((date = '2008-04-08') and ds is not null) (type: boolean)
                   Statistics: Num rows: 2 Data size: 376 Basic stats: COMPLETE Column stats: NONE
+                  TableScan Vectorization:
+                      native: true
                   Filter Operator
+                    Filter Vectorization:
+                        className: VectorFilterOperator
+                        native: true
                     predicate: ((date = '2008-04-08') and ds is not null) (type: boolean)
                     Statistics: Num rows: 1 Data size: 188 Basic stats: COMPLETE Column stats: NONE
                     Select Operator
                       expressions: ds (type: string)
                       outputColumnNames: _col0
+                      Select Vectorization:
+                          className: VectorSelectOperator
+                          native: true
                       Statistics: Num rows: 1 Data size: 188 Basic stats: COMPLETE Column stats: NONE
                       Spark HashTable Sink Operator
+                        Spark Hash Table Sink Vectorization:
+                            className: VectorSparkHashTableSinkOperator
+                            native: true
                         keys:
                           0 _col1 (type: string)
                           1 _col0 (type: string)
             Execution mode: vectorized
+            Map Vectorization:
+                enabled: true
+                enabledConditionsMet: hive.vectorized.use.vectorized.input.format IS true
+                inputFormatFeatureSupport: []
+                featureSupportInUse: []
+                inputFileFormats: org.apache.hadoop.hive.ql.io.orc.OrcInputFormat
+                allNative: true
+                usesVectorUDFAdaptor: false
+                vectorized: true
             Local Work:
               Map Reduce Local Work
 
@@ -107,12 +149,20 @@ STAGE PLANS:
                   alias: srcpart_hour
                   filterExpr: (UDFToDouble(hr) = 13.0D) (type: boolean)
                   Statistics: Num rows: 2 Data size: 344 Basic stats: COMPLETE Column stats: NONE
+                  TableScan Vectorization:
+                      native: true
                   Filter Operator
+                    Filter Vectorization:
+                        className: VectorFilterOperator
+                        native: true
                     predicate: (UDFToDouble(hr) = 13.0D) (type: boolean)
                     Statistics: Num rows: 1 Data size: 172 Basic stats: COMPLETE Column stats: NONE
                     Select Operator
                       expressions: hr (type: string)
                       outputColumnNames: _col0
+                      Select Vectorization:
+                          className: VectorSelectOperator
+                          native: true
                       Statistics: Num rows: 1 Data size: 172 Basic stats: COMPLETE Column stats: NONE
                       Map Join Operator
                         condition map:
@@ -120,6 +170,10 @@ STAGE PLANS:
                         keys:
                           0 _col0 (type: string)
                           1 _col1 (type: string)
+                        Map Join Vectorization:
+                            className: VectorMapJoinInnerStringOperator
+                            native: true
+                            nativeConditionsMet: hive.mapjoin.optimized.hashtable IS true, hive.vectorized.execution.mapjoin.native.enabled IS true, hive.execution.engine spark IN [tez, spark] IS true, One MapJoin Condition IS true, No nullsafe IS true, Small table vectorizes IS true, Optimized Table and Supports Key Types IS true
                         outputColumnNames: _col1
                         input vertices:
                           1 Map 3
@@ -130,31 +184,67 @@ STAGE PLANS:
                           keys:
                             0 _col1 (type: string)
                             1 _col0 (type: string)
+                          Map Join Vectorization:
+                              className: VectorMapJoinInnerBigOnlyStringOperator
+                              native: true
+                              nativeConditionsMet: hive.mapjoin.optimized.hashtable IS true, hive.vectorized.execution.mapjoin.native.enabled IS true, hive.execution.engine spark IN [tez, spark] IS true, One MapJoin Condition IS true, No nullsafe IS true, Small table vectorizes IS true, Optimized Table and Supports Key Types IS true
                           input vertices:
                             1 Map 4
                           Statistics: Num rows: 1 Data size: 207 Basic stats: PARTIAL Column stats: NONE
                           Group By Operator
                             aggregations: count()
+                            Group By Vectorization:
+                                className: VectorGroupByOperator
+                                groupByMode: HASH
+                                native: false
+                                vectorProcessingMode: HASH
                             mode: hash
                             outputColumnNames: _col0
                             Statistics: Num rows: 1 Data size: 8 Basic stats: PARTIAL Column stats: NONE
                             Reduce Output Operator
                               sort order: 
+                              Reduce Sink Vectorization:
+                                  className: VectorReduceSinkEmptyKeyOperator
+                                  native: true
+                                  nativeConditionsMet: hive.vectorized.execution.reducesink.new.enabled IS true, hive.execution.engine spark IN [tez, spark] IS true, No PTF TopN IS true, No DISTINCT columns IS true, BinarySortableSerDe for keys IS true, LazyBinarySerDe for values IS true
                               Statistics: Num rows: 1 Data size: 8 Basic stats: PARTIAL Column stats: NONE
                               value expressions: _col0 (type: bigint)
             Execution mode: vectorized
+            Map Vectorization:
+                enabled: true
+                enabledConditionsMet: hive.vectorized.use.vectorized.input.format IS true
+                inputFormatFeatureSupport: []
+                featureSupportInUse: []
+                inputFileFormats: org.apache.hadoop.hive.ql.io.orc.OrcInputFormat
+                allNative: false
+                usesVectorUDFAdaptor: false
+                vectorized: true
             Local Work:
               Map Reduce Local Work
         Reducer 2 
             Execution mode: vectorized
+            Reduce Vectorization:
+                enabled: true
+                enableConditionsMet: hive.vectorized.execution.reduce.enabled IS true, hive.execution.engine spark IN [tez, spark] IS true
+                allNative: false
+                usesVectorUDFAdaptor: false
+                vectorized: true
             Reduce Operator Tree:
               Group By Operator
                 aggregations: count(VALUE._col0)
+                Group By Vectorization:
+                    className: VectorGroupByOperator
+                    groupByMode: MERGEPARTIAL
+                    native: false
+                    vectorProcessingMode: GLOBAL
                 mode: mergepartial
                 outputColumnNames: _col0
                 Statistics: Num rows: 1 Data size: 8 Basic stats: PARTIAL Column stats: NONE
                 File Output Operator
                   compressed: false
+                  File Sink Vectorization:
+                      className: VectorFileSinkOperator
+                      native: false
                   Statistics: Num rows: 1 Data size: 8 Basic stats: PARTIAL Column stats: NONE
                   table:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat

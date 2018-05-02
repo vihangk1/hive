@@ -14,7 +14,7 @@ create table srcpart_hour stored as orc as select hr as hr, hr as hour from srcp
 
 set hive.auto.convert.join=true;
 -- with static pruning
-EXPLAIN select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
+EXPLAIN vectorization operator select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
 where srcpart_date.`date` = '2008-04-08' and srcpart.hr = 13;
 select count(*) from srcpart join srcpart_date on (srcpart.ds = srcpart_date.ds) join srcpart_hour on (srcpart.hr = srcpart_hour.hr) 
 where srcpart_date.`date` = '2008-04-08' and srcpart.hr = 13;
