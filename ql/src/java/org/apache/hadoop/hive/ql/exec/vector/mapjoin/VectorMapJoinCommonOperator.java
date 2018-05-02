@@ -480,7 +480,7 @@ private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
       {
         // Create our vector map join optimized hash table variation *above* the
         // map join table container.
-        LOG.info("Vihang : before initializing VectorMapJoinOptimizedCreateHashTable : "
+        LOG.error("Vihang : before initializing VectorMapJoinOptimizedCreateHashTable : "
             + mapJoinTables[posSingleVectorMapJoinSmallTable].getClass().getName());
         vectorMapJoinHashTable = VectorMapJoinOptimizedCreateHashTable.createHashTable(conf,
                 mapJoinTables[posSingleVectorMapJoinSmallTable]);

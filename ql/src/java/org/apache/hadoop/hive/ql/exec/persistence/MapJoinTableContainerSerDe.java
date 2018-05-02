@@ -133,7 +133,7 @@ public class MapJoinTableContainerSerDe {
       boolean useOptimizedContainer = HiveConf.getBoolVar(
           hconf, HiveConf.ConfVars.HIVEMAPJOINUSEOPTIMIZEDTABLE);
 
-      LOG.info("Vihang : useOptimizedContainer " + useOptimizedContainer);
+      LOG.error("Vihang : useOptimizedContainer " + useOptimizedContainer);
       for (FileStatus fileStatus: fileStatuses) {
         Path filePath = fileStatus.getPath();
         if (ShimLoader.getHadoopShims().isDirectory(fileStatus)) {
@@ -314,7 +314,7 @@ public class MapJoinTableContainerSerDe {
           (Class<? extends MapJoinPersistableTableContainer>) JavaUtils.loadClass(name);
       Constructor<? extends MapJoinPersistableTableContainer> constructor =
           clazz.getDeclaredConstructor(Map.class);
-      LOG.info("Vihang : returning object of the type " + clazz.getName());
+      LOG.error("Vihang : returning object of the type " + clazz.getName());
       return constructor.newInstance(metaData);
     } catch (Exception e) {
       String msg = "Error while attempting to create table container" +
@@ -326,16 +326,16 @@ public class MapJoinTableContainerSerDe {
   // Get an empty container when the small table is empty.
   private static MapJoinTableContainer getDefaultEmptyContainer(Configuration hconf,
       MapJoinObjectSerDeContext keyCtx, MapJoinObjectSerDeContext valCtx) throws SerDeException {
-    boolean useOptimizedContainer = HiveConf.getBoolVar(
-        hconf, HiveConf.ConfVars.HIVEMAPJOINUSEOPTIMIZEDTABLE);
-    if (!useOptimizedContainer) {
+    //boolean useOptimizedContainer = HiveConf.getBoolVar(
+    //    hconf, HiveConf.ConfVars.HIVEMAPJOINUSEOPTIMIZEDTABLE);
+    //if (!useOptimizedContainer) {
       LOG.info("Vihang : returning default empty container : HashMapWrapper");
       MapJoinTableContainer container = new HashMapWrapper();
       container.setSerde(keyCtx, valCtx);
       container.seal();
       return container;
-    } else {
-      return new MapJoinBytesTableContainer(hconf, valCtx, -1, 0);
-    }
+    //} else {
+    //  return new MapJoinBytesTableContainer(hconf, valCtx, -1, 0);
+    //}
   }
 }

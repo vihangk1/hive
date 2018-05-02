@@ -113,7 +113,7 @@ public class HashTableLoader implements org.apache.hadoop.hive.ql.exec.HashTable
       boolean firstContainer = true;
       boolean useOptimizedContainer = !useFastContainer && HiveConf.getBoolVar(
           hconf, HiveConf.ConfVars.HIVEMAPJOINUSEOPTIMIZEDTABLE);
-      LOG.info(
+      LOG.error(
           "Vihang : useOptimizedContainer is " + useOptimizedContainer + " useFastContainer is : "
               + useFastContainer + " MapJoinOptimizedTable is : " + HiveConf
               .getBoolVar(hconf, HiveConf.ConfVars.HIVEMAPJOINUSEOPTIMIZEDTABLE));
