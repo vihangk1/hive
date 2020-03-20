@@ -1265,11 +1265,6 @@ union FireEventRequestData {
     2: list<InsertEventRequestData> insertDatas
 }
 
-struct MultiInsertEventRequestData {
-    1: list<list<string>> partitionVals,
-    2: list<InsertEventRequestData> insertEventData
-}
-
 struct FireEventRequest {
     1: required bool successful,
     2: required FireEventRequestData data
@@ -1283,7 +1278,7 @@ struct FireEventRequest {
 }
 
 struct FireEventResponse {
-    1: list<i64> eventId
+    1: list<i64> eventIds
 }
 
 struct WriteNotificationLogRequest {

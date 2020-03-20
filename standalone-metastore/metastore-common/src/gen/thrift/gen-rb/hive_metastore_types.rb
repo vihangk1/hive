@@ -3866,24 +3866,6 @@ class FireEventRequestData < ::Thrift::Union
   ::Thrift::Union.generate_accessors self
 end
 
-class MultiInsertEventRequestData
-  include ::Thrift::Struct, ::Thrift::Struct_Union
-  PARTITIONVALS = 1
-  INSERTEVENTDATA = 2
-
-  FIELDS = {
-    PARTITIONVALS => {:type => ::Thrift::Types::LIST, :name => 'partitionVals', :element => {:type => ::Thrift::Types::LIST, :element => {:type => ::Thrift::Types::STRING}}},
-    INSERTEVENTDATA => {:type => ::Thrift::Types::LIST, :name => 'insertEventData', :element => {:type => ::Thrift::Types::STRUCT, :class => ::InsertEventRequestData}}
-  }
-
-  def struct_fields; FIELDS; end
-
-  def validate
-  end
-
-  ::Thrift::Struct.generate_accessors self
-end
-
 class FireEventRequest
   include ::Thrift::Struct, ::Thrift::Struct_Union
   SUCCESSFUL = 1
@@ -3914,10 +3896,10 @@ end
 
 class FireEventResponse
   include ::Thrift::Struct, ::Thrift::Struct_Union
-  EVENTID = 1
+  EVENTIDS = 1
 
   FIELDS = {
-    EVENTID => {:type => ::Thrift::Types::LIST, :name => 'eventId', :element => {:type => ::Thrift::Types::I64}}
+    EVENTIDS => {:type => ::Thrift::Types::LIST, :name => 'eventIds', :element => {:type => ::Thrift::Types::I64}}
   }
 
   def struct_fields; FIELDS; end
