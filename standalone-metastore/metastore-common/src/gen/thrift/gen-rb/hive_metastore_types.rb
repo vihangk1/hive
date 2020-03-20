@@ -3818,12 +3818,14 @@ class InsertEventRequestData
   FILESADDED = 2
   FILESADDEDCHECKSUM = 3
   SUBDIRECTORYLIST = 4
+  PARTITIONVAL = 5
 
   FIELDS = {
     REPLACE => {:type => ::Thrift::Types::BOOL, :name => 'replace', :optional => true},
     FILESADDED => {:type => ::Thrift::Types::LIST, :name => 'filesAdded', :element => {:type => ::Thrift::Types::STRING}},
     FILESADDEDCHECKSUM => {:type => ::Thrift::Types::LIST, :name => 'filesAddedChecksum', :element => {:type => ::Thrift::Types::STRING}, :optional => true},
-    SUBDIRECTORYLIST => {:type => ::Thrift::Types::LIST, :name => 'subDirectoryList', :element => {:type => ::Thrift::Types::STRING}, :optional => true}
+    SUBDIRECTORYLIST => {:type => ::Thrift::Types::LIST, :name => 'subDirectoryList', :element => {:type => ::Thrift::Types::STRING}, :optional => true},
+    PARTITIONVAL => {:type => ::Thrift::Types::LIST, :name => 'partitionVal', :element => {:type => ::Thrift::Types::STRING}, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -3841,12 +3843,18 @@ class FireEventRequestData < ::Thrift::Union
     def insertData(val)
       FireEventRequestData.new(:insertData, val)
     end
+
+    def insertDatas(val)
+      FireEventRequestData.new(:insertDatas, val)
+    end
   end
 
   INSERTDATA = 1
+  INSERTDATAS = 2
 
   FIELDS = {
-    INSERTDATA => {:type => ::Thrift::Types::STRUCT, :name => 'insertData', :class => ::InsertEventRequestData}
+    INSERTDATA => {:type => ::Thrift::Types::STRUCT, :name => 'insertData', :class => ::InsertEventRequestData},
+    INSERTDATAS => {:type => ::Thrift::Types::LIST, :name => 'insertDatas', :element => {:type => ::Thrift::Types::STRUCT, :class => ::InsertEventRequestData}}
   }
 
   def struct_fields; FIELDS; end
@@ -3856,6 +3864,24 @@ class FireEventRequestData < ::Thrift::Union
   end
 
   ::Thrift::Union.generate_accessors self
+end
+
+class MultiInsertEventRequestData
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+  PARTITIONVALS = 1
+  INSERTEVENTDATA = 2
+
+  FIELDS = {
+    PARTITIONVALS => {:type => ::Thrift::Types::LIST, :name => 'partitionVals', :element => {:type => ::Thrift::Types::LIST, :element => {:type => ::Thrift::Types::STRING}}},
+    INSERTEVENTDATA => {:type => ::Thrift::Types::LIST, :name => 'insertEventData', :element => {:type => ::Thrift::Types::STRUCT, :class => ::InsertEventRequestData}}
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+  end
+
+  ::Thrift::Struct.generate_accessors self
 end
 
 class FireEventRequest

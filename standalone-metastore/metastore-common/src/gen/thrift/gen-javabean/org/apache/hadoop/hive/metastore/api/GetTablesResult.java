@@ -354,14 +354,14 @@ import org.slf4j.LoggerFactory;
           case 1: // TABLES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list936 = iprot.readListBegin();
-                struct.tables = new ArrayList<Table>(_list936.size);
-                Table _elem937;
-                for (int _i938 = 0; _i938 < _list936.size; ++_i938)
+                org.apache.thrift.protocol.TList _list976 = iprot.readListBegin();
+                struct.tables = new ArrayList<Table>(_list976.size);
+                Table _elem977;
+                for (int _i978 = 0; _i978 < _list976.size; ++_i978)
                 {
-                  _elem937 = new Table();
-                  _elem937.read(iprot);
-                  struct.tables.add(_elem937);
+                  _elem977 = new Table();
+                  _elem977.read(iprot);
+                  struct.tables.add(_elem977);
                 }
                 iprot.readListEnd();
               }
@@ -387,9 +387,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(TABLES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.tables.size()));
-          for (Table _iter939 : struct.tables)
+          for (Table _iter979 : struct.tables)
           {
-            _iter939.write(oprot);
+            _iter979.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -414,9 +414,9 @@ import org.slf4j.LoggerFactory;
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.tables.size());
-        for (Table _iter940 : struct.tables)
+        for (Table _iter980 : struct.tables)
         {
-          _iter940.write(oprot);
+          _iter980.write(oprot);
         }
       }
     }
@@ -425,14 +425,14 @@ import org.slf4j.LoggerFactory;
     public void read(org.apache.thrift.protocol.TProtocol prot, GetTablesResult struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list941 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.tables = new ArrayList<Table>(_list941.size);
-        Table _elem942;
-        for (int _i943 = 0; _i943 < _list941.size; ++_i943)
+        org.apache.thrift.protocol.TList _list981 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.tables = new ArrayList<Table>(_list981.size);
+        Table _elem982;
+        for (int _i983 = 0; _i983 < _list981.size; ++_i983)
         {
-          _elem942 = new Table();
-          _elem942.read(iprot);
-          struct.tables.add(_elem942);
+          _elem982 = new Table();
+          _elem982.read(iprot);
+          struct.tables.add(_elem982);
         }
       }
       struct.setTablesIsSet(true);

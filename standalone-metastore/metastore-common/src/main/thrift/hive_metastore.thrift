@@ -1255,10 +1255,19 @@ struct InsertEventRequestData {
     3: optional list<string> filesAddedChecksum,
     // Used by acid operation to create the sub directory
     4: optional list<string> subDirectoryList,
+    // partition value which was inserted (used in case of bulk insert events)
+    5: optional list<string> partitionVal
 }
 
 union FireEventRequestData {
     1: InsertEventRequestData insertData
+    // used to fire insert events on multiple partitions
+    2: list<InsertEventRequestData> insertDatas
+}
+
+struct MultiInsertEventRequestData {
+    1: list<list<string>> partitionVals,
+    2: list<InsertEventRequestData> insertEventData
 }
 
 struct FireEventRequest {
@@ -1268,6 +1277,7 @@ struct FireEventRequest {
     // subevent as I assume they'll be used across most event types.
     3: optional string dbName,
     4: optional string tableName,
+    // ignored if event request data contains multiple insert event datas
     5: optional list<string> partitionVals,
     6: optional string catName,
 }
