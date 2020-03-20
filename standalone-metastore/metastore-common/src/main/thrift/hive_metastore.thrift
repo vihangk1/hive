@@ -1283,7 +1283,7 @@ struct FireEventRequest {
 }
 
 struct FireEventResponse {
-    1: i64 eventId
+    1: list<i64> eventId
 }
 
 struct WriteNotificationLogRequest {

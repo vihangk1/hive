@@ -547,13 +547,13 @@ import org.slf4j.LoggerFactory;
           case 1: // FILE_IDS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list912 = iprot.readListBegin();
-                struct.fileIds = new ArrayList<Long>(_list912.size);
-                long _elem913;
-                for (int _i914 = 0; _i914 < _list912.size; ++_i914)
+                org.apache.thrift.protocol.TList _list920 = iprot.readListBegin();
+                struct.fileIds = new ArrayList<Long>(_list920.size);
+                long _elem921;
+                for (int _i922 = 0; _i922 < _list920.size; ++_i922)
                 {
-                  _elem913 = iprot.readI64();
-                  struct.fileIds.add(_elem913);
+                  _elem921 = iprot.readI64();
+                  struct.fileIds.add(_elem921);
                 }
                 iprot.readListEnd();
               }
@@ -565,13 +565,13 @@ import org.slf4j.LoggerFactory;
           case 2: // METADATA
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list915 = iprot.readListBegin();
-                struct.metadata = new ArrayList<ByteBuffer>(_list915.size);
-                ByteBuffer _elem916;
-                for (int _i917 = 0; _i917 < _list915.size; ++_i917)
+                org.apache.thrift.protocol.TList _list923 = iprot.readListBegin();
+                struct.metadata = new ArrayList<ByteBuffer>(_list923.size);
+                ByteBuffer _elem924;
+                for (int _i925 = 0; _i925 < _list923.size; ++_i925)
                 {
-                  _elem916 = iprot.readBinary();
-                  struct.metadata.add(_elem916);
+                  _elem924 = iprot.readBinary();
+                  struct.metadata.add(_elem924);
                 }
                 iprot.readListEnd();
               }
@@ -605,9 +605,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(FILE_IDS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, struct.fileIds.size()));
-          for (long _iter918 : struct.fileIds)
+          for (long _iter926 : struct.fileIds)
           {
-            oprot.writeI64(_iter918);
+            oprot.writeI64(_iter926);
           }
           oprot.writeListEnd();
         }
@@ -617,9 +617,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(METADATA_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.metadata.size()));
-          for (ByteBuffer _iter919 : struct.metadata)
+          for (ByteBuffer _iter927 : struct.metadata)
           {
-            oprot.writeBinary(_iter919);
+            oprot.writeBinary(_iter927);
           }
           oprot.writeListEnd();
         }
@@ -651,16 +651,16 @@ import org.slf4j.LoggerFactory;
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.fileIds.size());
-        for (long _iter920 : struct.fileIds)
+        for (long _iter928 : struct.fileIds)
         {
-          oprot.writeI64(_iter920);
+          oprot.writeI64(_iter928);
         }
       }
       {
         oprot.writeI32(struct.metadata.size());
-        for (ByteBuffer _iter921 : struct.metadata)
+        for (ByteBuffer _iter929 : struct.metadata)
         {
-          oprot.writeBinary(_iter921);
+          oprot.writeBinary(_iter929);
         }
       }
       BitSet optionals = new BitSet();
@@ -677,24 +677,24 @@ import org.slf4j.LoggerFactory;
     public void read(org.apache.thrift.protocol.TProtocol prot, PutFileMetadataRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list922 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, iprot.readI32());
-        struct.fileIds = new ArrayList<Long>(_list922.size);
-        long _elem923;
-        for (int _i924 = 0; _i924 < _list922.size; ++_i924)
+        org.apache.thrift.protocol.TList _list930 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, iprot.readI32());
+        struct.fileIds = new ArrayList<Long>(_list930.size);
+        long _elem931;
+        for (int _i932 = 0; _i932 < _list930.size; ++_i932)
         {
-          _elem923 = iprot.readI64();
-          struct.fileIds.add(_elem923);
+          _elem931 = iprot.readI64();
+          struct.fileIds.add(_elem931);
         }
       }
       struct.setFileIdsIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list925 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-        struct.metadata = new ArrayList<ByteBuffer>(_list925.size);
-        ByteBuffer _elem926;
-        for (int _i927 = 0; _i927 < _list925.size; ++_i927)
+        org.apache.thrift.protocol.TList _list933 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+        struct.metadata = new ArrayList<ByteBuffer>(_list933.size);
+        ByteBuffer _elem934;
+        for (int _i935 = 0; _i935 < _list933.size; ++_i935)
         {
-          _elem926 = iprot.readBinary();
-          struct.metadata.add(_elem926);
+          _elem934 = iprot.readBinary();
+          struct.metadata.add(_elem934);
         }
       }
       struct.setMetadataIsSet(true);

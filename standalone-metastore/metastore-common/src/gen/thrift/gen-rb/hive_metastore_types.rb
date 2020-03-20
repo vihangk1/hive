@@ -3917,7 +3917,7 @@ class FireEventResponse
   EVENTID = 1
 
   FIELDS = {
-    EVENTID => {:type => ::Thrift::Types::I64, :name => 'eventId'}
+    EVENTID => {:type => ::Thrift::Types::LIST, :name => 'eventId', :element => {:type => ::Thrift::Types::I64}}
   }
 
   def struct_fields; FIELDS; end
