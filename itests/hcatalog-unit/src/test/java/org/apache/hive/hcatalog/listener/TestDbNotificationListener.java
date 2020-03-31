@@ -1126,7 +1126,7 @@ public class TestDbNotificationListener {
     assertTrue("Event id must be set in the fireEvent response", response.isSetEventIds());
     Assert.assertNotNull(response.getEventIds());
     Assert.assertTrue(response.getEventIds().size() == 1);
-    Assert.assertEquals(firstEventId+2, response.getEventIds().get(0).longValue())
+    Assert.assertEquals(firstEventId+2, response.getEventIds().get(0).longValue());
 
     verifyInsertEventReceived(defaultDbName, tblName, Arrays.asList(partKeyVals), rqst,
         firstEventId + 3, 1);
