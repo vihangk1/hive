@@ -217,6 +217,7 @@
     <janino.version>3.0.11</janino.version>
     <datasketches.version>1.1.0-incubating</datasketches.version>
     <spotbugs.version>4.0.3</spotbugs.version>
+    <pac4j.version>4.1.0</pac4j.version>
   </properties>
 
   <repositories>
