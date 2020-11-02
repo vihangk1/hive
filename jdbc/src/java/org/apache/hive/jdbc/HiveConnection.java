@@ -270,6 +270,8 @@ public class HiveConnection implements java.sql.Connection {
     sessConfMap = connParams.getSessionVars();
     if (isKerberosAuthMode()) {
       host = Utils.getCanonicalHostName(connParams.getHost());
+    } else if (isSamlAuthMode()) {
+      throw new SQLException("SAML auth mode is only applicable in http mode");
     } else {
       host = connParams.getHost();
     }
@@ -572,7 +574,7 @@ public class HiveConnection implements java.sql.Connection {
                   return 0;
                 }
               });
-    } else {
+    } else if (){
       httpClientBuilder = HttpClientBuilder.create();
     }
     // In case the server's idletimeout is set to a lower value, it might close it's side of
@@ -971,6 +973,11 @@ public class HiveConnection implements java.sql.Connection {
     return !JdbcConnectionParams.AUTH_SIMPLE.equals(sessConfMap.get(JdbcConnectionParams.AUTH_TYPE))
         && !JdbcConnectionParams.AUTH_TOKEN.equals(sessConfMap.get(JdbcConnectionParams.AUTH_TYPE))
         && sessConfMap.containsKey(JdbcConnectionParams.AUTH_PRINCIPAL);
+  }
+
+  private boolean isSamlAuthMode() {
+    return JdbcConnectionParams.AUTH_SSO_AUTH_TYPE
+        .equals(sessConfMap.get(JdbcConnectionParams.AUTH_TYPE));
   }
 
   private boolean isHttpTransportMode() {

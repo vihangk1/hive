@@ -3871,7 +3871,7 @@ public class HiveConf extends Configuration {
 
     // HiveServer2 auth configuration
     HIVE_SERVER2_AUTHENTICATION("hive.server2.authentication", "NONE",
-      new StringSet("NOSASL", "NONE", "LDAP", "KERBEROS", "PAM", "CUSTOM"),
+      new StringSet("NOSASL", "NONE", "LDAP", "KERBEROS", "PAM", "CUSTOM", "SAML2_0"),
         "Client authentication types.\n" +
         "  NONE: no authentication check\n" +
         "  LDAP: LDAP/AD based authentication\n" +
@@ -3879,7 +3879,8 @@ public class HiveConf extends Configuration {
         "  CUSTOM: Custom authentication provider\n" +
         "          (Use with property hive.server2.custom.authentication.class)\n" +
         "  PAM: Pluggable authentication module\n" +
-        "  NOSASL:  Raw transport"),
+        "  NOSASL:  Raw transport\n" +
+        "  SAML2_0: SAML 2.0 compliant authentication"),
     HIVE_SERVER2_TRUSTED_DOMAIN("hive.server2.trusted.domain", "",
         "Specifies the host or a domain to trust connections from. Authentication is skipped " +
         "for any connection coming from a host whose hostname ends with the value of this" +

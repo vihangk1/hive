@@ -223,6 +223,8 @@ public class HiveServer2 extends CompositeService {
     Runnable oomHook = new HiveServer2OomHookRunner(hiveServer2);
     boolean isHttpTransportMode = isHttpTransportMode(hiveConf);
     boolean isAllTransportMode = isAllTransportMode(hiveConf);
+    LOG.info("VIHANG-DEBUG: Transport mode Http = {}, All = {}", isHttpTransportMode,
+        isAllTransportMode);
     if (isHttpTransportMode || isAllTransportMode) {
       thriftCLIService = new ThriftHttpCLIService(cliService, oomHook);
       addService(thriftCLIService);
