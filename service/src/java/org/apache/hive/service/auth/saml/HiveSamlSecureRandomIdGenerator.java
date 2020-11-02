@@ -16,29 +16,14 @@
  * limitations under the License.
  */
 
-package org.apache.hive.service.auth;
+package org.apache.hive.service.auth.saml;
 
-public class HiveAuthConstants {
-  public enum AuthTypes {
-    NOSASL("NOSASL"),
-    NONE("NONE"),
-    LDAP("LDAP"),
-    KERBEROS("KERBEROS"),
-    CUSTOM("CUSTOM"),
-    PAM("PAM"),
-    SAML2_0("SAML2_0");
+import java.security.SecureRandom;
 
-    private final String authType;
-
-    AuthTypes(String authType) {
-      this.authType = authType;
-    }
-
-    public String getAuthName() {
-      return authType;
-    }
+public class HiveSamlSecureRandomIdGenerator implements HiveSamlRequestIdGenerator {
+  private static final SecureRandom random = new SecureRandom();
+  @Override
+  public String get() {
+    return String.valueOf(random.nextLong());
   }
-
-  public static final String HS2_PROXY_USER = "hive.server2.proxy.user";
-  public static final String HS2_CLIENT_TOKEN = "hiveserver2ClientToken";
 }
