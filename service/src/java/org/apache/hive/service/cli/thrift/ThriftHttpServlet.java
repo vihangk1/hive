@@ -57,7 +57,8 @@ import org.apache.hive.service.auth.HttpAuthenticationException;
 import org.apache.hive.service.auth.PasswdAuthenticationProvider;
 import org.apache.hive.service.auth.PlainSaslHelper;
 import org.apache.hive.service.auth.ldap.HttpEmptyAuthenticationException;
-import org.apache.hive.service.auth.saml.HiveSamlClient;
+import org.apache.hive.service.auth.saml.HiveSaml2Client;
+import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
 import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
 import org.apache.hive.service.cli.HiveSQLException;
@@ -255,25 +256,28 @@ public class ThriftHttpServlet extends TServlet {
         LOG.error("Error: ", e);
       }
       skipRequestContent(request);
-      if (e instanceof HttpSamlRedirectException) {
-        //unfortunately setting the response to 302 doesn't work well with the
-        //thrift http client which returns an exception with the response code in
-        //its message.
-      }
-      // Send a 401 to the client
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-      if (isKerberosAuthMode(authType)) {
-        response.addHeader(HttpAuthUtils.WWW_AUTHENTICATE, HttpAuthUtils.NEGOTIATE);
-      } else {
+      if (isSamlAuthMode(authType) && e instanceof HttpSamlRedirectException) {
         try {
-          LOG.error("Login attempt is failed for user : " +
-              getUsername(request, authType) + ". Error Messsage :" + e.getMessage());
-        } catch (Exception ex) {
-          // Ignore Exception
+          doSamlRedirect(request, response);
+        } catch (HttpSamlAuthenticationException httpSamlAuthenticationException) {
+          LOG.debug("Unable to set the SAML redirect", httpSamlAuthenticationException);
+          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
+      } else {
+        // Send a 401 to the client
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        if (isKerberosAuthMode(authType)) {
+          response.addHeader(HttpAuthUtils.WWW_AUTHENTICATE, HttpAuthUtils.NEGOTIATE);
+        } else {
+          try {
+            LOG.error("Login attempt is failed for user : " +
+                getUsername(request, authType) + ". Error Messsage :" + e.getMessage());
+          } catch (Exception ex) {
+            // Ignore Exception
+          }
+        }
+        response.getWriter().println("Authentication Error: " + e.getMessage());
       }
-      response.getWriter().println("Authentication Error: " + e.getMessage());
     } finally {
       // Clear the thread locals
       SessionManager.clearUserName();
@@ -281,6 +285,11 @@ public class ThriftHttpServlet extends TServlet {
       SessionManager.clearProxyUserName();
       SessionManager.clearForwardedAddresses();
     }
+  }
+
+  private void doSamlRedirect(HttpServletRequest request, HttpServletResponse response)
+      throws HttpSamlAuthenticationException {
+    HiveSaml2Client.get(hiveConf).setRedirect(request, response);
   }
 
   private void skipRequestContent(HttpServletRequest request) throws IOException {
@@ -297,7 +306,7 @@ public class ThriftHttpServlet extends TServlet {
   private String doSamlAuth(HttpServletRequest request, HttpServletResponse response)
       throws HttpSamlAuthenticationException {
       //TODO do saml assertion validation here
-      return HiveSamlClient.get(hiveConf).validate(request, response);
+      return HiveSaml2Client.get(hiveConf).validate(request, response);
   }
 
   private boolean isSamlAuthMode(String authType) {

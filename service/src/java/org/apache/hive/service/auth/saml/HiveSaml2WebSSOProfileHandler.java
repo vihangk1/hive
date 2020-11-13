@@ -18,12 +18,16 @@
 
 package org.apache.hive.service.auth.saml;
 
-public class HiveSamlException extends HttpSamlAuthenticationException {
-  HiveSamlException(String msg) { super(msg); }
+import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.pac4j.saml.profile.api.SAML2MessageReceiver;
+import org.pac4j.saml.profile.api.SAML2MessageSender;
+import org.pac4j.saml.sso.impl.SAML2WebSSOProfileHandler;
 
-  HiveSamlException(Exception e) { super(e); }
+public class HiveSaml2WebSSOProfileHandler extends SAML2WebSSOProfileHandler {
 
-  HiveSamlException(String msg, Throwable ex) {
-    super(msg, ex);
+  public HiveSaml2WebSSOProfileHandler(
+      SAML2MessageSender<AuthnRequest> messageSender,
+      SAML2MessageReceiver messageReceiver) {
+    super(messageSender, messageReceiver);
   }
 }
