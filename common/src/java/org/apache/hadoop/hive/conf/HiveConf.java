@@ -3986,6 +3986,17 @@ public class HiveConf extends Configuration {
       "List of the underlying pam services that should be used when auth type is PAM\n" +
       "A file with the same name must exist in /etc/pam.d"),
 
+    // HS2 SAML2.0 configuration
+    HIVE_SERVER2_SAML_KEYSTORE_PATH("hive.server2.saml2.keystore.path", "file:///tmp/samlKeystore.jks",
+        "Keystore path to the saml2 client."),
+    HIVE_SERVER2_SAML_KEYSTORE_PASSWORD("hive.server2.saml2.keystore.password", "pac4j-demo-passwd",
+        "Keystore path to the saml2 client."),
+    HIVE_SERVER2_SAML_PRIVATE_KEY_PASSWORD("hive.server2.saml2.private.key.password", "pac4j-demo-passwd",
+        "Keystore path to the saml2 client."),
+    HIVE_SERVER2_SAML_IDP_METADATA("hive.server2.saml2.idp.metadata", "file:///tmp/idp-metadata-10.xml",
+        "IDP metadata file for the SAML configuration"),
+    HIVE_SERVER2_SAML_SP_ID("hive.server2.saml2.sp.entity.id", "hs2-saml",
+        "Service provider entity id"),
     HIVE_SERVER2_ENABLE_DOAS("hive.server2.enable.doAs", true,
         "Setting this property to true will have HiveServer2 execute\n" +
         "Hive operations as the user making the calls to it."),

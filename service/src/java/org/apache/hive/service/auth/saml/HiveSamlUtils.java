@@ -21,66 +21,62 @@ package org.apache.hive.service.auth.saml;
 import static org.opensaml.saml.common.xml.SAMLConstants.SAML2_POST_BINDING_URI;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.conf.Configuration;
-import org.opensaml.saml.common.SAMLException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.core.AuthnRequest;
-import org.opensaml.xmlsec.signature.J;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.exception.http.RedirectionAction;
 import org.pac4j.core.exception.http.WithLocationAction;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import org.pac4j.saml.context.SAML2MessageContext;
 import org.pac4j.saml.credentials.SAML2Credentials;
 import org.pac4j.saml.credentials.extractor.SAML2CredentialsExtractor;
-import org.pac4j.saml.profile.api.SAML2ResponseValidator;
-import org.pac4j.saml.redirect.SAML2RedirectionActionBuilder;
 import org.pac4j.saml.sso.impl.SAML2AuthnRequestBuilder;
 import org.pac4j.saml.transport.Pac4jSAMLResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HiveSamlClient {
+public class HiveSamlUtils {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HiveSamlClient.class);
-  private static HiveSamlClient samlClient;
+  public static final String HIVE_SAML_REPONSE_HEADER = "X-Hive-SAML-Response";
+  public static final String HIVE_SAML_RESPONSE_PORT = "X-Hive-SAML-Response-Port";
+  private static final Logger LOG = LoggerFactory.getLogger(HiveSamlUtils.class);
+  private static HiveSamlUtils INSTANCE;
   private final SAML2Configuration saml2Configuration;
   private final SAML2Client saml2Client;
 
-  public static synchronized HiveSamlClient get(Configuration conf)
+  public static synchronized HiveSamlUtils get(Configuration conf)
       throws HiveSamlException {
-    if (samlClient != null) {
-      return samlClient;
+    if (INSTANCE != null) {
+      return INSTANCE;
     }
-    samlClient = new HiveSamlClient(conf);
-    return samlClient;
+    INSTANCE = new HiveSamlUtils(conf);
+    return INSTANCE;
   }
 
-  private HiveSamlClient(Configuration conf) throws HiveSamlException {
+  private HiveSamlUtils(Configuration conf) throws HiveSamlException {
     // TODO pass these via hive-site.xml
     try {
       saml2Configuration = new SAML2Configuration("file:///tmp/samlKeystore.jks",
           "pac4j-demo-passwd",
           "pac4j-demo-passwd",
-          "file:///tmp/idp-metadata-6.xml");
+          "file:///tmp/idp-metadata-10.xml");
       saml2Configuration
           .setAuthnRequestBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
       saml2Configuration.setResponseBindingType(SAML2_POST_BINDING_URI);
       saml2Configuration.setServiceProviderEntityId("hs2-saml");
       saml2Configuration.setWantsAssertionsSigned(true);
       saml2Configuration.setAuthnRequestSigned(true);
+      //saml2Configuration.setAssertionConsumerServiceIndex(1);
       saml2Client = new SAML2Client(saml2Configuration);
       //TODO what is this?
-      saml2Client.setCallbackUrl("http://localhost:10001/cliservice");
-      saml2Client.setName(HiveSamlClient.class.getSimpleName());
+      saml2Client.setCallbackUrl("http://localhost:9999");
+      saml2Client.setName(HiveSamlUtils.class.getSimpleName());
       saml2Client.init();
       //TODO handle the replayCache as described in http://www.pac4j.org/docs/clients/saml.html
     } catch (Exception ex) {
@@ -88,12 +84,12 @@ public class HiveSamlClient {
     }
   }
 
-  public void getRedirectUrl(HttpServletRequest request, HttpServletResponse response)
+  public void setRedirect(HttpServletRequest request, HttpServletResponse response)
       throws HttpSamlAuthenticationException {
-    /*SAML2RedirectionActionBuilder redirectionActionBuilder = new SAML2RedirectionActionBuilder(
-        saml2Client);
-    Optional<RedirectionAction> redirect = redirectionActionBuilder
-        .getRedirectionAction(new JEEContext(request, response));*/
+    String responsePort = request.getHeader(HIVE_SAML_RESPONSE_PORT);
+    if (responsePort == null || responsePort.isEmpty()) {
+      throw new HttpSamlAuthenticationException("No response port specified");
+    }
     Optional<RedirectionAction> redirect = saml2Client
         .getRedirectionAction(new JEEContext(request, response));
     if (!redirect.isPresent()) {
@@ -104,7 +100,6 @@ public class HiveSamlClient {
     try {
       String location = locationAction.getLocation();
       LOG.info("VIHANG-DEBUG: location = {}", location);
-      URL redirectUrl = new URL(location);
       response.sendRedirect(locationAction.getLocation());
     } catch (IOException e) {
       throw new HttpSamlAuthenticationException(e);
@@ -137,6 +132,7 @@ public class HiveSamlClient {
           saml2Client);
       Optional<SAML2Credentials> credentials = credentialsExtractor
           .extract(new JEEContext(request, response));
+      //TODO(Vihang) find a better way to distinguish a redirect case
       if (!credentials.isPresent()) {
         throw new HttpSamlAuthenticationException("Credentials could not be extracted");
       }

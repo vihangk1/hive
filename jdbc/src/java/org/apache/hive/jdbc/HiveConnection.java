@@ -76,11 +76,20 @@ import javax.security.sasl.SaslException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.auth.HiveAuthUtils;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
+import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
+import org.apache.hive.jdbc.saml.HiveJdbcSamlRedirectStrategy;
+import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
+
+import org.apache.hive.service.rpc.thrift.TSetClientInfoReq;
+import org.apache.hadoop.hive.common.auth.HiveAuthUtils;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.service.auth.HiveAuthConstants;
 import org.apache.hive.service.auth.KerberosSaslHelper;
@@ -156,6 +165,7 @@ public class HiveConnection implements java.sql.Connection {
   private String wmPool = null, wmApp = null;
   private Properties clientInfo;
   private Subject loggedInSubject;
+  private HiveJdbcBrowserClient browserClient = null;
 
   /**
    * Get all direct HiveServer2 URLs from a ZooKeeper based HiveServer2 URL
@@ -270,7 +280,7 @@ public class HiveConnection implements java.sql.Connection {
     sessConfMap = connParams.getSessionVars();
     if (isKerberosAuthMode()) {
       host = Utils.getCanonicalHostName(connParams.getHost());
-    } else if (isSamlAuthMode()) {
+    } else if (isSamlAuthMode() && !isHttpTransportMode()) {
       throw new SQLException("SAML auth mode is only applicable in http mode");
     } else {
       host = connParams.getHost();
@@ -307,6 +317,7 @@ public class HiveConnection implements java.sql.Connection {
       client = EmbeddedCLIServicePortal.get(connParams.getHiveConfs());
       connParams.getHiveConfs().clear();
       // open client session
+      // TODO(Vihang) need to throw here if saml auth?
       openSession();
       executeInitSql();
     } else {
@@ -478,6 +489,7 @@ public class HiveConnection implements java.sql.Connection {
   private TTransport createHttpTransport() throws SQLException, TTransportException {
     CloseableHttpClient httpClient;
     boolean useSsl = isSslConnection();
+    //TODO(Vihang) throw exception is ssl is disabled and SAML is being used.
     // Create an http client from the configs
     httpClient = getHttpClient(useSsl);
     transport = new THttpClient(getServerHttpUrl(useSsl), httpClient);
@@ -492,7 +504,7 @@ public class HiveConnection implements java.sql.Connection {
       JdbcConnectionParams.DEFAULT_COOKIE_NAMES_HS2 :
       sessConfMap.get(JdbcConnectionParams.COOKIE_NAME);
     CookieStore cookieStore = isCookieEnabled ? new BasicCookieStore() : null;
-    HttpClientBuilder httpClientBuilder;
+    HttpClientBuilder httpClientBuilder = null;
     // Request interceptor for any request pre-processing logic
     HttpRequestInterceptor requestInterceptor;
     Map<String, String> additionalHttpHeaders = new HashMap<String, String>();
@@ -527,9 +539,22 @@ public class HiveConnection implements java.sql.Connection {
        * for sending to the server before every request.
        * In https mode, the entire information is encrypted
        */
-      requestInterceptor = new HttpKerberosRequestInterceptor(sessConfMap.get(JdbcConnectionParams.AUTH_PRINCIPAL),
-          host, getServerHttpUrl(useSsl), loggedInSubject, cookieStore, cookieName, useSsl, additionalHttpHeaders,
+      requestInterceptor = new HttpKerberosRequestInterceptor(
+          sessConfMap.get(JdbcConnectionParams.AUTH_PRINCIPAL),
+          host, getServerHttpUrl(useSsl), loggedInSubject, cookieStore, cookieName,
+          useSsl, additionalHttpHeaders,
           customCookies);
+    } else if (isSamlAuthMode()) {
+      //TODO(Vihang) add a browser auth mode?
+      try {
+        browserClient = HiveJdbcBrowserClient.create(sessConfMap);
+      } catch (IOException e) {
+        LOG.error("Could not create browser client", e);
+        throw new SQLException(
+            "Could not create a browser client for SSO: " + e.getMessage(), " 08S01", e);
+      }
+      requestInterceptor = new HttpSamlAuthRequestInterceptor(browserClient, cookieStore,
+          cookieName, useSsl, additionalHttpHeaders, customCookies);
     } else {
       // Check for delegation token, if present add it in the header
       String tokenStr = getClientDelegationToken(sessConfMap);
@@ -574,7 +599,7 @@ public class HiveConnection implements java.sql.Connection {
                   return 0;
                 }
               });
-    } else if (){
+    } else {
       httpClientBuilder = HttpClientBuilder.create();
     }
     // In case the server's idletimeout is set to a lower value, it might close it's side of
@@ -594,6 +619,10 @@ public class HiveConnection implements java.sql.Connection {
       }
     });
 
+    if (isSamlAuthMode()) {
+      httpClientBuilder
+          .setRedirectStrategy(new HiveJdbcSamlRedirectStrategy(browserClient));
+    }
     // Add the request interceptor to the client builder
     httpClientBuilder.addInterceptorFirst(requestInterceptor);
 
@@ -898,39 +927,84 @@ public class HiveConnection implements java.sql.Connection {
       openReq.setPassword(sessConfMap.get(JdbcConnectionParams.AUTH_PASSWD));
     }
 
-    try {
-      TOpenSessionResp openResp = client.OpenSession(openReq);
-
-      // Populate a given configuration from HS2 server HiveConf, only if that configuration
-      // is not already present in Connection parameter HiveConf i.e., client side configuration
-      // takes precedence over the server side configuration.
-      Map<String, String> serverHiveConf = openResp.getConfiguration();
-
-      updateServerHiveConf(serverHiveConf, connParams);
-
-      // validate connection
-      Utils.verifySuccess(openResp.getStatus());
-      if (!supportedProtocols.contains(openResp.getServerProtocolVersion())) {
-        throw new TException("Unsupported Hive2 protocol");
+    int numRetry = isSamlAuthMode() ? 2 : 1;
+    String samlResponse = null;
+    for (int i=0; i<numRetry; i++) {
+      try {
+        openSession(openReq);
+      } catch (TException e) {
+        if (isSamlRedirect(e)) {
+          samlResponse = doSamlRedirect();
+        } else {
+          throw new SQLException(
+              "Could not establish connection to " + jdbcUriString + ": " + e
+                  .getMessage(), " 08S01", e);
+        }
       }
-      protocol = openResp.getServerProtocolVersion();
-      sessHandle = openResp.getSessionHandle();
-
-      final String serverFetchSizeString =
-          openResp.getConfiguration().get(ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname);
-      if (serverFetchSizeString == null) {
-        throw new IllegalStateException("Server returned a null default fetch size. Check that "
-            + ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname + " is configured correctly.");
-      }
-
-      this.defaultFetchSize = Integer.parseInt(serverFetchSizeString);
-      if (this.defaultFetchSize <= 0) {
-        throw new IllegalStateException("Default fetch size must be greater than 0");
-      }
-    } catch (TException e) {
-      throw new SQLException("Could not establish connection to " + jdbcUriString + ": " + e.getMessage(), " 08S01", e);
     }
     isClosed = false;
+  }
+
+  private String doSamlRedirect() throws SQLException {
+    try {
+      Preconditions.checkNotNull(browserClient);
+      try (HiveJdbcBrowserClient bc = browserClient) {
+        browserClient.doBrowserSSO();
+        return browserClient.getSamlResponse();
+      }
+    } catch (Exception ex) {
+      throw new SQLException("Browser based SSO failed: " + ex.getMessage(),
+          " 08S01",
+          ex);
+    }
+  }
+
+  private void openSession(TOpenSessionReq openReq) throws TException, SQLException {
+    TOpenSessionResp openResp = client.OpenSession(openReq);
+
+    // Populate a given configuration from HS2 server HiveConf, only if that configuration
+    // is not already present in Connection parameter HiveConf i.e., client side configuration
+    // takes precedence over the server side configuration.
+    Map<String, String> serverHiveConf = openResp.getConfiguration();
+
+    updateServerHiveConf(serverHiveConf, connParams);
+
+    // validate connection
+    Utils.verifySuccess(openResp.getStatus());
+    if (!supportedProtocols.contains(openResp.getServerProtocolVersion())) {
+      throw new TException("Unsupported Hive2 protocol");
+    }
+    protocol = openResp.getServerProtocolVersion();
+    sessHandle = openResp.getSessionHandle();
+
+    final String serverFetchSizeString =
+        openResp.getConfiguration().get(ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname);
+    if (serverFetchSizeString == null) {
+      throw new IllegalStateException("Server returned a null default fetch size. Check that "
+          + ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname + " is configured correctly.");
+    }
+
+    this.defaultFetchSize = Integer.parseInt(serverFetchSizeString);
+    if (this.defaultFetchSize <= 0) {
+      throw new IllegalStateException("Default fetch size must be greater than 0");
+    }
+  }
+
+  private boolean isSamlRedirect(TException e) {
+    //Unfortunately, thrift over http doesn't return the response code
+    if (e.getMessage().startsWith("HTTP Response code: ")) {
+      String code = e.getMessage().substring("HTTP Response code: ".length());
+      try {
+        int statusCode = Integer.parseInt(code.trim());
+        // TODO(Vihang) May be more type of return code here?
+        if (statusCode == 302) {
+          return true;
+        }
+      } catch (NumberFormatException ex) {
+        // ignore, return false
+      }
+    }
+    return false;
   }
 
   public boolean isHplSqlMode() {
