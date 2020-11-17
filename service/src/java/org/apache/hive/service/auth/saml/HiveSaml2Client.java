@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hive.service.ServiceUtils;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.exception.http.RedirectionAction;
@@ -44,14 +45,22 @@ public class HiveSaml2Client extends SAML2Client {
   private static final Logger LOG = LoggerFactory.getLogger(HiveSaml2Client.class);
   private static HiveSaml2Client INSTANCE;
 
-  private HiveSaml2Client(SAML2Configuration saml2Configuration) {
-    // TODO pass these via hive-site.xml
+  private HiveSaml2Client(SAML2Configuration saml2Configuration, String callbackUrl) {
     super(saml2Configuration);
     //TODO what is this? should be configure this?
-    setCallbackUrl("http://localhost:9999");
+    LOG.info("Starting the SAML client with callback URL as {}", callbackUrl);
+    setCallbackUrl(callbackUrl);
     setName(HiveSamlUtils.class.getSimpleName());
     init();
     //TODO handle the replayCache as described in http://www.pac4j.org/docs/clients/saml.html
+  }
+
+  private static String getCallBackUrl(HiveConf conf) {
+    int portNum = conf.getIntVar(ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT);
+    String ssoPath = ServiceUtils
+        .getHttpPath(conf.getVar(ConfVars.HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH));
+    //TODO(Vihang) determine scheme and hostname
+    return "http://localhost:"+portNum + ssoPath;
   }
 
   @Override
@@ -76,7 +85,7 @@ public class HiveSaml2Client extends SAML2Client {
       return INSTANCE;
     }
     try {
-      INSTANCE = new HiveSaml2Client(getSamlConfig(conf));
+      INSTANCE = new HiveSaml2Client(getSamlConfig(conf), getCallBackUrl(conf));
     } catch (Exception e) {
       throw new HiveSamlException("Could not instantiate SAML2.0 client", e);
     }

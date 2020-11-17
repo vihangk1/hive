@@ -3997,6 +3997,8 @@ public class HiveConf extends Configuration {
         "IDP metadata file for the SAML configuration"),
     HIVE_SERVER2_SAML_SP_ID("hive.server2.saml2.sp.entity.id", "hs2-saml",
         "Service provider entity id"),
+    HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH("hive.server2.saml2.sp.callback.path", "/sso/saml",
+        "Callback URL where SAML responses should be posted"),
     HIVE_SERVER2_ENABLE_DOAS("hive.server2.enable.doAs", true,
         "Setting this property to true will have HiveServer2 execute\n" +
         "Hive operations as the user making the calls to it."),

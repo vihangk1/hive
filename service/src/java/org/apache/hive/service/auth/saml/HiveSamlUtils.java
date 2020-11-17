@@ -45,6 +45,7 @@ public class HiveSamlUtils {
 
   public static final String HIVE_SAML_REPONSE_HEADER = "X-Hive-SAML-Response";
   public static final String HIVE_SAML_RESPONSE_PORT = "X-Hive-SAML-Response-Port";
+  public static final String AUTH_HEADER = "Authorization :";
   private static final Logger LOG = LoggerFactory.getLogger(HiveSamlUtils.class);
   private static HiveSamlUtils INSTANCE;
   private final SAML2Configuration saml2Configuration;
