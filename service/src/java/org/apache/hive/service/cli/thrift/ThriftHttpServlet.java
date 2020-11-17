@@ -63,6 +63,7 @@ import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
 import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.cli.session.SessionManager;
+import org.apache.parquet.Strings;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServlet;
@@ -306,7 +307,12 @@ public class ThriftHttpServlet extends TServlet {
   private String doSamlAuth(HttpServletRequest request, HttpServletResponse response)
       throws HttpSamlAuthenticationException {
       //TODO do saml assertion validation here
-      return HiveSaml2Client.get(hiveConf).validate(request, response);
+    String authHeader = request.getHeader(HiveSamlUtils.AUTH_HEADER);
+    if (Strings.isNullOrEmpty(authHeader) || !authHeader.startsWith("Bearer ")) {
+      throw new HttpSamlRedirectException("No token found");
+    }
+    LOG.info("VIHANG-DEBUG: Found auth token: " + authHeader);
+    return authHeader;
   }
 
   private boolean isSamlAuthMode(String authType) {
