@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import java.util.Map;
 import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.CookieStore;
 import org.apache.http.protocol.HttpContext;
@@ -29,6 +30,7 @@ import org.apache.http.protocol.HttpContext;
 public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
 
   private final HiveJdbcBrowserClient browserClient;
+  private static final String BEARER = "Bearer ";
 
   public HttpSamlAuthRequestInterceptor(HiveJdbcBrowserClient browserClient, CookieStore cookieStore, String cn,
       boolean isSSL, Map<String, String> additionalHeaders,
@@ -41,10 +43,12 @@ public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
   protected void addHttpAuthHeader(HttpRequest httpRequest, HttpContext httpContext)
       throws Exception {
     String port = String.valueOf(browserClient.getPort());
-    String samlResponse = browserClient.getSamlResponse();
-    if (samlResponse != null) {
-      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_REPONSE_HEADER, samlResponse);
+    String token = browserClient.getToken();
+    if (token != null) {
+      httpRequest.addHeader(HttpHeaders.AUTHORIZATION, BEARER + token);
+      httpRequest.removeHeaders(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
+    } else {
+      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT, port);
     }
-    httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT, port);
   }
 }

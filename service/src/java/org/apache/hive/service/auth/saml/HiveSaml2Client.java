@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-import org.apache.hive.service.ServiceUtils;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.exception.http.RedirectionAction;
@@ -36,8 +35,6 @@ import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import org.pac4j.saml.credentials.SAML2Credentials;
 import org.pac4j.saml.credentials.extractor.SAML2CredentialsExtractor;
-import org.pac4j.saml.profile.api.SAML2MessageReceiver;
-import org.pac4j.saml.sso.impl.SAML2WebSSOMessageSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,36 +45,18 @@ public class HiveSaml2Client extends SAML2Client {
   private HiveSaml2Client(SAML2Configuration saml2Configuration, String callbackUrl) {
     super(saml2Configuration);
     //TODO what is this? should be configure this?
-    LOG.info("Starting the SAML client with callback URL as {}", callbackUrl);
+    LOG.info("VIHANG-DEBUG: Starting the SAML client with callback URL as {}", callbackUrl);
     setCallbackUrl(callbackUrl);
-    setName(HiveSamlUtils.class.getSimpleName());
+    setName(HiveSaml2Client.class.getSimpleName());
     init();
     //TODO handle the replayCache as described in http://www.pac4j.org/docs/clients/saml.html
   }
 
   private static String getCallBackUrl(HiveConf conf) {
     int portNum = conf.getIntVar(ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT);
-    String ssoPath = ServiceUtils
-        .getHttpPath(conf.getVar(ConfVars.HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH));
+    String ssoPath = conf.getVar(ConfVars.HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH);
     //TODO(Vihang) determine scheme and hostname
     return "http://localhost:"+portNum + ssoPath;
-  }
-
-  @Override
-  protected void initSAMLProfileHandler() {
-    if (!configuration.getResponseBindingType()
-        .equals(SAMLConstants.SAML2_POST_BINDING_URI)) {
-      throw new RuntimeException(
-          "Unsupported response binding type " + configuration.getResponseBindingType());
-    }
-    SAML2MessageReceiver messageReceiver = new HiveSamlWebSSOMessageReceiver(
-        getAuthnResponseValidator());
-    this.profileHandler = new HiveSaml2WebSSOProfileHandler(
-        new SAML2WebSSOMessageSender(this.signatureSigningParametersProvider,
-            this.configuration.getAuthnRequestBindingType(),
-            true,
-            this.configuration.isAuthnRequestSigned()),
-        messageReceiver);
   }
 
   public static synchronized HiveSaml2Client get(HiveConf conf) throws HiveSamlException {

@@ -1,0 +1,150 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.hive.service.auth.saml;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hive.service.auth.HttpAuthenticationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class SamlAuthTokenGenerator implements AuthTokenGenerator {
+
+  private final long ttlMs;
+  private final SecureRandom rand = new SecureRandom();
+  private final byte[] signatureSecret = Long.toString(rand.nextLong()).getBytes();
+  private static final String USER = "u";
+  private static final String SEPARATOR = "=";
+  private static final String ATTR_SEPARATOR = ";";
+  private static final String ID = "id";
+  private static final String CREATE_TIME = "time";
+  private static final String SIGN = "sg";
+  private static SamlAuthTokenGenerator INSTANCE;
+  private static final Logger LOG = LoggerFactory.getLogger(SamlAuthTokenGenerator.class);
+
+  public static synchronized AuthTokenGenerator get(HiveConf conf) {
+    if (INSTANCE != null) {
+      return INSTANCE;
+    }
+    INSTANCE = new SamlAuthTokenGenerator(conf);
+    return INSTANCE;
+  }
+
+  private SamlAuthTokenGenerator(HiveConf conf) {
+    ttlMs = conf.getTimeVar(HiveConf.ConfVars.HIVE_SERVER2_SAML_CALLBACK_TOKEN_TTL,
+        TimeUnit.MILLISECONDS);
+  }
+
+  @Override
+  public String get(String username) {
+    String id = String.valueOf(rand.nextLong());
+    String time = String.valueOf(System.currentTimeMillis());
+    LOG.debug("Generating token for user {} with id {} and time {}", username, id, time);
+    String tokenStr = getTokenStr(username, id, time);
+    return sign(tokenStr);
+  }
+
+  private String getTokenStr(String username, String id, String timestamp) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(USER).append(SEPARATOR).append(username)
+        .append(ATTR_SEPARATOR);
+    sb.append(ID).append(SEPARATOR).append(id)
+        .append(ATTR_SEPARATOR);
+    sb.append(CREATE_TIME).append(SEPARATOR).append(timestamp);
+    return sb.toString();
+  }
+
+  private String getSign(String input) {
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.update(input.getBytes());
+      md.update(signatureSecret);
+      byte[] digest = md.digest();
+      return Base64.getEncoder().encodeToString(digest);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  private String sign(String input) {
+    return input + ATTR_SEPARATOR + SIGN + SEPARATOR + getSign(input);
+  }
+
+  @Override
+  public boolean validate(String token) {
+    Map<String, String> keyValue = new HashMap<>();
+    if (!parse(token, keyValue)) {
+      return false;
+    }
+    String tokenStr = getTokenStr(keyValue.get(USER), keyValue.get(ID),
+        keyValue.get(CREATE_TIME));
+    String signature = getSign(tokenStr);
+    if (!signatureMatches(keyValue.get(SIGN), signature)) {
+      return false;
+    }
+    if (isExpired(System.currentTimeMillis(),
+        Long.parseLong(keyValue.get(CREATE_TIME)))) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String getUser(String token) throws HttpAuthenticationException {
+    if (!validate(token)) {
+      throw new HttpSamlAuthenticationException("Invalid token");
+    }
+    Map<String, String> keyValues = new HashMap<>();
+    parse(token, keyValues);
+    return keyValues.get(USER);
+  }
+
+  private boolean isExpired(long currentTime, long tokenTime) {
+    if (currentTime >= tokenTime) {
+      return (currentTime - tokenTime) > ttlMs;
+    }
+    return false;
+  }
+
+  private boolean signatureMatches(String origSign, String derivedSign) {
+    return !MessageDigest.isEqual(origSign.getBytes(), derivedSign.getBytes());
+  }
+
+  private boolean parse(String token, Map<String, String> kv) {
+    String[] splits = token.split(ATTR_SEPARATOR);
+    if (splits.length != 4) {
+      return false;
+    }
+    for (String split : splits) {
+      String[] pair = split.split(SEPARATOR);
+      if (pair.length != 2) {
+        return false;
+      }
+      kv.put(pair[0], pair[1]);
+    }
+    return kv.containsKey(USER) && kv.containsKey(CREATE_TIME) && kv.containsKey(ID) && kv
+        .containsKey(SIGN);
+  }
+}

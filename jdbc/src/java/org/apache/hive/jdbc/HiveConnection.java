@@ -950,7 +950,7 @@ public class HiveConnection implements java.sql.Connection {
       Preconditions.checkNotNull(browserClient);
       try (HiveJdbcBrowserClient bc = browserClient) {
         browserClient.doBrowserSSO();
-        return browserClient.getSamlResponse();
+        return browserClient.getToken();
       }
     } catch (Exception ex) {
       throw new SQLException("Browser based SSO failed: " + ex.getMessage(),

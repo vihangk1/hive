@@ -27,12 +27,15 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -46,7 +49,7 @@ public class HiveJdbcBrowserClient implements Closeable {
   private String origin;
   private URI ssoUri;
   private final Integer port;
-  private String samlResponse;
+  private String token;
 
   public static HiveJdbcBrowserClient create(Map<String, String> sessionConf)
       throws IOException {
@@ -72,7 +75,6 @@ public class HiveJdbcBrowserClient implements Closeable {
     if (serverSocket != null) {
       serverSocket.close();
     }
-    samlResponse = null;
   }
 
   public void setSsoUri(URI ssoUri) {
@@ -120,13 +122,15 @@ public class HiveJdbcBrowserClient implements Closeable {
         String[] lines = response.split("\r\n");
         for (String line : lines) {
           if (!Strings.isNullOrEmpty(line)) {
-            if (line.startsWith("SAMLResponse=")) {
-              samlResponse = line.substring("SAMLResponse=".length());
+            //TODO(Vihang) may be better to have a Jetty server and parse the response
+            if (line.contains("token=")) {
+              Map<String, String> params = parseUrlEncodedFormData(line);
+              token = params.get("token");
               sendSuccess(socket);
             }
           }
         }
-        if (samlResponse == null) {
+        if (token == null) {
           throw new IOException("Did not receive SAML response");
         }
         break;
@@ -134,8 +138,26 @@ public class HiveJdbcBrowserClient implements Closeable {
     }
   }
 
-  public String getSamlResponse() {
-    return samlResponse;
+  private Map<String, String> parseUrlEncodedFormData(String line) {
+    String decoded;
+    try {
+      decoded = URLDecoder.decode(line, StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    Map<String, String> ret = new HashMap<>();
+    for (String params : decoded.split("&")) {
+      if (params.contains("=")) {
+        String key = params.substring(0, params.indexOf("="));
+        String val = params.substring(params.indexOf("=") + 1);
+        ret.put(key, val);
+      }
+    }
+    return ret;
+  }
+
+  public String getToken() {
+    return token;
   }
 
   private void sendSuccess(Socket socket) throws IOException {

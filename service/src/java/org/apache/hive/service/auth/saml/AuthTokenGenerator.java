@@ -18,12 +18,10 @@
 
 package org.apache.hive.service.auth.saml;
 
-import java.security.SecureRandom;
+import org.apache.hive.service.auth.HttpAuthenticationException;
 
-public class HiveSamlSecureRandomIdGenerator implements HiveSamlRequestIdGenerator {
-  private static final SecureRandom random = new SecureRandom();
-  @Override
-  public String get() {
-    return String.valueOf(random.nextLong());
-  }
+public interface AuthTokenGenerator {
+  String get(String username);
+  boolean validate(String token);
+  String getUser(String token) throws HttpAuthenticationException;
 }
