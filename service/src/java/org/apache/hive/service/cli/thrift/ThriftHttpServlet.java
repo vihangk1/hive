@@ -29,6 +29,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -61,6 +62,7 @@ import org.apache.hive.service.auth.saml.HiveSaml2Client;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
 import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
+import org.apache.hive.service.auth.saml.SamlAuthTokenGenerator;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.cli.session.SessionManager;
 import org.apache.parquet.Strings;
@@ -73,6 +75,9 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
+import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.credentials.TokenCredentials;
+import org.pac4j.core.credentials.extractor.BearerAuthExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -305,14 +310,18 @@ public class ThriftHttpServlet extends TServlet {
   }
 
   private String doSamlAuth(HttpServletRequest request, HttpServletResponse response)
-      throws HttpSamlAuthenticationException {
-      //TODO do saml assertion validation here
-    String authHeader = request.getHeader(HiveSamlUtils.AUTH_HEADER);
-    if (Strings.isNullOrEmpty(authHeader) || !authHeader.startsWith("Bearer ")) {
+      throws HttpAuthenticationException {
+    BearerAuthExtractor extractor = new BearerAuthExtractor();
+    Optional<TokenCredentials> tokenCredentials = extractor.extract(new JEEContext(request, response));
+    String token = tokenCredentials.map(TokenCredentials::getToken).orElse(null);
+    if (token == null) {
       throw new HttpSamlRedirectException("No token found");
     }
-    LOG.info("VIHANG-DEBUG: Found auth token: " + authHeader);
-    return authHeader;
+    if (!SamlAuthTokenGenerator.get(hiveConf).validate(token)) {
+      LOG.error("Token not valid");
+      return null;
+    }
+    return SamlAuthTokenGenerator.get(hiveConf).getUser(token);
   }
 
   private boolean isSamlAuthMode(String authType) {
