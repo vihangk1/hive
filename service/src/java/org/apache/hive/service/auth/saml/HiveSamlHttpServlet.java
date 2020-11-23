@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.http.HttpStatus;
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,22 +49,41 @@ public class HiveSamlHttpServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) {
     String nameId = null;
+    Integer port = null;
     try {
+      port = extractRelayState(request, response);
+      LOG.debug("RelayState is " + port);
       nameId = HiveSaml2Client.get(conf).validate(request, response);
     } catch (HttpSamlAuthenticationException e) {
       LOG.error("Invalid SAML response received", e);
     }
     try {
       if (nameId != null) {
-        generateFormData(response, "http://localhost:9999", tokenGenerator.get(nameId),
+        LOG.debug(
+            "Successfully validated saml response. Forwarding the token to port " + port);
+        generateFormData(response, "http://localhost:" + port, tokenGenerator.get(nameId),
             true, "");
       } else {
-        generateFormData(response, "http://localhost:9999", null, false,
+        generateFormData(response, "http://localhost:" + port, null, false,
             "SAML assertion could not be validated. Check server logs for details.");
       }
     } catch (IOException e) {
-      LOG.error("Could not generate the form data", e);
+      LOG.error("Could not process the SAML response", e);
       response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private Integer extractRelayState(HttpServletRequest request,
+      HttpServletResponse response) throws HttpSamlAuthenticationException {
+    String relayState = request.getParameter("RelayState");
+    if (relayState == null) {
+      throw new HttpSamlAuthenticationException("Could not get the RelayState from the SAML response");
+    }
+    try {
+     return
+         Integer.parseInt(relayState);
+    } catch (NumberFormatException e) {
+      throw new HttpSamlAuthenticationException("Invalid value of relay state received: " + relayState);
     }
   }
 

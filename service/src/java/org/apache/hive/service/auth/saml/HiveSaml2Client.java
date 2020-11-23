@@ -48,6 +48,7 @@ public class HiveSaml2Client extends SAML2Client {
     LOG.info("VIHANG-DEBUG: Starting the SAML client with callback URL as {}", callbackUrl);
     setCallbackUrl(callbackUrl);
     setName(HiveSaml2Client.class.getSimpleName());
+    setStateGenerator(new HiveSamlRelayStateGenerator());
     init();
     //TODO handle the replayCache as described in http://www.pac4j.org/docs/clients/saml.html
   }

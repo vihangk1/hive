@@ -62,7 +62,6 @@ public class HiveJdbcBrowserClient implements Closeable {
         .build();
     // TODO(Vihang) make this configurable.
     int port = Integer.parseInt(sessionConf.getOrDefault("saml.response.port", "0"));
-    port = 9999;
     serverSocket = new ServerSocket(port, 0,
         InetAddress.getByName("localhost"));
     this.port = serverSocket.getLocalPort();
