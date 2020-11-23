@@ -916,13 +916,12 @@ public class HiveConnection implements java.sql.Connection {
     }
 
     int numRetry = isSamlAuthMode() ? 2 : 1;
-    String samlResponse = null;
     for (int i=0; i<numRetry; i++) {
       try {
         openSession(openReq);
       } catch (TException e) {
         if (isSamlRedirect(e)) {
-          samlResponse = doSamlRedirect();
+          doSamlRedirect();
         } else {
           throw new SQLException(
               "Could not establish connection to " + jdbcUriString + ": " + e
