@@ -39,6 +39,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.service.ServiceUtils;
 import org.apache.hive.service.auth.HiveAuthFactory;
 import org.apache.hive.service.auth.saml.HiveSamlHttpServlet;
+import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.cli.CLIService;
 import org.apache.hive.service.rpc.thrift.TCLIService;
 import org.apache.hive.service.rpc.thrift.TCLIService.Iface;
@@ -209,9 +210,10 @@ public class ThriftHttpCLIService extends ThriftCLIService {
         server.setHandler(context);
       }
       context.addServlet(new ServletHolder(thriftHttpServlet), httpPath);
-      //TODO(Vihang) do this only when SAML is enabled.
-      String ssoPath = ServiceUtils.getHttpPath(hiveConf.getVar(ConfVars.HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH));
-      context.addServlet(new ServletHolder(new HiveSamlHttpServlet(hiveConf)), ssoPath);
+      if (HiveSamlUtils.isSamlAuthMode(authType)) {
+        String ssoPath = ServiceUtils.getHttpPath(hiveConf.getVar(ConfVars.HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH));
+        context.addServlet(new ServletHolder(new HiveSamlHttpServlet(hiveConf)), ssoPath);
+      }
       constrainHttpMethods(context, false);
 
       // TODO: check defaults: maxTimeout, keepalive, maxBodySize,

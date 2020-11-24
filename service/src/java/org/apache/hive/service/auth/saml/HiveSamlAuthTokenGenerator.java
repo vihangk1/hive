@@ -30,7 +30,12 @@ import org.apache.hive.service.auth.HttpAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SamlAuthTokenGenerator implements AuthTokenGenerator {
+/**
+ * A token is generated when the SAML assertion is successfully validated. This Token
+ * is passed back to the client (Jdbc/ODBC Driver) via the browser. This token is
+ * presented by the subsequent http request as a bearer token.
+ */
+public class HiveSamlAuthTokenGenerator implements AuthTokenGenerator {
 
   private final long ttlMs;
   private final SecureRandom rand = new SecureRandom();
@@ -41,18 +46,18 @@ public class SamlAuthTokenGenerator implements AuthTokenGenerator {
   private static final String ID = "id";
   private static final String CREATE_TIME = "time";
   private static final String SIGN = "sg";
-  private static SamlAuthTokenGenerator INSTANCE;
-  private static final Logger LOG = LoggerFactory.getLogger(SamlAuthTokenGenerator.class);
+  private static HiveSamlAuthTokenGenerator INSTANCE;
+  private static final Logger LOG = LoggerFactory.getLogger(HiveSamlAuthTokenGenerator.class);
 
   public static synchronized AuthTokenGenerator get(HiveConf conf) {
     if (INSTANCE != null) {
       return INSTANCE;
     }
-    INSTANCE = new SamlAuthTokenGenerator(conf);
+    INSTANCE = new HiveSamlAuthTokenGenerator(conf);
     return INSTANCE;
   }
 
-  private SamlAuthTokenGenerator(HiveConf conf) {
+  private HiveSamlAuthTokenGenerator(HiveConf conf) {
     ttlMs = conf.getTimeVar(HiveConf.ConfVars.HIVE_SERVER2_SAML_CALLBACK_TOKEN_TTL,
         TimeUnit.MILLISECONDS);
   }

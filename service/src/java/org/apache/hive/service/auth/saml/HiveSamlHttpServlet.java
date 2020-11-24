@@ -22,14 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.http.HttpStatus;
-import org.apache.tools.ant.taskdefs.condition.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +40,7 @@ public class HiveSamlHttpServlet extends HttpServlet {
 
   public HiveSamlHttpServlet(HiveConf conf) {
     this.conf = Preconditions.checkNotNull(conf);
-    tokenGenerator = SamlAuthTokenGenerator.get(conf);
+    tokenGenerator = HiveSamlAuthTokenGenerator.get(conf);
   }
 
   @Override
