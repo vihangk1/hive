@@ -18,9 +18,13 @@
 
 package org.apache.hive.service.auth.saml;
 
+import org.apache.hive.service.auth.HiveAuthConstants;
+
 public class HiveSamlUtils {
 
-  public static final String HIVE_SAML_REPONSE_HEADER = "X-Hive-SAML-Response";
   public static final String HIVE_SAML_RESPONSE_PORT = "X-Hive-SAML-Response-Port";
-  public static final String AUTH_HEADER = "Authorization :";
+
+  public static boolean isSamlAuthMode(String authType) {
+    return authType.equalsIgnoreCase(HiveAuthConstants.AuthTypes.SAML2_0.toString());
+  }
 }

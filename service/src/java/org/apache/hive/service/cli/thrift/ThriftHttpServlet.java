@@ -62,10 +62,9 @@ import org.apache.hive.service.auth.saml.HiveSaml2Client;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
 import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
-import org.apache.hive.service.auth.saml.SamlAuthTokenGenerator;
+import org.apache.hive.service.auth.saml.HiveSamlAuthTokenGenerator;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.cli.session.SessionManager;
-import org.apache.parquet.Strings;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServlet;
@@ -220,7 +219,7 @@ public class ThriftHttpServlet extends TServlet {
             } else {
               clientUserName = doKerberosAuth(request);
             }
-          } else if (isSamlAuthMode(authType)) {
+          } else if (HiveSamlUtils.isSamlAuthMode(authType)) {
             // do SAML auth mode
             clientUserName = doSamlAuth(request, response);
           } else {
@@ -262,7 +261,7 @@ public class ThriftHttpServlet extends TServlet {
         LOG.error("Error: ", e);
       }
       skipRequestContent(request);
-      if (isSamlAuthMode(authType) && e instanceof HttpSamlRedirectException) {
+      if (HiveSamlUtils.isSamlAuthMode(authType) && e instanceof HttpSamlRedirectException) {
         try {
           doSamlRedirect(request, response);
         } catch (HttpSamlAuthenticationException httpSamlAuthenticationException) {
@@ -317,15 +316,11 @@ public class ThriftHttpServlet extends TServlet {
     if (token == null) {
       throw new HttpSamlRedirectException("No token found");
     }
-    if (!SamlAuthTokenGenerator.get(hiveConf).validate(token)) {
+    if (!HiveSamlAuthTokenGenerator.get(hiveConf).validate(token)) {
       LOG.error("Token not valid");
       return null;
     }
-    return SamlAuthTokenGenerator.get(hiveConf).getUser(token);
-  }
-
-  private boolean isSamlAuthMode(String authType) {
-    return authType.equalsIgnoreCase(HiveAuthConstants.AuthTypes.SAML2_0.toString());
+    return HiveSamlAuthTokenGenerator.get(hiveConf).getUser(token);
   }
 
   /**

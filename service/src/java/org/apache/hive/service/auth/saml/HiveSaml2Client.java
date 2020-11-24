@@ -60,14 +60,16 @@ public class HiveSaml2Client extends SAML2Client {
     return "http://localhost:"+portNum + ssoPath;
   }
 
-  public static synchronized HiveSaml2Client get(HiveConf conf) throws HiveSamlException {
+  public static synchronized HiveSaml2Client get(HiveConf conf)
+      throws HttpSamlAuthenticationException {
     if (INSTANCE != null) {
       return INSTANCE;
     }
     try {
       INSTANCE = new HiveSaml2Client(getSamlConfig(conf), getCallBackUrl(conf));
     } catch (Exception e) {
-      throw new HiveSamlException("Could not instantiate SAML2.0 client", e);
+      throw new HttpSamlAuthenticationException("Could not instantiate SAML2.0 client",
+          e);
     }
     return INSTANCE;
   }
