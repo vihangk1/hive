@@ -100,7 +100,14 @@ public class Utils {
     public static final String AUTH_PASSWD = "password";
     public static final String AUTH_KERBEROS_AUTH_TYPE = "kerberosAuthType";
     public static final String AUTH_KERBEROS_AUTH_TYPE_FROM_SUBJECT = "fromSubject";
-    public static final String AUTH_SSO_AUTH_TYPE = "saml";
+    // JdbcConnection param which specifies if we need to use a browser to do
+    // authentication.
+    public static final String AUTH_SSO_AUTH_TYPE = "browser";
+    // JdbcConnectionParam which specifies if the authMode is done via a browser
+    public static final String AUTH_SSO_BROWSER_MODE = "browser";
+    public static final String AUTH_SSO_TOKEN_MODE = "token";
+    // param which specifies the specific auth Mode. Currently only applies for SSO
+    public static final String AUTH_MODE = "authMode";
     public static final String ANONYMOUS_USER = "anonymous";
     public static final String ANONYMOUS_PASSWD = "anonymous";
     public static final String USE_SSL = "ssl";

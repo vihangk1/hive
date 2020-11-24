@@ -1661,7 +1661,7 @@ public class Commands {
 
     beeLine.info("Connecting to " + url);
     if (Utils.parsePropertyFromUrl(url, JdbcConnectionParams.AUTH_PRINCIPAL) == null
-    || !JdbcConnectionParams.AUTH_SSO_AUTH_TYPE.equals(auth)) {
+        && !JdbcConnectionParams.AUTH_SSO_AUTH_TYPE.equals(auth)) {
       String urlForPrompt = url.substring(0, url.contains(";") ? url.indexOf(';') : url.length());
       if (username == null) {
         username = beeLine.getConsoleReader().readLine("Enter username for " + urlForPrompt + ": ");
