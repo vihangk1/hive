@@ -280,8 +280,8 @@ public class HiveConnection implements java.sql.Connection {
     sessConfMap = connParams.getSessionVars();
     if (isKerberosAuthMode()) {
       host = Utils.getCanonicalHostName(connParams.getHost());
-    } else if (isSamlAuthMode() && !isHttpTransportMode()) {
-      throw new SQLException("SAML auth mode is only applicable in http mode");
+    } else if (isBrowserAuthMode() && !isHttpTransportMode()) {
+      throw new SQLException("SAML2 auth mode is only applicable in http mode");
     } else {
       host = connParams.getHost();
     }
@@ -544,7 +544,7 @@ public class HiveConnection implements java.sql.Connection {
           host, getServerHttpUrl(useSsl), loggedInSubject, cookieStore, cookieName,
           useSsl, additionalHttpHeaders,
           customCookies);
-    } else if (isSamlAuthMode()) {
+    } else if (isBrowserAuthMode()) {
       //TODO(Vihang) add a browser auth mode?
       try {
         browserClient = HiveJdbcBrowserClient.create(sessConfMap);
@@ -619,7 +619,7 @@ public class HiveConnection implements java.sql.Connection {
       }
     });
 
-    if (isSamlAuthMode()) {
+    if (isBrowserAuthMode()) {
       httpClientBuilder
           .setRedirectStrategy(new HiveJdbcSamlRedirectStrategy(browserClient));
     }
@@ -927,7 +927,7 @@ public class HiveConnection implements java.sql.Connection {
       openReq.setPassword(sessConfMap.get(JdbcConnectionParams.AUTH_PASSWD));
     }
 
-    int numRetry = isSamlAuthMode() ? 2 : 1;
+    int numRetry = isBrowserAuthMode() ? 2 : 1;
     for (int i=0; i<numRetry; i++) {
       try {
         openSession(openReq);
@@ -1048,8 +1048,8 @@ public class HiveConnection implements java.sql.Connection {
         && sessConfMap.containsKey(JdbcConnectionParams.AUTH_PRINCIPAL);
   }
 
-  private boolean isSamlAuthMode() {
-    return JdbcConnectionParams.AUTH_SSO_AUTH_TYPE
+  private boolean isBrowserAuthMode() {
+    return JdbcConnectionParams.AUTH_SSO_BROWSER_MODE
         .equals(sessConfMap.get(JdbcConnectionParams.AUTH_TYPE));
   }
 
