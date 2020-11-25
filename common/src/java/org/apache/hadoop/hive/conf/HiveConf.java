@@ -3957,18 +3957,26 @@ public class HiveConf extends Configuration {
       "A file with the same name must exist in /etc/pam.d"),
 
     // HS2 SAML2.0 configuration
-    HIVE_SERVER2_SAML_KEYSTORE_PATH("hive.server2.saml2.keystore.path", "file:///tmp/samlKeystore.jks",
+    HIVE_SERVER2_SAML_KEYSTORE_PATH("hive.server2.saml2.keystore.path", "",
         "Keystore path to the saml2 client."),
-    HIVE_SERVER2_SAML_KEYSTORE_PASSWORD("hive.server2.saml2.keystore.password", "pac4j-demo-passwd",
+    HIVE_SERVER2_SAML_KEYSTORE_PASSWORD("hive.server2.saml2.keystore.password", "",
         "Keystore path to the saml2 client."),
-    HIVE_SERVER2_SAML_PRIVATE_KEY_PASSWORD("hive.server2.saml2.private.key.password", "pac4j-demo-passwd",
+    HIVE_SERVER2_SAML_PRIVATE_KEY_PASSWORD("hive.server2.saml2.private.key.password", "",
         "Keystore path to the saml2 client."),
-    HIVE_SERVER2_SAML_IDP_METADATA("hive.server2.saml2.idp.metadata", "file:///tmp/idp-metadata-10.xml",
+    HIVE_SERVER2_SAML_IDP_METADATA("hive.server2.saml2.idp.metadata", "",
         "IDP metadata file for the SAML configuration"),
-    HIVE_SERVER2_SAML_SP_ID("hive.server2.saml2.sp.entity.id", "hs2-saml",
+    HIVE_SERVER2_SAML_SP_ID("hive.server2.saml2.sp.entity.id", "hiveserver2-saml-id",
         "Service provider entity id"),
-    HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH("hive.server2.saml2.sp.callback.path", "/sso/saml",
-        "Callback URL where SAML responses should be posted"),
+    HIVE_SERVER2_SAML_CALLBACK_URL("hive.server2.saml2.sp.callback.url", "",
+        "Callback URL where SAML responses should be posted. Currently this\n" +
+            " must be configured at the same port number as defined by hive.server2.thrift.http.port."),
+    HIVE_SERVER2_SAML_WANT_ASSERTIONS_SIGNED("hive.server2.saml2.want.assertions.signed", true,
+        "When this configuration is set to true, hive server2 will validate the signature\n"
+            + " of the assertions received at the callback url. For security reasons, it is recommended"
+            + "that this value should be true."),
+    HIVE_SERVER2_SAML_SIGN_REQUESTS("hive.server2.saml2.sign.requests", false,
+        "When this configuration is set to true, HiveServer2 will sign the SAML requests\n" +
+            " which can be validated by the IDP provider."),
     HIVE_SERVER2_SAML_CALLBACK_TOKEN_TTL("hive.server2.saml2.callback.token.ttl", "30s",
         new TimeValidator(TimeUnit.MILLISECONDS), "Time for which the token issued by\n"
         + "service provider is valid."),

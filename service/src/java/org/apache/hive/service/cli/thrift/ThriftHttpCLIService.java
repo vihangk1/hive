@@ -211,7 +211,7 @@ public class ThriftHttpCLIService extends ThriftCLIService {
       }
       context.addServlet(new ServletHolder(thriftHttpServlet), httpPath);
       if (HiveSamlUtils.isSamlAuthMode(authType)) {
-        String ssoPath = ServiceUtils.getHttpPath(hiveConf.getVar(ConfVars.HIVE_SERVER2_SAML_CALLBACK_HTTP_PATH));
+        String ssoPath = HiveSamlUtils.getCallBackPath(hiveConf);
         context.addServlet(new ServletHolder(new HiveSamlHttpServlet(hiveConf)), ssoPath);
       }
       constrainHttpMethods(context, false);

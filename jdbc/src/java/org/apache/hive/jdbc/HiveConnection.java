@@ -536,7 +536,6 @@ public class HiveConnection implements java.sql.Connection {
           useSsl, additionalHttpHeaders,
           customCookies);
     } else if (isBrowserAuthMode()) {
-      //TODO(Vihang) add a browser auth mode?
       try {
         browserClient = HiveJdbcBrowserClient.create(sessConfMap);
       } catch (IOException e) {
@@ -915,13 +914,22 @@ public class HiveConnection implements java.sql.Connection {
       openReq.setPassword(sessConfMap.get(JdbcConnectionParams.AUTH_PASSWD));
     }
 
+    //TODO(Vihang): This is a bit hacky. We piggy back on a dummy OpenSession call
+    // to get the redirect response from the server. Instead its probably cleaner to
+    // introduce a new thrift API call to fetch the single-sign on information and
+    // then do the browser SSO.
     int numRetry = isBrowserAuthMode() ? 2 : 1;
     for (int i=0; i<numRetry; i++) {
       try {
         openSession(openReq);
       } catch (TException e) {
         if (isSamlRedirect(e)) {
-          doSamlRedirect();
+          boolean success = doBrowserSSO();
+          if (!success) {
+            throw new SQLException(
+                "Could not establish connection to " + jdbcUriString + ": "
+                    + browserClient.getMessage(), " 08S01", e);
+          }
         } else {
           throw new SQLException(
               "Could not establish connection to " + jdbcUriString + ": " + e
@@ -932,12 +940,12 @@ public class HiveConnection implements java.sql.Connection {
     isClosed = false;
   }
 
-  private String doSamlRedirect() throws SQLException {
+  private boolean doBrowserSSO() throws SQLException {
     try {
       Preconditions.checkNotNull(browserClient);
       try (HiveJdbcBrowserClient bc = browserClient) {
         browserClient.doBrowserSSO();
-        return browserClient.getToken();
+        return browserClient.getStatus();
       }
     } catch (Exception ex) {
       throw new SQLException("Browser based SSO failed: " + ex.getMessage(),
