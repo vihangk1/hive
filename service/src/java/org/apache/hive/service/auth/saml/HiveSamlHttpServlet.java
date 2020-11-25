@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.http.HttpStatus;
+import org.opensaml.saml.common.SAMLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,6 @@ public class HiveSamlHttpServlet extends HttpServlet {
   private static final Logger LOG = LoggerFactory
       .getLogger(HiveSamlHttpServlet.class);
   private final HiveConf conf;
-  private static final ObjectMapper objMapper = new ObjectMapper();
   private final AuthTokenGenerator tokenGenerator;
 
   public HiveSamlHttpServlet(HiveConf conf) {
@@ -45,60 +45,70 @@ public class HiveSamlHttpServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-    String nameId = null;
-    Integer port = null;
+    String nameId;
+    Integer port;
     try {
       port = extractRelayState(request, response);
+    } catch (HttpSamlAuthenticationException e) {
+      LOG.error("Invalid relay state" ,e);
+      response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
+    try {
       LOG.debug("RelayState is " + port);
       nameId = HiveSaml2Client.get(conf).validate(request, response);
     } catch (HttpSamlAuthenticationException e) {
-      LOG.error("Invalid SAML response received", e);
+      LOG.error("SAML response could not be validated", e);
+      generateFormData(response, "http://localhost:" + port, null, false,
+          "SAML assertion could not be validated. Check server logs for more details.");
+      return;
     }
-    try {
-      if (nameId != null) {
-        LOG.debug(
-            "Successfully validated saml response. Forwarding the token to port " + port);
-        generateFormData(response, "http://localhost:" + port, tokenGenerator.get(nameId),
-            true, "");
-      } else {
-        generateFormData(response, "http://localhost:" + port, null, false,
-            "SAML assertion could not be validated. Check server logs for details.");
-      }
-    } catch (IOException e) {
-      LOG.error("Could not process the SAML response", e);
-      response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-    }
+    Preconditions.checkState(nameId != null);
+    LOG.debug(
+        "Successfully validated saml response. Forwarding the token to port " + port);
+    generateFormData(response, "http://localhost:" + port, tokenGenerator.get(nameId),
+        true, "");
   }
 
   private Integer extractRelayState(HttpServletRequest request,
       HttpServletResponse response) throws HttpSamlAuthenticationException {
     String relayState = request.getParameter("RelayState");
     if (relayState == null) {
-      throw new HttpSamlAuthenticationException("Could not get the RelayState from the SAML response");
+      throw new HttpSamlAuthenticationException(
+          "Could not get the RelayState from the SAML response");
     }
     try {
-     return
-         Integer.parseInt(relayState);
+      return Integer.parseInt(relayState);
     } catch (NumberFormatException e) {
-      throw new HttpSamlAuthenticationException("Invalid value of relay state received: " + relayState);
+      throw new HttpSamlAuthenticationException(
+          "Invalid value of relay state received: " + relayState);
     }
   }
 
   private void generateFormData(HttpServletResponse response, String url, String token,
-      boolean sucess, String msg) throws IOException {
+      boolean sucess, String msg) {
     StringBuilder sb = new StringBuilder();
     sb.append("<html>");
     sb.append("<body onload='document.forms[\"form\"].submit()'>");
     sb.append(String.format("<form name='form' action='%s' method='POST'>", url));
-    sb.append(String.format("<input type='hidden' name='token' value='%s'>", token));
-    sb.append(String.format("<input type='hidden' name='success' value='%s'>",
-        String.valueOf(sucess)));
-    sb.append(String.format("<input type='hidden' name='message' value='%s'>", msg));
+    sb.append(String
+        .format("<input type='hidden' name='%s' value='%s'>", HiveSamlUtils.TOKEN_KEY,
+            token));
+    sb.append(String.format("<input type='hidden' name='%s' value='%s'>",
+        HiveSamlUtils.STATUS_KEY, sucess));
+    sb.append(String
+        .format("<input type='hidden' name='%s' value='%s'>", HiveSamlUtils.MESSAGE_KEY,
+            msg));
     sb.append("</form>");
     sb.append("</body>");
     sb.append("</html>");
     try (PrintWriter write = response.getWriter()) {
       write.write(sb.toString());
+    } catch (IOException e) {
+      LOG.error("Could not generate the form data for sending a response to url " + url,
+          e);
+      // if there is an error set a response code to internal error.
+      response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
   }
 }

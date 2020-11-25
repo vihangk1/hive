@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +47,9 @@ public class HiveJdbcBrowserClient implements Closeable {
   private final Map<String, String> sessionConf;
   private final ServerSocket serverSocket;
   private static final Logger LOG = LoggerFactory.getLogger(HiveJdbcBrowserClient.class);
-  private String origin;
   private URI ssoUri;
   private final Integer port;
-  private String token;
+  private HiveSamlResponse serverResponse;
 
   public static HiveJdbcBrowserClient create(Map<String, String> sessionConf)
       throws IOException {
@@ -81,7 +81,7 @@ public class HiveJdbcBrowserClient implements Closeable {
   }
 
   private boolean validateSSOUrl(URI ssoUrl) {
-    //TODO(Vihang) add validation code here
+    //TODO(Vihang) add URL validation code here
     return true;
   }
 
@@ -117,81 +117,88 @@ public class HiveJdbcBrowserClient implements Closeable {
         // block until you read into the buffer
         int len = reader.read(buffer);
         String response = String.valueOf(buffer, 0, len);
-        LOG.info("Received response : " + response);
+        LOG.debug("Received response : " + response);
         String[] lines = response.split("\r\n");
         for (String line : lines) {
           if (!Strings.isNullOrEmpty(line)) {
             //TODO(Vihang) may be better to have a Jetty server and parse the response
             if (line.contains("token=")) {
-              Map<String, String> params = parseUrlEncodedFormData(line);
-              token = params.get("token");
-              sendSuccess(socket);
+              serverResponse = new HiveSamlResponse(line);
+              sendBrowserMsg(socket, serverResponse.status);
             }
           }
         }
-        if (token == null) {
-          throw new IOException("Did not receive SAML response");
+        if (serverResponse == null) {
+          throw new IOException("Could not parse the response from server.");
         }
         break;
       }
     }
   }
 
-  private Map<String, String> parseUrlEncodedFormData(String line) {
-    String decoded;
-    try {
-      decoded = URLDecoder.decode(line, StandardCharsets.UTF_8.toString());
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+  public boolean getStatus() {
+    return serverResponse != null && serverResponse.status;
+  }
+
+  public String getMessage() {
+    return serverResponse == null ? "" : serverResponse.msg;
+  }
+
+  private static final class HiveSamlResponse {
+    private final String msg;
+    private final boolean status;
+    private final String token;
+
+    public HiveSamlResponse(String postResponse) {
+      Map<String, String> params = parseUrlEncodedFormData(postResponse);
+      status = Boolean.parseBoolean(params.get(HiveSamlUtils.STATUS_KEY));
+      msg = params.getOrDefault(HiveSamlUtils.MESSAGE_KEY, "");
+      token = params.get(HiveSamlUtils.TOKEN_KEY);
     }
-    Map<String, String> ret = new HashMap<>();
-    for (String params : decoded.split("&")) {
-      if (params.contains("=")) {
-        String key = params.substring(0, params.indexOf("="));
-        String val = params.substring(params.indexOf("=") + 1);
-        ret.put(key, val);
+
+
+    private Map<String, String> parseUrlEncodedFormData(String line) {
+      String decoded;
+      try {
+        decoded = URLDecoder.decode(line, StandardCharsets.UTF_8.toString());
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
       }
+      Map<String, String> ret = new HashMap<>();
+      for (String params : decoded.split("&")) {
+        if (params.contains("=")) {
+          String key = params.substring(0, params.indexOf("="));
+          String val = params.substring(params.indexOf("=") + 1);
+          ret.put(key, val);
+        }
+      }
+      return ret;
     }
-    return ret;
   }
 
   public String getToken() {
-    return token;
+    return serverResponse == null ? null : serverResponse.token;
   }
 
-  private void sendSuccess(Socket socket) throws IOException {
+  private void sendBrowserMsg(Socket socket, boolean success) throws IOException {
     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
     List<String> content = new ArrayList<>();
     content.add("HTTP/1.0 200 OK");
     content.add("Content-Type: text/html");
-    String responseText =
-        "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/>"
-            + "<title>SAML Response Received</title></head>"
-            + "<body>SAML Response received. You may close this window.</body></html>";
-    content.add(String.format("Content-Length: %s", responseText.length()));
-    content.add("");
-    content.add(responseText);
-
-    for (int i = 0; i < content.size(); ++i) {
-      if (i > 0) {
-        out.print("\r\n");
-      }
-      out.print(content.get(i));
+    String responseText;
+    if (success) {
+      responseText =
+          "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/>"
+              + "<title>SAML Response Received</title></head>"
+              + "<body>Successfully authenticated. You may close this window.</body></html>";
+    } else {
+      responseText =
+          "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/>"
+              + "<title>SAML Response Received</title></head>"
+              + "<body>Authentication failed. Please check server logs for details."
+              + " You may close this window.</body></html>";
     }
-    out.flush();
-  }
-
-  private void sendFail(Socket socket) throws IOException {
-    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-    List<String> content = new ArrayList<>();
-    content.add("HTTP/1.0 200 OK");
-    content.add("Content-Type: text/html");
-    String responseText =
-        "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/>"
-            + "<title>SAML Response Received</title></head>"
-            + "<body>SAML Response received. You may close this window.</body></html>";
     content.add(String.format("Content-Length: %s", responseText.length()));
     content.add("");
     content.add(responseText);
