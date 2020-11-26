@@ -35,28 +35,29 @@ import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import org.pac4j.saml.credentials.SAML2Credentials;
+import org.pac4j.saml.credentials.SAML2Credentials.SAMLAttribute;
 import org.pac4j.saml.credentials.extractor.SAML2CredentialsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * HiveServer2's implementation of SAML2Client. We mostly rely on pac4j to do most of the
- * heavy lifting. This class implements the initialization logic of the underlying
- * {@link SAML2Client} using the HiveConf. Also, implements the generation of SAML
- * requests using HTTP-Redirect binding.
- * //TODO: Add support for HTTP-Post binding.
+ * heavy lifting. This class implements the initialization logic of the underlying {@link
+ * SAML2Client} using the HiveConf. Also, implements the generation of SAML requests using
+ * HTTP-Redirect binding. //TODO: Add support for HTTP-Post binding.
  */
 public class HiveSaml2Client extends SAML2Client {
 
   private static final Logger LOG = LoggerFactory.getLogger(HiveSaml2Client.class);
   private static HiveSaml2Client INSTANCE;
+  private final HiveSamlGroupNameFilter groupNameFilter;
 
-  private HiveSaml2Client(SAML2Configuration saml2Configuration, String callbackUrl) {
-    super(saml2Configuration);
-    setCallbackUrl(callbackUrl);
+  private HiveSaml2Client(HiveConf conf) throws Exception {
+    super(getSamlConfig(conf));
+    setCallbackUrl(getCallBackUrl(conf));
     setName(HiveSaml2Client.class.getSimpleName());
     setStateGenerator(new HiveSamlRelayStateGenerator());
-    LOG.info("Initializing the Saml2Client with callback url as {}", callbackUrl);
+    groupNameFilter = new HiveSamlGroupNameFilter(conf);
     init();
     //TODO handle the replayCache as described in http://www.pac4j.org/docs/clients/saml.html
   }
@@ -72,7 +73,7 @@ public class HiveSaml2Client extends SAML2Client {
       return INSTANCE;
     }
     try {
-      INSTANCE = new HiveSaml2Client(getSamlConfig(conf), getCallBackUrl(conf));
+      INSTANCE = new HiveSaml2Client(conf);
     } catch (Exception e) {
       throw new HttpSamlAuthenticationException("Could not instantiate SAML2.0 client",
           e);
@@ -131,26 +132,38 @@ public class HiveSaml2Client extends SAML2Client {
    * Given a response which may contain a SAML Assertion, validates it. If the validation
    * is successful, it extracts the nameId from the assertion which is used as the
    * identity of the end user.
+   *
    * @param request
    * @param response
    * @return the NameId as received in the assertion if the assertion was valid.
-   * @throws HttpSamlAuthenticationException In case the assertition is not present or
-   * is invalid.
+   * @throws HttpSamlAuthenticationException In case the assertition is not present or is
+   *                                         invalid.
    */
   public String validate(HttpServletRequest request, HttpServletResponse response)
       throws HttpSamlAuthenticationException {
+    Optional<SAML2Credentials> credentials;
     try {
       SAML2CredentialsExtractor credentialsExtractor = new SAML2CredentialsExtractor(
           this);
-      Optional<SAML2Credentials> credentials = credentialsExtractor
+      credentials = credentialsExtractor
           .extract(new JEEContext(request, response));
-      if (!credentials.isPresent()) {
-        throw new HttpSamlAuthenticationException("Credentials could not be extracted");
-      }
-      return credentials.get().getNameId().getValue();
     } catch (Exception ex) {
       throw new HttpSamlAuthenticationException("Could not validate the SAML response",
           ex);
     }
+    if (!credentials.isPresent()) {
+      throw new HttpSamlAuthenticationException("Credentials could not be extracted");
+    }
+    //TODO(Vihang) Have this as a configurable attribute of the assertion?
+    String nameId = credentials.get().getNameId().getValue();
+    for (SAMLAttribute attribute : credentials.get().getAttributes()) {
+      if (groupNameFilter.apply(attribute)) {
+        LOG.debug("Successfully matched the group name for {}", attribute);
+        return nameId;
+      }
+    }
+    LOG.warn("Could not match any groups for the nameid {}", nameId);
+    throw new HttpSamlNoGroupsMatchedException(
+        "None of the configured groups match for the user");
   }
 }
