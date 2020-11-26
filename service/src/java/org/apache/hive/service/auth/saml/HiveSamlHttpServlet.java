@@ -51,14 +51,18 @@ public class HiveSamlHttpServlet extends HttpServlet {
       port = extractRelayState(request, response);
     } catch (HttpSamlAuthenticationException e) {
       LOG.error("Invalid relay state" ,e);
-      response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return;
     }
     try {
       LOG.debug("RelayState is " + port);
       nameId = HiveSaml2Client.get(conf).validate(request, response);
     } catch (HttpSamlAuthenticationException e) {
-      LOG.error("SAML response could not be validated", e);
+      if (e instanceof HttpSamlNoGroupsMatchedException) {
+        LOG.error("Could not authenticate user since the groups didn't match", e);
+      } else {
+        LOG.error("SAML response could not be validated", e);
+      }
       generateFormData(response, "http://localhost:" + port, null, false,
           "SAML assertion could not be validated. Check server logs for more details.");
       return;
