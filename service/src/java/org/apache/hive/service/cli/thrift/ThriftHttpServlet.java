@@ -27,6 +27,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,12 +60,15 @@ import org.apache.hive.service.auth.PasswdAuthenticationProvider;
 import org.apache.hive.service.auth.PlainSaslHelper;
 import org.apache.hive.service.auth.ldap.HttpEmptyAuthenticationException;
 import org.apache.hive.service.auth.saml.HiveSaml2Client;
+import org.apache.hive.service.auth.saml.HiveSamlRelayStateInfo;
+import org.apache.hive.service.auth.saml.HiveSamlRelayStateStore;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
 import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
 import org.apache.hive.service.auth.saml.HiveSamlAuthTokenGenerator;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.cli.session.SessionManager;
+import org.apache.http.Header;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServlet;
@@ -141,7 +145,6 @@ public class ThriftHttpServlet extends TServlet {
     String clientUserName = null;
     String clientIpAddress;
     boolean requireNewCookie = false;
-    LOG.info("VIHANG-DEBUG (authmode={}): Received post request", authType);
 
     try {
       if (hiveConf.getBoolean(ConfVars.HIVE_SERVER2_XSRF_FILTER_ENABLED.varname, false)) {
@@ -316,11 +319,21 @@ public class ThriftHttpServlet extends TServlet {
     if (token == null) {
       throw new HttpSamlRedirectException("No token found");
     }
-    if (!HiveSamlAuthTokenGenerator.get(hiveConf).validate(token)) {
-      LOG.error("Token not valid");
-      return null;
+    String codeVerifier = request.getHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER);
+    if (codeVerifier == null) {
+      throw new HttpSamlAuthenticationException("Code verifier not found");
     }
-    return HiveSamlAuthTokenGenerator.get(hiveConf).getUser(token);
+    String user = HiveSamlAuthTokenGenerator.get(hiveConf).validate(token);
+    // token is valid; now confirm if the code verifier matches with the relay state.
+    Map<String, String> keyValues = new HashMap<>();
+    if (HiveSamlAuthTokenGenerator.parse(token, keyValues)) {
+      String relayStateKey = keyValues.get(HiveSamlAuthTokenGenerator.RELAY_STATE);
+      if (!HiveSamlRelayStateStore.get()
+          .validateCodeVerifier(relayStateKey, codeVerifier)) {
+        throw new HttpSamlAuthenticationException("Code verifier could not be validated");
+      }
+    }
+    return user;
   }
 
   /**

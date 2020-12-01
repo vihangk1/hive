@@ -18,7 +18,6 @@
 
 package org.apache.hive.service.auth.saml;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.http.HttpStatus;
-import org.opensaml.saml.common.SAMLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +44,18 @@ public class HiveSamlHttpServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) {
     String nameId;
-    Integer port;
+    String relayState;
+    int port;
     try {
-      port = extractRelayState(request, response);
+      relayState = HiveSamlRelayStateStore.get().getRelayStateInfo(request, response);
+      port = HiveSamlRelayStateStore.get().getRelayStateInfo(relayState).getPort();
     } catch (HttpSamlAuthenticationException e) {
       LOG.error("Invalid relay state" ,e);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return;
     }
     try {
-      LOG.debug("RelayState is " + port);
+      LOG.debug("RelayState port is " + port);
       nameId = HiveSaml2Client.get(conf).validate(request, response);
     } catch (HttpSamlAuthenticationException e) {
       if (e instanceof HttpSamlNoGroupsMatchedException) {
@@ -63,6 +63,7 @@ public class HiveSamlHttpServlet extends HttpServlet {
       } else {
         LOG.error("SAML response could not be validated", e);
       }
+      //TODO(Vihang) do we need a https://localhost here?
       generateFormData(response, "http://localhost:" + port, null, false,
           "SAML assertion could not be validated. Check server logs for more details.");
       return;
@@ -70,23 +71,9 @@ public class HiveSamlHttpServlet extends HttpServlet {
     Preconditions.checkState(nameId != null);
     LOG.debug(
         "Successfully validated saml response. Forwarding the token to port " + port);
-    generateFormData(response, "http://localhost:" + port, tokenGenerator.get(nameId),
-        true, "");
-  }
-
-  private Integer extractRelayState(HttpServletRequest request,
-      HttpServletResponse response) throws HttpSamlAuthenticationException {
-    String relayState = request.getParameter("RelayState");
-    if (relayState == null) {
-      throw new HttpSamlAuthenticationException(
-          "Could not get the RelayState from the SAML response");
-    }
-    try {
-      return Integer.parseInt(relayState);
-    } catch (NumberFormatException e) {
-      throw new HttpSamlAuthenticationException(
-          "Invalid value of relay state received: " + relayState);
-    }
+    //TODO(Vihang) do we need a https://localhost here?
+    generateFormData(response, "http://localhost:" + port,
+        tokenGenerator.get(nameId, relayState), true, "");
   }
 
   private void generateFormData(HttpServletResponse response, String url, String token,

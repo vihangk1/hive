@@ -29,6 +29,7 @@ import org.apache.hive.service.auth.HiveAuthConstants;
 public class HiveSamlUtils {
 
   public static final String HIVE_SAML_RESPONSE_PORT = "X-Hive-SAML-Response-Port";
+  public static final String HIVE_SAML_CODE_VERIFIER = "X-Hive-SAML-Code-Verifier";
   public static final String TOKEN_KEY = "token";
   public static final String STATUS_KEY = "status";
   public static final String MESSAGE_KEY = "message";
