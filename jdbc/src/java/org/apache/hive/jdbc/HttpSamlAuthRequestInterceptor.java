@@ -44,8 +44,10 @@ public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
       throws Exception {
     String port = String.valueOf(browserClient.getPort());
     String token = browserClient.getToken();
+    String codeChallenge = browserClient.getCodeChallenge();
     if (token != null) {
       httpRequest.addHeader(HttpHeaders.AUTHORIZATION, BEARER + token);
+      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER, codeChallenge);
       httpRequest.removeHeaders(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
     } else {
       httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT, port);

@@ -68,8 +68,6 @@ public class HiveAuthFactory {
     this.conf = conf;
     transportMode = conf.getVar(HiveConf.ConfVars.HIVE_SERVER2_TRANSPORT_MODE);
     authTypeStr = conf.getVar(HiveConf.ConfVars.HIVE_SERVER2_AUTHENTICATION);
-    LOG.info("VIHANG-DEBUG: authtypeStr = {} AuthType for SAML2_0 = {}", authTypeStr,
-        HiveAuthConstants.AuthTypes.SAML2_0.getAuthName());
     // ShimLoader.getHadoopShims().isSecurityEnabled() will only check that
     // hadoopAuth is not simple, it does not guarantee it is kerberos
     hadoopAuth = conf.get(HADOOP_SECURITY_AUTHENTICATION, "simple");

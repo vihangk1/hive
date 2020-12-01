@@ -20,6 +20,8 @@ package org.apache.hive.jdbc.saml;
 
 import com.google.common.base.Preconditions;
 import java.net.URI;
+import org.apache.hive.service.auth.saml.HiveSamlUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -42,7 +44,9 @@ public class HiveJdbcSamlRedirectStrategy extends DefaultRedirectStrategy {
     int status = response.getStatusLine().getStatusCode();
     if (status == HttpStatus.SC_MOVED_TEMPORARILY || status == HttpStatus.SC_SEE_OTHER) {
       URI locationUri = getLocationURI(request, response, context);
-      browserClient.setSsoUri(locationUri);
+      Header codeChallengeHeader = response
+          .getFirstHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER);
+      browserClient.init(locationUri, codeChallengeHeader.getValue());
     }
     return super.isRedirected(request, response, context);
   }

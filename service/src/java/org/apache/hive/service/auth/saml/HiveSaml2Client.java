@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * HiveServer2's implementation of SAML2Client. We mostly rely on pac4j to do most of the
  * heavy lifting. This class implements the initialization logic of the underlying {@link
  * SAML2Client} using the HiveConf. Also, implements the generation of SAML requests using
- * HTTP-Redirect binding. //TODO: Add support for HTTP-Post binding.
+ * HTTP-Redirect binding. //TODO: Add support for HTTP-Post binding for SAML request.
  */
 public class HiveSaml2Client extends SAML2Client {
 
@@ -56,7 +56,7 @@ public class HiveSaml2Client extends SAML2Client {
     super(getSamlConfig(conf));
     setCallbackUrl(getCallBackUrl(conf));
     setName(HiveSaml2Client.class.getSimpleName());
-    setStateGenerator(new HiveSamlRelayStateGenerator());
+    setStateGenerator(HiveSamlRelayStateStore.get());
     groupNameFilter = new HiveSamlGroupNameFilter(conf);
     init();
     //TODO handle the replayCache as described in http://www.pac4j.org/docs/clients/saml.html

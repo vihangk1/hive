@@ -18,10 +18,7 @@
 
 package org.apache.hive.service.auth.saml;
 
-import org.apache.hive.service.auth.HttpAuthenticationException;
-
 public interface AuthTokenGenerator {
-  String get(String username);
-  boolean validate(String token);
-  String getUser(String token) throws HttpAuthenticationException;
+  String get(String username, String relayStateId);
+  String validate(String token) throws HttpSamlAuthenticationException;
 }

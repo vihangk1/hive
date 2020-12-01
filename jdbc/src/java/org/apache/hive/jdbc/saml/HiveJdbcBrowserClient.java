@@ -50,6 +50,7 @@ public class HiveJdbcBrowserClient implements Closeable {
   private URI ssoUri;
   private final Integer port;
   private HiveSamlResponse serverResponse;
+  private String codeChallenge;
 
   public static HiveJdbcBrowserClient create(Map<String, String> sessionConf)
       throws IOException {
@@ -76,8 +77,20 @@ public class HiveJdbcBrowserClient implements Closeable {
     }
   }
 
-  public void setSsoUri(URI ssoUri) {
+  public void init(URI ssoUri, String codeChallenge) {
+    // everytime we set the sso URI we should clean up the previous state if its set.
+    // this may be from the previous invalid connection attempt or if the token has
+    // expired
+    reset();
     this.ssoUri = ssoUri;
+    this.codeChallenge = codeChallenge;
+  }
+
+  private void reset() {
+    if (serverResponse != null) {
+      serverResponse = null;
+    }
+    codeChallenge = null;
   }
 
   private boolean validateSSOUrl(URI ssoUrl) {
@@ -178,6 +191,10 @@ public class HiveJdbcBrowserClient implements Closeable {
 
   public String getToken() {
     return serverResponse == null ? null : serverResponse.token;
+  }
+
+  public String getCodeChallenge() {
+    return codeChallenge;
   }
 
   private void sendBrowserMsg(Socket socket, boolean success) throws IOException {

@@ -18,25 +18,20 @@
 
 package org.apache.hive.service.auth.saml;
 
-import java.util.Optional;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.util.generator.ValueGenerator;
+public class HiveSamlRelayStateInfo {
+  private final int port;
+  private final long codeVerifier;
 
-/**
- * Relay state generator for the SAML Request which includes the port number from the
- * request header. This port number is used eventually to redirect the token to the
- * localhost:port from the browser.
- */
-public class HiveSamlRelayStateGenerator implements ValueGenerator {
-  @Override
-  public String generateValue(WebContext webContext) {
-    Optional<String> portNumber = webContext
-        .getRequestHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
-    if (!portNumber.isPresent()) {
-      throw new RuntimeException(
-          "SAML response port header " + HiveSamlUtils.HIVE_SAML_RESPONSE_PORT
-              + " is not set ");
-    }
-    return portNumber.get();
+  HiveSamlRelayStateInfo(int port, long codeVerifier) {
+    this.port = port;
+    this.codeVerifier = codeVerifier;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public long getCodeVerifier() {
+    return codeVerifier;
   }
 }
