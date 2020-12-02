@@ -84,7 +84,7 @@ public class HiveSaml2Client extends SAML2Client {
   /**
    * Extracts the SAML specific configuration needed to initialize the SAML2.0 client.
    */
-  private static SAML2Configuration getSamlConfig(HiveConf conf) {
+  private static SAML2Configuration getSamlConfig(HiveConf conf) throws Exception {
     SAML2Configuration saml2Configuration = new SAML2Configuration(
         conf.get(ConfVars.HIVE_SERVER2_SAML_KEYSTORE_PATH.varname),
         conf.get(ConfVars.HIVE_SERVER2_SAML_KEYSTORE_PASSWORD.varname),
@@ -93,8 +93,9 @@ public class HiveSaml2Client extends SAML2Client {
     saml2Configuration
         .setAuthnRequestBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
     saml2Configuration.setResponseBindingType(SAML2_POST_BINDING_URI);
-    saml2Configuration
-        .setServiceProviderEntityId(conf.get(ConfVars.HIVE_SERVER2_SAML_SP_ID.varname));
+    /*saml2Configuration
+        .setServiceProviderEntityId(conf.get(ConfVars.HIVE_SERVER2_SAML_SP_ID.varname));*/
+    saml2Configuration.setServiceProviderEntityId(getCallBackUrl(conf));
     saml2Configuration.setWantsAssertionsSigned(
         conf.getBoolVar(ConfVars.HIVE_SERVER2_SAML_WANT_ASSERTIONS_SIGNED));
     saml2Configuration
