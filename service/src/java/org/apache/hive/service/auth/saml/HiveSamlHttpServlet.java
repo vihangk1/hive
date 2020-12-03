@@ -21,10 +21,13 @@ package org.apache.hive.service.auth.saml;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hive.service.auth.saml.HiveSamlRequestStateInfo.HiveSamlRequestState;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,60 +48,64 @@ public class HiveSamlHttpServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) {
     String nameId;
     String relayState;
-    int port;
+    long clientIdentifier;
     try {
       relayState = HiveSamlRelayStateStore.get().getRelayStateInfo(request, response);
-      port = HiveSamlRelayStateStore.get().getRelayStateInfo(relayState).getPort();
+      clientIdentifier = HiveSamlRelayStateStore.get().getRelayStateInfo(relayState)
+          .getClientIdentifier();
     } catch (HttpSamlAuthenticationException e) {
-      LOG.error("Invalid relay state" ,e);
+      LOG.error("Invalid relay state", e);
       response.setStatus(HttpStatus.SC_UNAUTHORIZED);
       return;
     }
+    HiveSamlRequestStateInfo requestStateInfo = null;
     try {
-      LOG.debug("RelayState port is " + port);
+      LOG.debug("Client identifier is " + clientIdentifier);
       nameId = HiveSaml2Client.get(conf).validate(request, response);
+      Preconditions.checkState(nameId != null);
+      requestStateInfo = new HiveSamlRequestStateInfo(HiveSamlRequestState.SUCCESS,
+          HiveSamlRequestStateInfo.SUCCESS_MSG, nameId);
+      sendBrowserMsg(response, true);
     } catch (HttpSamlAuthenticationException e) {
       if (e instanceof HttpSamlNoGroupsMatchedException) {
         LOG.error("Could not authenticate user since the groups didn't match", e);
+        requestStateInfo = new HiveSamlRequestStateInfo(HiveSamlRequestState.ERROR,
+            HiveSamlRequestStateInfo.NO_VALID_GROUPS_ERR_MSG, null);
       } else {
         LOG.error("SAML response could not be validated", e);
+        requestStateInfo = new HiveSamlRequestStateInfo(HiveSamlRequestState.ERROR,
+            HiveSamlRequestStateInfo.NO_VALID_SAML_RESPONSE, null);
       }
-      //TODO(Vihang) do we need a https://localhost here?
-      generateFormData(response, "http://localhost:" + port, null, false,
-          "SAML assertion could not be validated. Check server logs for more details.");
-      return;
+      sendBrowserMsg(response, false);
+    } catch (Exception e) {
+      LOG.error("Unexpected error received while processing the SAML response for client "
+          + clientIdentifier, e);
+      response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+    } finally {
+      if (requestStateInfo != null) {
+        HiveSamlRelayStateStore.get().setRequestState(clientIdentifier, requestStateInfo);
+      }
     }
-    Preconditions.checkState(nameId != null);
-    LOG.debug(
-        "Successfully validated saml response. Forwarding the token to port " + port);
-    //TODO(Vihang) do we need a https://localhost here?
-    generateFormData(response, "http://localhost:" + port,
-        tokenGenerator.get(nameId, relayState), true, "");
   }
 
-  private void generateFormData(HttpServletResponse response, String url, String token,
-      boolean sucess, String msg) {
+  private void sendBrowserMsg(HttpServletResponse response, boolean success) {
     StringBuilder sb = new StringBuilder();
     sb.append("<html>");
-    sb.append("<body onload='document.forms[\"form\"].submit()'>");
-    sb.append(String.format("<form name='form' action='%s' method='POST'>", url));
-    sb.append(String
-        .format("<input type='hidden' name='%s' value='%s'>", HiveSamlUtils.TOKEN_KEY,
-            token));
-    sb.append(String.format("<input type='hidden' name='%s' value='%s'>",
-        HiveSamlUtils.STATUS_KEY, sucess));
-    sb.append(String
-        .format("<input type='hidden' name='%s' value='%s'>", HiveSamlUtils.MESSAGE_KEY,
-            msg));
-    sb.append("</form>");
+    sb.append("<title>Authentication Response Received</title>");
+    sb.append("<body>");
+    if (success) {
+      sb.append("Successfully authenticated. You may close this window.");
+    } else {
+      sb.append(
+          "Authentication failed. Please check server logs for details."
+              + " You may close this window.");
+    }
     sb.append("</body>");
     sb.append("</html>");
-    try (PrintWriter write = response.getWriter()) {
-      write.write(sb.toString());
+    try (PrintWriter writer = response.getWriter()) {
+      writer.print(sb.toString());
     } catch (IOException e) {
-      LOG.error("Could not generate the form data for sending a response to url " + url,
-          e);
-      // if there is an error set a response code to internal error.
+      LOG.error("Error while generating the response.", e);
       response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
   }

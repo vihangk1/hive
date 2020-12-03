@@ -27,10 +27,8 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -60,15 +58,14 @@ import org.apache.hive.service.auth.PasswdAuthenticationProvider;
 import org.apache.hive.service.auth.PlainSaslHelper;
 import org.apache.hive.service.auth.ldap.HttpEmptyAuthenticationException;
 import org.apache.hive.service.auth.saml.HiveSaml2Client;
-import org.apache.hive.service.auth.saml.HiveSamlRelayStateInfo;
 import org.apache.hive.service.auth.saml.HiveSamlRelayStateStore;
+import org.apache.hive.service.auth.saml.HiveSamlRequestStateInfo;
+import org.apache.hive.service.auth.saml.HiveSamlRequestStateInfo.HiveSamlRequestState;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
 import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
-import org.apache.hive.service.auth.saml.HiveSamlAuthTokenGenerator;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.cli.session.SessionManager;
-import org.apache.http.Header;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServlet;
@@ -78,9 +75,6 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
-import org.pac4j.core.context.JEEContext;
-import org.pac4j.core.credentials.TokenCredentials;
-import org.pac4j.core.credentials.extractor.BearerAuthExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,27 +307,33 @@ public class ThriftHttpServlet extends TServlet {
 
   private String doSamlAuth(HttpServletRequest request, HttpServletResponse response)
       throws HttpAuthenticationException {
-    BearerAuthExtractor extractor = new BearerAuthExtractor();
-    Optional<TokenCredentials> tokenCredentials = extractor.extract(new JEEContext(request, response));
-    String token = tokenCredentials.map(TokenCredentials::getToken).orElse(null);
-    if (token == null) {
-      throw new HttpSamlRedirectException("No token found");
-    }
-    String codeVerifier = request.getHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER);
+    String codeVerifier = request.getHeader(HiveSamlUtils.HIVE_SAML_CLIENT_IDENTIFIER);
     if (codeVerifier == null) {
-      throw new HttpSamlAuthenticationException("Code verifier not found");
+      throw new HttpSamlRedirectException("Code verifier not found");
     }
-    String user = HiveSamlAuthTokenGenerator.get(hiveConf).validate(token);
-    // token is valid; now confirm if the code verifier matches with the relay state.
-    Map<String, String> keyValues = new HashMap<>();
-    if (HiveSamlAuthTokenGenerator.parse(token, keyValues)) {
-      String relayStateKey = keyValues.get(HiveSamlAuthTokenGenerator.RELAY_STATE);
-      if (!HiveSamlRelayStateStore.get()
-          .validateCodeVerifier(relayStateKey, codeVerifier)) {
-        throw new HttpSamlAuthenticationException("Code verifier could not be validated");
+
+    long clientIdentifier;
+    try {
+      clientIdentifier = Long.parseLong(codeVerifier);
+    } catch (NumberFormatException e) {
+      throw new HttpSamlAuthenticationException("Invalid code verifier", e);
+    }
+    HiveSamlRequestStateInfo requestStateInfo = HiveSamlRelayStateStore.get()
+        .waitUntilRequestIsProcessed(clientIdentifier, 0);
+    // TODO how do we handle if the requestStateInfo is null? This may happen
+    // if for instance the user has not entered the credentials to the IDP
+    // or if the client is trying to get access using some old clientIdentifier
+    try {
+      if (requestStateInfo.getState() == HiveSamlRequestState.ERROR) {
+        throw new HttpSamlAuthenticationException(requestStateInfo.getMessage());
       }
+      if (requestStateInfo.getAuthenticatedUser() == null) {
+        throw new HttpSamlAuthenticationException("Authenticated user is null");
+      }
+      return requestStateInfo.getAuthenticatedUser();
+    } finally {
+      //HiveSamlRelayStateStore.get().removeRequestState(clientIdentifier);
     }
-    return user;
   }
 
   /**

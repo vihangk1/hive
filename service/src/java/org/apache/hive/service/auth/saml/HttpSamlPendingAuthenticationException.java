@@ -15,17 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hive.service.auth.saml;
 
-public class HiveSamlRelayStateInfo {
-  private final long clientIdentifier;
+public class HttpSamlPendingAuthenticationException extends HttpSamlAuthenticationException {
 
-  HiveSamlRelayStateInfo(long clientIdentifier) {
-    this.clientIdentifier = clientIdentifier;
-  }
-
-  public long getClientIdentifier() {
-    return clientIdentifier;
+  public HttpSamlPendingAuthenticationException(String msg) {
+    super(msg);
   }
 }

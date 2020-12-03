@@ -21,13 +21,13 @@ package org.apache.hive.service.auth.saml;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.security.SecureRandom;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.hive.service.auth.saml.HiveSamlRequestStateInfo.HiveSamlRequestState;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.util.generator.ValueGenerator;
 import org.slf4j.Logger;
@@ -49,7 +49,11 @@ public class HiveSamlRelayStateStore implements ValueGenerator {
   private static final Logger LOG = LoggerFactory
       .getLogger(HiveSamlRelayStateStore.class);
 
+  //TODO(Vihang) add time based eviction here.
+  private final ConcurrentHashMap<Long, HiveSamlRequestStateInfo>
+      requestStateInfoMap = new ConcurrentHashMap<>();
   private static final HiveSamlRelayStateStore INSTANCE = new HiveSamlRelayStateStore();
+  private final Object requestStateNotifier = new Object();
 
   private HiveSamlRelayStateStore() {
   }
@@ -60,19 +64,11 @@ public class HiveSamlRelayStateStore implements ValueGenerator {
 
   @Override
   public String generateValue(WebContext webContext) {
-    Optional<String> portNumber = webContext
-        .getRequestHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
-    if (!portNumber.isPresent()) {
-      throw new RuntimeException(
-          "SAML response port header " + HiveSamlUtils.HIVE_SAML_RESPONSE_PORT
-              + " is not set ");
-    }
-    int port = Integer.parseInt(portNumber.get());
     String relayState = UUID.randomUUID().toString();
-    HiveSamlRelayStateInfo relayStateInfo = new HiveSamlRelayStateInfo(port,
+    HiveSamlRelayStateInfo relayStateInfo = new HiveSamlRelayStateInfo(
         randGenerator.nextLong());
-    webContext.setResponseHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER,
-        String.valueOf(relayStateInfo.getCodeVerifier()));
+    webContext.setResponseHeader(HiveSamlUtils.HIVE_SAML_CLIENT_IDENTIFIER,
+        String.valueOf(relayStateInfo.getClientIdentifier()));
     relayStateCache.put(relayState, relayStateInfo);
     return relayState;
   }
@@ -98,16 +94,29 @@ public class HiveSamlRelayStateStore implements ValueGenerator {
     return relayStateInfo;
   }
 
-  public synchronized boolean validateCodeVerifier(String relayStateKey,
-      String codeVerifier) {
-    HiveSamlRelayStateInfo relayStateInfo = relayStateCache.getIfPresent(relayStateKey);
-    if (relayStateInfo == null) {
-      return false;
+  public void setRequestState(Long clientIdentifier,
+      HiveSamlRequestStateInfo requestStateInfo) {
+    synchronized (requestStateNotifier) {
+    requestStateInfoMap.put(clientIdentifier, requestStateInfo);
+      requestStateNotifier.notifyAll();
     }
-    //TODO(Vihang) compare the hash instead of the value?
-    relayStateCache.invalidate(relayStateKey);
-    LOG.debug("Validating code verifier {} with {}", codeVerifier,
-        relayStateInfo.getCodeVerifier());
-    return String.valueOf(relayStateInfo.getCodeVerifier()).equals(codeVerifier);
+  }
+
+  public HiveSamlRequestStateInfo waitUntilRequestIsProcessed(final long clientIdentifier,
+      long timeOutInMs) throws HttpSamlAuthenticationException {
+    HiveSamlRequestStateInfo requestStateInfo;
+    synchronized (requestStateNotifier) {
+      requestStateInfo = requestStateInfoMap.get(clientIdentifier);
+      while (requestStateInfo == null
+          || requestStateInfo.getState() == HiveSamlRequestState.PENDING) {
+        try {
+          requestStateNotifier.wait(timeOutInMs);
+        } catch (InterruptedException e) {
+          // ignored
+        }
+        requestStateInfo = requestStateInfoMap.get(clientIdentifier);
+      }
+    }
+    return requestStateInfo;
   }
 }

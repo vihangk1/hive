@@ -22,7 +22,6 @@ import com.google.common.base.Preconditions;
 import java.util.Map;
 import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.CookieStore;
 import org.apache.http.protocol.HttpContext;
@@ -30,7 +29,7 @@ import org.apache.http.protocol.HttpContext;
 public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
 
   private final HiveJdbcBrowserClient browserClient;
-  private static final String BEARER = "Bearer ";
+  private static final String CODE_VERIFIER_SENT = "codeVerifierSent";
 
   public HttpSamlAuthRequestInterceptor(HiveJdbcBrowserClient browserClient, CookieStore cookieStore, String cn,
       boolean isSSL, Map<String, String> additionalHeaders,
@@ -42,15 +41,13 @@ public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
   @Override
   protected void addHttpAuthHeader(HttpRequest httpRequest, HttpContext httpContext)
       throws Exception {
-    String port = String.valueOf(browserClient.getPort());
-    String token = browserClient.getToken();
-    String codeChallenge = browserClient.getCodeChallenge();
-    if (token != null) {
-      httpRequest.addHeader(HttpHeaders.AUTHORIZATION, BEARER + token);
-      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER, codeChallenge);
-      httpRequest.removeHeaders(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
+    String clientIdentifier = browserClient.getClientIdentifier();
+    if (clientIdentifier != null && !Boolean
+        .parseBoolean((String)httpContext.getAttribute(CODE_VERIFIER_SENT))) {
+      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_CLIENT_IDENTIFIER, clientIdentifier);
+      httpContext.setAttribute(CODE_VERIFIER_SENT, String.valueOf(true));
     } else {
-      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT, port);
+      httpRequest.removeHeaders(HiveSamlUtils.HIVE_SAML_CLIENT_IDENTIFIER);
     }
   }
 }

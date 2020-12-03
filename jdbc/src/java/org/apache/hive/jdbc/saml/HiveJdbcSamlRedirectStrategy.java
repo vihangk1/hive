@@ -45,7 +45,7 @@ public class HiveJdbcSamlRedirectStrategy extends DefaultRedirectStrategy {
     if (status == HttpStatus.SC_MOVED_TEMPORARILY || status == HttpStatus.SC_SEE_OTHER) {
       URI locationUri = getLocationURI(request, response, context);
       Header codeChallengeHeader = response
-          .getFirstHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER);
+          .getFirstHeader(HiveSamlUtils.HIVE_SAML_CLIENT_IDENTIFIER);
       browserClient.init(locationUri, codeChallengeHeader.getValue());
     }
     return super.isRedirected(request, response, context);

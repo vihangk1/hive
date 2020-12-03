@@ -560,6 +560,7 @@ public class HiveConnection implements java.sql.Connection {
             cookieName, useSsl, additionalHttpHeaders, customCookies);
       }
     }
+    //TODO(Vihang) how do we handle the case when cookie auth is disabled?
     // Configure http client for cookie based authentication
     if (isCookieEnabled) {
       // Create a http client with a retry mechanism when the server returns a status code of 401.
@@ -924,12 +925,7 @@ public class HiveConnection implements java.sql.Connection {
         openSession(openReq);
       } catch (TException e) {
         if (isSamlRedirect(e)) {
-          boolean success = doBrowserSSO();
-          if (!success) {
-            throw new SQLException(
-                "Could not establish connection to " + jdbcUriString + ": "
-                    + browserClient.getMessage(), " 08S01", e);
-          }
+          doBrowserSSO();
         } else {
           throw new SQLException(
               "Could not establish connection to " + jdbcUriString + ": " + e
@@ -940,12 +936,11 @@ public class HiveConnection implements java.sql.Connection {
     isClosed = false;
   }
 
-  private boolean doBrowserSSO() throws SQLException {
+  private void doBrowserSSO() throws SQLException {
     try {
       Preconditions.checkNotNull(browserClient);
       try (HiveJdbcBrowserClient bc = browserClient) {
         browserClient.doBrowserSSO();
-        return browserClient.getStatus();
       }
     } catch (Exception ex) {
       throw new SQLException("Browser based SSO failed: " + ex.getMessage(),

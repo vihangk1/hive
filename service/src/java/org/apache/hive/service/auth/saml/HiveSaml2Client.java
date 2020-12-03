@@ -18,7 +18,6 @@
 
 package org.apache.hive.service.auth.saml;
 
-import static org.apache.hive.service.auth.saml.HiveSamlUtils.HIVE_SAML_RESPONSE_PORT;
 import static org.opensaml.saml.common.xml.SAMLConstants.SAML2_POST_BINDING_URI;
 
 import java.io.IOException;
@@ -108,11 +107,6 @@ public class HiveSaml2Client extends SAML2Client {
    */
   public void setRedirect(HttpServletRequest request, HttpServletResponse response)
       throws HttpSamlAuthenticationException {
-    String responsePort = request.getHeader(HIVE_SAML_RESPONSE_PORT);
-    if (responsePort == null || responsePort.isEmpty()) {
-      throw new HttpSamlAuthenticationException("No response port specified");
-    }
-    LOG.debug("Request has response port set as {}", responsePort);
     Optional<RedirectionAction> redirect = getRedirectionAction(
         new JEEContext(request, response));
     if (!redirect.isPresent()) {
