@@ -18,7 +18,7 @@
 
 package org.apache.hive.service.auth.saml;
 
-import static org.apache.hive.service.auth.saml.HiveSamlUtils.HIVE_SAML_RESPONSE_PORT;
+import static org.apache.hive.service.auth.saml.HiveSamlUtils.SSO_TOKEN_RESPONSE_PORT;
 import static org.opensaml.saml.common.xml.SAMLConstants.SAML2_POST_BINDING_URI;
 
 import java.io.IOException;
@@ -93,9 +93,11 @@ public class HiveSaml2Client extends SAML2Client {
     saml2Configuration
         .setAuthnRequestBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
     saml2Configuration.setResponseBindingType(SAML2_POST_BINDING_URI);
-    /*saml2Configuration
-        .setServiceProviderEntityId(conf.get(ConfVars.HIVE_SERVER2_SAML_SP_ID.varname));*/
-    saml2Configuration.setServiceProviderEntityId(getCallBackUrl(conf));
+    // if the SP id is set use it else we configure the SP Id as the callback id.
+    // this behavior IDP dependent. E.g. in case of Okta we can explicitly set a
+    // different SP id.
+    saml2Configuration.setServiceProviderEntityId(
+        conf.get(ConfVars.HIVE_SERVER2_SAML_SP_ID.varname, getCallBackUrl(conf)));
     saml2Configuration.setWantsAssertionsSigned(
         conf.getBoolVar(ConfVars.HIVE_SERVER2_SAML_WANT_ASSERTIONS_SIGNED));
     saml2Configuration
@@ -108,7 +110,7 @@ public class HiveSaml2Client extends SAML2Client {
    */
   public void setRedirect(HttpServletRequest request, HttpServletResponse response)
       throws HttpSamlAuthenticationException {
-    String responsePort = request.getHeader(HIVE_SAML_RESPONSE_PORT);
+    String responsePort = request.getHeader(SSO_TOKEN_RESPONSE_PORT);
     if (responsePort == null || responsePort.isEmpty()) {
       throw new HttpSamlAuthenticationException("No response port specified");
     }
@@ -155,16 +157,12 @@ public class HiveSaml2Client extends SAML2Client {
     if (!credentials.isPresent()) {
       throw new HttpSamlAuthenticationException("Credentials could not be extracted");
     }
-    //TODO(Vihang) Have this as a configurable attribute of the assertion?
     String nameId = credentials.get().getNameId().getValue();
-    for (SAMLAttribute attribute : credentials.get().getAttributes()) {
-      if (groupNameFilter.apply(attribute)) {
-        LOG.debug("Successfully matched the group name for {}", attribute);
-        return nameId;
-      }
+    if (!groupNameFilter.apply(credentials.get().getAttributes())) {
+      LOG.warn("Could not match any groups for the nameid {}", nameId);
+      throw new HttpSamlNoGroupsMatchedException(
+          "None of the configured groups match for the user");
     }
-    LOG.warn("Could not match any groups for the nameid {}", nameId);
-    throw new HttpSamlNoGroupsMatchedException(
-        "None of the configured groups match for the user");
+    return nameId;
   }
 }

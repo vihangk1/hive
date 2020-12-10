@@ -102,7 +102,6 @@ public class Utils {
     public static final String AUTH_KERBEROS_AUTH_TYPE_FROM_SUBJECT = "fromSubject";
     // JdbcConnection param which specifies if we need to use a browser to do
     // authentication.
-    public static final String AUTH_SSO_AUTH_TYPE = "browser";
     // JdbcConnectionParam which specifies if the authMode is done via a browser
     public static final String AUTH_SSO_BROWSER_MODE = "browser";
     public static final String AUTH_SSO_TOKEN_MODE = "token";

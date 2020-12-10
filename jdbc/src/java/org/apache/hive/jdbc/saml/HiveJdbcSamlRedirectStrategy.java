@@ -20,19 +20,29 @@ package org.apache.hive.jdbc.saml;
 
 import com.google.common.base.Preconditions;
 import java.net.URI;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClient.JdbcBrowserClientContext;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.ProtocolException;
+import org.apache.http.client.RedirectStrategy;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.protocol.HttpContext;
 
+/**
+ * This is an implementation of {@link RedirectStrategy} to intercept the HTTP redirect
+ * response received from the server in a browser mode auth flow. This is mainly used
+ * to get the redirect URL from the HTTP redirect response since HttpThrift client does
+ * not expose such information when the server throws a HTTP 302 redirect as response.
+ * The redirect URL is then used to initialize the {@link IJdbcBrowserClient} so that it
+ * can do the browser based SSO.
+ */
 public class HiveJdbcSamlRedirectStrategy extends DefaultRedirectStrategy {
-  private final HiveJdbcBrowserClient browserClient;
+  private final IJdbcBrowserClient browserClient;
 
-  public HiveJdbcSamlRedirectStrategy(HiveJdbcBrowserClient browserClient) {
+  public HiveJdbcSamlRedirectStrategy(IJdbcBrowserClient browserClient) {
     this.browserClient = Preconditions.checkNotNull(browserClient);
   }
 
@@ -44,9 +54,11 @@ public class HiveJdbcSamlRedirectStrategy extends DefaultRedirectStrategy {
     int status = response.getStatusLine().getStatusCode();
     if (status == HttpStatus.SC_MOVED_TEMPORARILY || status == HttpStatus.SC_SEE_OTHER) {
       URI locationUri = getLocationURI(request, response, context);
-      Header codeChallengeHeader = response
-          .getFirstHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER);
-      browserClient.init(locationUri, codeChallengeHeader.getValue());
+      Header clientIdentifier = response
+          .getFirstHeader(HiveSamlUtils.SSO_CLIENT_IDENTIFIER);
+      IJdbcBrowserClient.JdbcBrowserClientContext browserClientContext = new JdbcBrowserClientContext(
+          locationUri, clientIdentifier.getValue());
+      browserClient.init(browserClientContext);
     }
     return super.isRedirected(request, response, context);
   }

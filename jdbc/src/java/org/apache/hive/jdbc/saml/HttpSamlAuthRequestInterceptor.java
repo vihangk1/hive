@@ -16,23 +16,28 @@
  * limitations under the License.
  */
 
-package org.apache.hive.jdbc;
+package org.apache.hive.jdbc.saml;
 
 import com.google.common.base.Preconditions;
 import java.util.Map;
-import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
+import org.apache.hive.jdbc.HttpRequestInterceptorBase;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.CookieStore;
 import org.apache.http.protocol.HttpContext;
 
+/**
+ * This implements the logic to intercept the HTTP requests from the Hive Jdbc connection
+ * and add the bearer token and client identifier to the headers from the underlying
+ * {@link IJdbcBrowserClient}.
+ */
 public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
 
-  private final HiveJdbcBrowserClient browserClient;
+  private final IJdbcBrowserClient browserClient;
   private static final String BEARER = "Bearer ";
 
-  public HttpSamlAuthRequestInterceptor(HiveJdbcBrowserClient browserClient, CookieStore cookieStore, String cn,
+  public HttpSamlAuthRequestInterceptor(IJdbcBrowserClient browserClient, CookieStore cookieStore, String cn,
       boolean isSSL, Map<String, String> additionalHeaders,
       Map<String, String> customCookies) {
     super(cookieStore, cn, isSSL, additionalHeaders, customCookies);
@@ -43,14 +48,15 @@ public class HttpSamlAuthRequestInterceptor extends HttpRequestInterceptorBase {
   protected void addHttpAuthHeader(HttpRequest httpRequest, HttpContext httpContext)
       throws Exception {
     String port = String.valueOf(browserClient.getPort());
-    String token = browserClient.getToken();
-    String codeChallenge = browserClient.getCodeChallenge();
-    if (token != null) {
+    String token = browserClient.getServerResponse() == null ? null
+        : browserClient.getServerResponse().getToken();
+    String clientIdentifier = browserClient.getClientIdentifier();
+    if (token != null && !token.isEmpty()) {
       httpRequest.addHeader(HttpHeaders.AUTHORIZATION, BEARER + token);
-      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER, codeChallenge);
-      httpRequest.removeHeaders(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
+      httpRequest.addHeader(HiveSamlUtils.SSO_CLIENT_IDENTIFIER, clientIdentifier);
+      httpRequest.removeHeaders(HiveSamlUtils.SSO_TOKEN_RESPONSE_PORT);
     } else {
-      httpRequest.addHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT, port);
+      httpRequest.addHeader(HiveSamlUtils.SSO_TOKEN_RESPONSE_PORT, port);
     }
   }
 }

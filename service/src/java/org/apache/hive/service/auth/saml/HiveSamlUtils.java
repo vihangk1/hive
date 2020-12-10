@@ -28,8 +28,8 @@ import org.apache.hive.service.auth.HiveAuthConstants;
 
 public class HiveSamlUtils {
 
-  public static final String HIVE_SAML_RESPONSE_PORT = "X-Hive-SAML-Response-Port";
-  public static final String HIVE_SAML_CODE_VERIFIER = "X-Hive-SAML-Code-Verifier";
+  public static final String SSO_TOKEN_RESPONSE_PORT = "X-Token-Response-Port";
+  public static final String SSO_CLIENT_IDENTIFIER = "X-Client-Identifier";
   public static final String TOKEN_KEY = "token";
   public static final String STATUS_KEY = "status";
   public static final String MESSAGE_KEY = "message";
@@ -59,8 +59,8 @@ public class HiveSamlUtils {
       // currently we only support the callback url to be at the same port as the http
       // server.
       Preconditions.checkArgument(port == httpPort,
-          "Callback url must be at the same port as http port defined by "
-              + ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT.varname);
+          "Callback url " + callbackUrl + " must be at the same port " + httpPort
+              + " defined by " + ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT.varname);
       return uri;
     } catch (URISyntaxException e) {
       throw new Exception("Invalid callback url configuration: "

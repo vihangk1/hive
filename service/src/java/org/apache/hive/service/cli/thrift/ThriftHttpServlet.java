@@ -60,7 +60,6 @@ import org.apache.hive.service.auth.PasswdAuthenticationProvider;
 import org.apache.hive.service.auth.PlainSaslHelper;
 import org.apache.hive.service.auth.ldap.HttpEmptyAuthenticationException;
 import org.apache.hive.service.auth.saml.HiveSaml2Client;
-import org.apache.hive.service.auth.saml.HiveSamlRelayStateInfo;
 import org.apache.hive.service.auth.saml.HiveSamlRelayStateStore;
 import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.apache.hive.service.auth.saml.HttpSamlAuthenticationException;
@@ -68,7 +67,6 @@ import org.apache.hive.service.auth.saml.HttpSamlRedirectException;
 import org.apache.hive.service.auth.saml.HiveSamlAuthTokenGenerator;
 import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.cli.session.SessionManager;
-import org.apache.http.Header;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServlet;
@@ -95,7 +93,7 @@ public class ThriftHttpServlet extends TServlet {
   private final String authType;
   private final UserGroupInformation serviceUGI;
   private final UserGroupInformation httpUGI;
-  private HiveConf hiveConf = new HiveConf();
+  private final HiveConf hiveConf;
 
   // Class members for cookie based authentication.
   private CookieSigner signer;
@@ -113,8 +111,9 @@ public class ThriftHttpServlet extends TServlet {
 
   public ThriftHttpServlet(TProcessor processor, TProtocolFactory protocolFactory,
       String authType, UserGroupInformation serviceUGI, UserGroupInformation httpUGI,
-      HiveAuthFactory hiveAuthFactory) {
+      HiveAuthFactory hiveAuthFactory, HiveConf hiveConf) {
     super(processor, protocolFactory);
+    this.hiveConf = hiveConf;
     this.authType = authType;
     this.serviceUGI = serviceUGI;
     this.httpUGI = httpUGI;
@@ -268,7 +267,7 @@ public class ThriftHttpServlet extends TServlet {
         try {
           doSamlRedirect(request, response);
         } catch (HttpSamlAuthenticationException httpSamlAuthenticationException) {
-          LOG.debug("Unable to set the SAML redirect", httpSamlAuthenticationException);
+          LOG.error("Unable to set the SAML redirect", httpSamlAuthenticationException);
           response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
       } else {
@@ -319,7 +318,7 @@ public class ThriftHttpServlet extends TServlet {
     if (token == null) {
       throw new HttpSamlRedirectException("No token found");
     }
-    String codeVerifier = request.getHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER);
+    String codeVerifier = request.getHeader(HiveSamlUtils.SSO_CLIENT_IDENTIFIER);
     if (codeVerifier == null) {
       throw new HttpSamlAuthenticationException("Code verifier not found");
     }

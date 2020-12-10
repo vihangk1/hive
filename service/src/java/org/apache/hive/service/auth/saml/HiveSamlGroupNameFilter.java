@@ -18,10 +18,8 @@
 
 package org.apache.hive.service.auth.saml;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -49,6 +47,18 @@ public class HiveSamlGroupNameFilter implements Predicate<SAMLAttribute> {
     }
     groupNames = builder.build();
     LOG.debug("Initialized allowed group names as {}", groupNames);
+  }
+
+  public boolean apply(List<SAMLAttribute> attributes) {
+    if (attributeName.isEmpty() && attributes.size() == 0) {
+      return true;
+    }
+    for (SAMLAttribute attribute : attributes) {
+      if (apply(attribute)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

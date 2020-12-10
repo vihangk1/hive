@@ -83,8 +83,12 @@ import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
-import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
+import org.apache.hive.jdbc.saml.HiveJdbcBrowserClientFactory;
 import org.apache.hive.jdbc.saml.HiveJdbcSamlRedirectStrategy;
+import org.apache.hive.jdbc.saml.HttpSamlAuthRequestInterceptor;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClient;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserServerResponse;
 import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 
 import org.apache.hive.service.rpc.thrift.TSetClientInfoReq;
@@ -165,7 +169,7 @@ public class HiveConnection implements java.sql.Connection {
   private String wmPool = null, wmApp = null;
   private Properties clientInfo;
   private Subject loggedInSubject;
-  private HiveJdbcBrowserClient browserClient = null;
+  private final IJdbcBrowserClient browserClient;
 
   /**
    * Get all direct HiveServer2 URLs from a ZooKeeper based HiveServer2 URL
@@ -262,6 +266,7 @@ public class HiveConnection implements java.sql.Connection {
     sessConfMap = null;
     isEmbeddedMode = true;
     initFetchSize = 0;
+    browserClient = null;
   }
 
   public HiveConnection(String uri, Properties info) throws SQLException {
@@ -281,7 +286,7 @@ public class HiveConnection implements java.sql.Connection {
     if (isKerberosAuthMode()) {
       host = Utils.getCanonicalHostName(connParams.getHost());
     } else if (isBrowserAuthMode() && !isHttpTransportMode()) {
-      throw new SQLException("SAML2 auth mode is only applicable in http mode");
+      throw new SQLException("Browser auth mode is only applicable in http mode");
     } else {
       host = connParams.getHost();
     }
@@ -313,6 +318,15 @@ public class HiveConnection implements java.sql.Connection {
     supportedProtocols.add(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9);
     supportedProtocols.add(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V10);
 
+    if (isBrowserAuthMode()) {
+      try {
+        browserClient = HiveJdbcBrowserClientFactory.create(connParams.getHiveConfs());
+      } catch (HiveJdbcBrowserException e) {
+        throw new SQLException("");
+      }
+    } else {
+      browserClient = null;
+    }
     if (isEmbeddedMode) {
       client = EmbeddedCLIServicePortal.get(connParams.getHiveConfs());
       connParams.getHiveConfs().clear();
@@ -545,13 +559,6 @@ public class HiveConnection implements java.sql.Connection {
           useSsl, additionalHttpHeaders,
           customCookies);
     } else if (isBrowserAuthMode()) {
-      try {
-        browserClient = HiveJdbcBrowserClient.create(sessConfMap);
-      } catch (IOException e) {
-        LOG.error("Could not create browser client", e);
-        throw new SQLException(
-            "Could not create a browser client for SSO: " + e.getMessage(), " 08S01", e);
-      }
       requestInterceptor = new HttpSamlAuthRequestInterceptor(browserClient, cookieStore,
           cookieName, useSsl, additionalHttpHeaders, customCookies);
     } else {
@@ -938,9 +945,12 @@ public class HiveConnection implements java.sql.Connection {
         if (isSamlRedirect(e)) {
           boolean success = doBrowserSSO();
           if (!success) {
+            String msg = browserClient.getServerResponse() == null
+                || browserClient.getServerResponse().getMsg() == null ? ""
+                : browserClient.getServerResponse().getMsg();
             throw new SQLException(
                 "Could not establish connection to " + jdbcUriString + ": "
-                    + browserClient.getMessage(), " 08S01", e);
+                    + msg, " 08S01", e);
           }
         } else {
           throw new SQLException(
@@ -955,9 +965,13 @@ public class HiveConnection implements java.sql.Connection {
   private boolean doBrowserSSO() throws SQLException {
     try {
       Preconditions.checkNotNull(browserClient);
-      try (HiveJdbcBrowserClient bc = browserClient) {
+      try (IJdbcBrowserClient bc = browserClient) {
         browserClient.doBrowserSSO();
-        return browserClient.getStatus();
+        HiveJdbcBrowserServerResponse response = browserClient.getServerResponse();
+        if (response != null) {
+          return response.isSuccessful();
+        }
+        return false;
       }
     } catch (Exception ex) {
       throw new SQLException("Browser based SSO failed: " + ex.getMessage(),

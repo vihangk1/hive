@@ -24,7 +24,6 @@ import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,17 +60,17 @@ public class HiveSamlRelayStateStore implements ValueGenerator {
   @Override
   public String generateValue(WebContext webContext) {
     Optional<String> portNumber = webContext
-        .getRequestHeader(HiveSamlUtils.HIVE_SAML_RESPONSE_PORT);
+        .getRequestHeader(HiveSamlUtils.SSO_TOKEN_RESPONSE_PORT);
     if (!portNumber.isPresent()) {
       throw new RuntimeException(
-          "SAML response port header " + HiveSamlUtils.HIVE_SAML_RESPONSE_PORT
+          "SAML response port header " + HiveSamlUtils.SSO_TOKEN_RESPONSE_PORT
               + " is not set ");
     }
     int port = Integer.parseInt(portNumber.get());
     String relayState = UUID.randomUUID().toString();
     HiveSamlRelayStateInfo relayStateInfo = new HiveSamlRelayStateInfo(port,
         randGenerator.nextLong());
-    webContext.setResponseHeader(HiveSamlUtils.HIVE_SAML_CODE_VERIFIER,
+    webContext.setResponseHeader(HiveSamlUtils.SSO_CLIENT_IDENTIFIER,
         String.valueOf(relayStateInfo.getCodeVerifier()));
     relayStateCache.put(relayState, relayStateInfo);
     return relayState;

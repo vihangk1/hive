@@ -2120,7 +2120,8 @@ public class HiveConf extends Configuration {
         "format", false),
     HIVETESTMODEACIDKEYIDXSKIP("hive.test.acid.key.index.skip", false, "For testing only. OrcRecordUpdater will skip "
         + "generation of the hive.acid.key.index", false),
-
+    HIVE_TEST_MODE_SAML_BROWSER_AUTH("hive.test.saml.browser.class", "", "For testing only.\n"
+         + " If this configuration is set, the JDBC connection uses an instance of this class instead of browser to complete the SAML auth flow."),
     HIVEMERGEMAPFILES("hive.merge.mapfiles", true,
         "Merge small files at the end of a map-only job"),
     HIVEMERGEMAPREDFILES("hive.merge.mapredfiles", false,
@@ -3995,7 +3996,7 @@ public class HiveConf extends Configuration {
         "Keystore path to the saml2 client."),
     HIVE_SERVER2_SAML_IDP_METADATA("hive.server2.saml2.idp.metadata", "",
         "IDP metadata file for the SAML configuration"),
-    HIVE_SERVER2_SAML_SP_ID("hive.server2.saml2.sp.entity.id", "hiveserver2-saml-id",
+    HIVE_SERVER2_SAML_SP_ID("hive.server2.saml2.sp.entity.id", "",
         "Service provider entity id"),
     HIVE_SERVER2_SAML_CALLBACK_URL("hive.server2.saml2.sp.callback.url", "",
         "Callback URL where SAML responses should be posted. Currently this\n" +
