@@ -18,40 +18,40 @@
 
 package org.apache.hive.jdbc.saml;
 
-import java.util.Map;
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
 
 /**
  * A factory to instantiate {@link IJdbcBrowserClient} objects. This is currently mostly
- * used to make sure we can instantiate a test browser client which does the browser
- * flow programmatically to run automated tests.
+ * used to make sure we can instantiate a test browser client which does the browser flow
+ * programmatically to run automated tests.
  */
-public class HiveJdbcBrowserClientFactory {
+public class HiveJdbcBrowserClientFactory implements IJdbcBrowserClientFactory {
+
+  private static final HiveJdbcBrowserClientFactory INSTANCE =
+      new HiveJdbcBrowserClientFactory();
+
+  private HiveJdbcBrowserClientFactory() {
+    // prevent instantiation
+  }
+
+  public static HiveJdbcBrowserClientFactory get() {
+    return INSTANCE;
+  }
 
   /**
    * Returns an instance of {@link IJdbcBrowserClient} as per the configuration. If
    * hive.test.saml.browser.class is set on the HS2 server side, then this factory will
    * use its value to instantiate the given class name.
    *
-   * @param hiveParams as received from the server side hive configuration.
+   * @param jdbcParams as received from the url
    * @return An instance of {@link IJdbcBrowserClient}
    * @throws HiveJdbcBrowserException In case the test browser class could not be
    *                                  instantiated.
    */
-  public static IJdbcBrowserClient create(Map<String, String> hiveParams)
+  @Override
+  public IJdbcBrowserClient create(JdbcConnectionParams jdbcParams)
       throws HiveJdbcBrowserException {
-    String testClassName = hiveParams
-        .get(ConfVars.HIVE_TEST_MODE_SAML_BROWSER_AUTH.varname);
-    if (testClassName != null && !testClassName.isEmpty()) {
-      String className = hiveParams.get(ConfVars.HIVE_TEST_MODE_SAML_BROWSER_AUTH.varname);
-      try {
-        return (IJdbcBrowserClient) Class.forName(className).newInstance();
-      } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-        throw new HiveJdbcBrowserException(
-            "Unable to instantiate browser client " + className);
-      }
-    }
-    return new HiveJdbcBrowserClient(hiveParams);
+    return new HiveJdbcBrowserClient(jdbcParams);
   }
 }

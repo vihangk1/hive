@@ -89,6 +89,7 @@ import org.apache.hive.jdbc.saml.HttpSamlAuthRequestInterceptor;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserServerResponse;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClientFactory;
 import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 
 import org.apache.hive.service.rpc.thrift.TSetClientInfoReq;
@@ -320,7 +321,7 @@ public class HiveConnection implements java.sql.Connection {
 
     if (isBrowserAuthMode()) {
       try {
-        browserClient = HiveJdbcBrowserClientFactory.create(connParams.getHiveConfs());
+        browserClient = getJdbcBrowserClientFactory().create(connParams);
       } catch (HiveJdbcBrowserException e) {
         throw new SQLException("");
       }
@@ -399,6 +400,11 @@ public class HiveConnection implements java.sql.Connection {
 
     // Wrap the client with a thread-safe proxy to serialize the RPC calls
     client = newSynchronizedClient(client);
+  }
+
+  @VisibleForTesting
+  protected IJdbcBrowserClientFactory getJdbcBrowserClientFactory() {
+    return HiveJdbcBrowserClientFactory.get();
   }
 
   private void executeInitSql() throws SQLException {
@@ -935,8 +941,7 @@ public class HiveConnection implements java.sql.Connection {
 
     //TODO(Vihang): This is a bit hacky. We piggy back on a dummy OpenSession call
     // to get the redirect response from the server. Instead its probably cleaner to
-    // introduce a new thrift API call to fetch the single-sign on information and
-    // then do the browser SSO.
+    // explicitly do a HTTP post request and get the response.
     int numRetry = isBrowserAuthMode() ? 2 : 1;
     for (int i=0; i<numRetry; i++) {
       try {

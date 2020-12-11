@@ -21,6 +21,7 @@ package org.apache.hive.service.auth.saml;
 import static org.apache.hive.service.auth.saml.HiveSamlUtils.SSO_TOKEN_RESPONSE_PORT;
 import static org.opensaml.saml.common.xml.SAMLConstants.SAML2_POST_BINDING_URI;
 
+import com.cronutils.utils.VisibleForTesting;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
@@ -103,6 +104,11 @@ public class HiveSaml2Client extends SAML2Client {
     saml2Configuration
         .setAuthnRequestSigned(conf.getBoolVar(ConfVars.HIVE_SERVER2_SAML_SIGN_REQUESTS));
     return saml2Configuration;
+  }
+
+  @VisibleForTesting
+  public static synchronized void shutdown() {
+    INSTANCE = null;
   }
 
   /**

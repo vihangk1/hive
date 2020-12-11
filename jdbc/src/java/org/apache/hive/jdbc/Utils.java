@@ -105,8 +105,10 @@ public class Utils {
     // JdbcConnectionParam which specifies if the authMode is done via a browser
     public static final String AUTH_SSO_BROWSER_MODE = "browser";
     public static final String AUTH_SSO_TOKEN_MODE = "token";
-    // param which specifies the specific auth Mode. Currently only applies for SSO
-    public static final String AUTH_MODE = "authMode";
+    // connection parameter used to specify a port number to listen on in case of
+    // browser mode.
+    public static final String AUTH_BROWSER_RESPONSE_PORT = "browserResponsePort";
+    public static final String AUTH_BROWSER_RESPONSE_TIMEOUT_SECS = "browserResponseTimeout";
     public static final String ANONYMOUS_USER = "anonymous";
     public static final String ANONYMOUS_PASSWD = "anonymous";
     public static final String USE_SSL = "ssl";

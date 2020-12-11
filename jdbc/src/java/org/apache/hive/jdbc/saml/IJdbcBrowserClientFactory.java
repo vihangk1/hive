@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,13 +19,20 @@
 package org.apache.hive.jdbc.saml;
 
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
 
 /**
- * HTMLUnit based {@link IJdbcBrowserClient} for testing purposes.
+ * Factory class to instantiate the {@link IJdbcBrowserClient}. This is mostly used for
+ * testing purposes so that test can instantiate a test browser client which can do
+ * browser interaction programmatically.
  */
-public class TestHtmlUnitBrowserClient extends HiveJdbcBrowserClient {
-  public TestHtmlUnitBrowserClient(JdbcConnectionParams connectionParams)
-      throws HiveJdbcBrowserException {
-    super(connectionParams);
-  }
+public interface IJdbcBrowserClientFactory {
+
+  /**
+   * Create a {@link IJdbcBrowserClient} from a the given {@link JdbcConnectionParams}
+   * @throws HiveJdbcBrowserException In case of any error to instantiate the browser
+   * client.
+   */
+  IJdbcBrowserClient create(JdbcConnectionParams connectionParams)
+      throws HiveJdbcBrowserException;
 }

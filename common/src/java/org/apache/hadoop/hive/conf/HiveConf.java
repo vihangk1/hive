@@ -2120,8 +2120,8 @@ public class HiveConf extends Configuration {
         "format", false),
     HIVETESTMODEACIDKEYIDXSKIP("hive.test.acid.key.index.skip", false, "For testing only. OrcRecordUpdater will skip "
         + "generation of the hive.acid.key.index", false),
-    HIVE_TEST_MODE_SAML_BROWSER_AUTH("hive.test.saml.browser.class", "", "For testing only.\n"
-         + " If this configuration is set, the JDBC connection uses an instance of this class instead of browser to complete the SAML auth flow."),
+    HIVE_TEST_MODE_SAML_BROWSER_AUTH("hive.test.browser.mode", false, "For testing only.\n"
+         + " If this configuration is set, the JDBC connection uses a test browser client to complete the SAML auth flow."),
     HIVEMERGEMAPFILES("hive.merge.mapfiles", true,
         "Merge small files at the end of a map-only job"),
     HIVEMERGEMAPREDFILES("hive.merge.mapredfiles", false,
