@@ -42,7 +42,7 @@ import org.apache.hive.jdbc.miniHS2.MiniHS2;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClientFactory;
-import org.apache.hive.jdbc.saml.TestHtmlUnitBrowserClient;
+import org.apache.hive.jdbc.saml.TestSimpleSAMLBrowserClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -52,8 +52,12 @@ import org.testcontainers.utility.DockerImageName;
 
 public class TestHttpSamlAuthentication {
 
+  private static final String USER1 = "user1";
+  private static final String USER1_PASSWORD = "user1pass";
+  private static final String USER2 = "user2";
+  private static final String USER2_PASSWORD = "user2pass";
   private static MiniHS2 miniHS2;
-  private static Map<String, String> idpEnv;
+  private static final String USER_PASS_MODE = "example-userpass";
 
   public static GenericContainer genericContainer;
   private static final File tmpDir = Files.createTempDir();
@@ -103,13 +107,13 @@ public class TestHttpSamlAuthentication {
     }
   }
 
-  private void setIdpEnv(boolean useSignedAssertions) throws Exception {
+  private void setupIDP(boolean useSignedAssertions, String authMode) throws Exception {
     Map<String, String> configOverlay = new HashMap<>();
     configOverlay.put(ConfVars.HIVE_SERVER2_SAML_CALLBACK_URL.varname,
         "http://localhost:" + miniHS2.getHttpPort()
             + "/sso/saml?client_name=HiveSaml2Client");
     miniHS2.start(configOverlay);
-    idpEnv = getIdpEnv(useSignedAssertions);
+    Map<String, String> idpEnv = getIdpEnv(useSignedAssertions, authMode);
     genericContainer = new GenericContainer<>(
         DockerImageName.parse("test-saml-idp:1.0"))
         .withExposedPorts(8080, 8443)
@@ -128,7 +132,8 @@ public class TestHttpSamlAuthentication {
     Files.write(metadata, targetFile, StandardCharsets.UTF_8);
   }
 
-  private static Map<String, String> getIdpEnv(boolean useSignedAssertions) throws Exception {
+  private static Map<String, String> getIdpEnv(boolean useSignedAssertions,
+      String authMode) throws Exception {
     Map<String, String> idpEnv = new HashMap<>();
     idpEnv
         .put("SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE", HiveSamlUtils.getCallBackUri(
@@ -138,7 +143,7 @@ public class TestHttpSamlAuthentication {
     idpEnv.put("SIMPLESAMLPHP_SP_NAME_ID_FORMAT",
         "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress");
     idpEnv.put("SIMPLESAMLPHP_SP_NAME_ID_ATTRIBUTE", "email");
-    idpEnv.put("SIMPLESAMLPHP_IDP_AUTH", "example-static");
+    idpEnv.put("SIMPLESAMLPHP_IDP_AUTH", authMode);
     // by default idp signs the assertions
     if (!useSignedAssertions) {
       idpEnv.put("SIMPLESAMLPHP_SP_SIGN_ASSERTION", "false");
@@ -147,16 +152,23 @@ public class TestHttpSamlAuthentication {
   }
 
   private static String getSamlJdbcConnectionUrl() throws Exception {
-    return miniHS2.getHttpJdbcURL() + "auth=browser;browserResponseTimeout=30";
+    return miniHS2.getHttpJdbcURL() + "auth=browser;browserResponseTimeout=0";
   }
 
   private static class TestHiveJdbcBrowserClientFactory implements
       IJdbcBrowserClientFactory {
+    private String user;
+    private String password;
+    TestHiveJdbcBrowserClientFactory(String user, String password) {
+      this.user = user;
+      this.password = password;
+    }
 
     @Override
     public IJdbcBrowserClient create(JdbcConnectionParams connectionParams)
         throws HiveJdbcBrowserException {
-      return new TestHtmlUnitBrowserClient(connectionParams);
+      return new TestSimpleSAMLBrowserClient(connectionParams, user
+          , password);
     }
   }
 
@@ -168,27 +180,31 @@ public class TestHttpSamlAuthentication {
       super(uri, info);
     }
 
-    @Override
-    public IJdbcBrowserClientFactory getJdbcBrowserClientFactory() {
-      return new TestHiveJdbcBrowserClientFactory();
-    }
-  }
-
-  @Test
-  public void testBasicConnection() throws Exception {
-    setIdpEnv(true);
-    try (TestHiveConnection connection = new TestHiveConnection(
-        getSamlJdbcConnectionUrl(), new Properties())){
-      assertLoggedInUser(connection, "user1");
+    public TestHiveConnection(String uri, Properties info, String testUser,
+        String testPass) throws SQLException {
+      super(uri, info, new TestHiveJdbcBrowserClientFactory(testUser, testPass));
     }
   }
 
   @Test(expected = SQLException.class)
   public void testFailureForUnsignedResponse() throws Exception {
-    setIdpEnv(false);
+    setupIDP(false, USER_PASS_MODE);
     try (TestHiveConnection connection = new TestHiveConnection(
-        getSamlJdbcConnectionUrl(), new Properties())) {
+        getSamlJdbcConnectionUrl(), new Properties(), USER1, USER1_PASSWORD)) {
       fail("Expected a failure since SAML response is not signed");
+    }
+  }
+
+  @Test
+  public void testBasicConnection() throws Exception {
+    setupIDP(true, USER_PASS_MODE);
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER1, USER1_PASSWORD)) {
+      assertLoggedInUser(connection, USER1);
+    }
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER2, USER2_PASSWORD)) {
+      assertLoggedInUser(connection, USER2);
     }
   }
 

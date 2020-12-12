@@ -31,6 +31,7 @@
     <hive.path.to.root>../..</hive.path.to.root>
     <spark.home>${basedir}/${hive.path.to.root}/itests/hive-unit/target/spark</spark.home>
     <testcontainers.version>1.15.0</testcontainers.version>
+    <htmlunit.version>2.45.0</htmlunit.version>
   </properties>
 
   <dependencies>
@@ -432,6 +433,12 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.htmlunit</groupId>
+      <artifactId>htmlunit</artifactId>
+      <version>${htmlunit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

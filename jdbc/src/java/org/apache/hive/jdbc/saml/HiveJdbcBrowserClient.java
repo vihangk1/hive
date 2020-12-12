@@ -18,8 +18,10 @@
 
 package org.apache.hive.jdbc.saml;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +36,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +56,10 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
   protected JdbcBrowserClientContext clientContext;
   // By default we wait for 2 min unless overridden by a JDBC connection param
   // saml.response.timeout
-  private static final int DEFAULT_SOCKET_TIMEOUT_SECS = 120*1000;
+  private static final int DEFAULT_SOCKET_TIMEOUT_SECS = 120;
+  private final ExecutorService serverResponseThread = Executors.newSingleThreadExecutor(
+      new ThreadFactoryBuilder().setNameFormat("Hive-Jdbc-Browser-Client-%d")
+          .setDaemon(true).build());
 
   HiveJdbcBrowserClient(JdbcConnectionParams connectionParams)
       throws HiveJdbcBrowserException {
@@ -107,6 +117,17 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
   }
 
   public void doBrowserSSO() throws HiveJdbcBrowserException {
+    Future<Void> serverResponseHandle = waitAsyncForServerResponse();
+    openBrowserWindow();
+    try {
+      serverResponseHandle.get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new HiveJdbcBrowserException(e);
+    }
+  }
+
+  @VisibleForTesting
+  protected  void openBrowserWindow() throws HiveJdbcBrowserException {
     URI ssoUri = clientContext.getSsoUri();
     Preconditions.checkNotNull(ssoUri, "SSO Url is null");
     Preconditions.checkArgument(validateSSOUrl(ssoUri), "Invalid SSO url");
@@ -134,46 +155,51 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
     } catch (IOException e) {
       throw new HiveJdbcBrowserException("Unable to open browser to execute SSO", e);
     }
+  }
 
-    // listen to the response on the server socket
-    Socket socket;
-    try {
-      LOG.debug("Waiting for a server response on port {} with a timeout of {} ms",
-          serverSocket.getLocalPort(), serverSocket.getSoTimeout());
-      socket = serverSocket.accept();
-    } catch (SocketTimeoutException timeoutException) {
-      throw new HiveJdbcBrowserException("Timed out while waiting for server response",
-          timeoutException);
-    } catch (IOException e) {
-      throw new HiveJdbcBrowserException(
-          "Unexpected error while listening on port " + serverSocket.getLocalPort()
-              + " for server response", e);
-    }
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-        socket.getInputStream(), StandardCharsets.UTF_8))) {
-      char[] buffer = new char[16 * 1024];
-      // block until you read into the buffer
-      int len = reader.read(buffer);
-      String response = String.valueOf(buffer, 0, len);
-      String[] lines = response.split("\r\n");
-      for (String line : lines) {
-        if (!Strings.isNullOrEmpty(line)) {
-          //TODO(Vihang) may be better to have a Jetty server and parse the response
-          if (line.contains("token=")) {
-            serverResponse = new HiveJdbcBrowserServerResponse(line);
-            sendBrowserMsg(socket, serverResponse.isSuccessful());
-          } else {
-            LOG.trace("Skipping line {} from server response", line);
+  private Future<Void> waitAsyncForServerResponse() {
+    return serverResponseThread.submit(() -> {
+      // listen to the response on the server socket
+      Socket socket;
+      try {
+        LOG.debug("Waiting for a server response on port {} with a timeout of {} ms",
+            serverSocket.getLocalPort(), serverSocket.getSoTimeout());
+        socket = serverSocket.accept();
+      } catch (SocketTimeoutException timeoutException) {
+        throw new HiveJdbcBrowserException("Timed out while waiting for server response",
+            timeoutException);
+      } catch (IOException e) {
+        throw new HiveJdbcBrowserException(
+            "Unexpected error while listening on port " + serverSocket.getLocalPort()
+                + " for server response", e);
+      }
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+          socket.getInputStream(), StandardCharsets.UTF_8))) {
+        char[] buffer = new char[16 * 1024];
+        // block until you read into the buffer
+        int len = reader.read(buffer);
+        String response = String.valueOf(buffer, 0, len);
+        String[] lines = response.split("\r\n");
+        for (String line : lines) {
+          if (!Strings.isNullOrEmpty(line)) {
+            //TODO(Vihang) may be better to have a Jetty server and parse the response
+            if (line.contains("token=")) {
+              serverResponse = new HiveJdbcBrowserServerResponse(line);
+              sendBrowserMsg(socket, serverResponse.isSuccessful());
+            } else {
+              LOG.trace("Skipping line {} from server response", line);
+            }
           }
         }
+        if (serverResponse == null) {
+          throw new HiveJdbcBrowserException("Could not parse the response from server.");
+        }
+      } catch (IOException e) {
+        throw new HiveJdbcBrowserException(
+            "Unexpected exception while processing server response ", e);
       }
-      if (serverResponse == null) {
-        throw new HiveJdbcBrowserException("Could not parse the response from server.");
-      }
-    } catch (IOException e) {
-      throw new HiveJdbcBrowserException(
-          "Unexpected exception while processing server response ", e);
-    }
+      return null;
+    });
   }
 
   public HiveJdbcBrowserServerResponse getServerResponse() {

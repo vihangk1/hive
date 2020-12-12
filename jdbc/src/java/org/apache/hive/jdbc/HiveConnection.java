@@ -271,6 +271,12 @@ public class HiveConnection implements java.sql.Connection {
   }
 
   public HiveConnection(String uri, Properties info) throws SQLException {
+    this(uri, info, HiveJdbcBrowserClientFactory.get());
+  }
+
+  @VisibleForTesting
+  protected HiveConnection(String uri, Properties info,
+      IJdbcBrowserClientFactory browserClientFactory) throws SQLException {
     setupLoginTimeout();
     try {
       connParams = Utils.parseURL(uri, info);
@@ -321,7 +327,7 @@ public class HiveConnection implements java.sql.Connection {
 
     if (isBrowserAuthMode()) {
       try {
-        browserClient = getJdbcBrowserClientFactory().create(connParams);
+        browserClient = browserClientFactory.create(connParams);
       } catch (HiveJdbcBrowserException e) {
         throw new SQLException("");
       }
@@ -400,11 +406,6 @@ public class HiveConnection implements java.sql.Connection {
 
     // Wrap the client with a thread-safe proxy to serialize the RPC calls
     client = newSynchronizedClient(client);
-  }
-
-  @VisibleForTesting
-  protected IJdbcBrowserClientFactory getJdbcBrowserClientFactory() {
-    return HiveJdbcBrowserClientFactory.get();
   }
 
   private void executeInitSql() throws SQLException {
