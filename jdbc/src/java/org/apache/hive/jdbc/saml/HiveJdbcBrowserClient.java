@@ -27,13 +27,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -46,11 +50,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is used to execute a browser based SSO workflow with the authentication
- * mode is browser.
+ * This class is used to execute a browser based SSO workflow with the authentication mode
+ * is browser.
  */
 public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
+
   private static final Logger LOG = LoggerFactory.getLogger(HiveJdbcBrowserClient.class);
+  // error message when the socket times out.
+  @VisibleForTesting
+  public static final String TIMEOUT_ERROR_MSG = "Timed out while waiting for server response";
   private final ServerSocket serverSocket;
   private HiveJdbcBrowserServerResponse serverResponse;
   protected JdbcBrowserClientContext clientContext;
@@ -78,7 +86,7 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
       serverSocket = new ServerSocket(port, 0,
           InetAddress.getByName("localhost"));
       LOG.debug("Browser response timeout is set to {} seconds", timeout);
-      serverSocket.setSoTimeout(timeout*1000);
+      serverSocket.setSoTimeout(timeout * 1000);
     } catch (IOException e) {
       throw new HiveJdbcBrowserException("Unable to bind to the localhost");
     }
@@ -118,6 +126,7 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
 
   public void doBrowserSSO() throws HiveJdbcBrowserException {
     Future<Void> serverResponseHandle = waitAsyncForServerResponse();
+    logDebugInfoUri(clientContext.getSsoUri());
     openBrowserWindow();
     try {
       serverResponseHandle.get();
@@ -126,8 +135,43 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
     }
   }
 
+  private void logDebugInfoUri(URI ssoURI) {
+    Map<String, String> uriParams = new HashMap<>();
+    try {
+      uriParams = getQueryParams(ssoURI);
+    } catch (HiveJdbcBrowserException e) {
+      LOG.debug("Could get query params of the SSO URI", e);
+    }
+    LOG.debug("Initializing browser SSO request to URI. Relay state is {}",
+        uriParams.get("RelayState"));
+  }
+
+  private Map<String, String> getQueryParams(URI ssoUri)
+      throws HiveJdbcBrowserException {
+    String decodedUrl;
+    try {
+      decodedUrl = URLDecoder
+          .decode(ssoUri.toString(), StandardCharsets.UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new HiveJdbcBrowserException(e);
+    }
+    String[] params;
+    try {
+      params = new URI(decodedUrl).getQuery().split("&");
+    } catch (URISyntaxException e) {
+      throw new HiveJdbcBrowserException(e);
+    }
+    Map<String, String> paramMap = new HashMap<>();
+    for (String param : params) {
+      String key = param.split("=")[0];
+      String val = param.split("=")[1];
+      paramMap.put(key, val);
+    }
+    return paramMap;
+  }
+
   @VisibleForTesting
-  protected  void openBrowserWindow() throws HiveJdbcBrowserException {
+  protected void openBrowserWindow() throws HiveJdbcBrowserException {
     URI ssoUri = clientContext.getSsoUri();
     Preconditions.checkNotNull(ssoUri, "SSO Url is null");
     Preconditions.checkArgument(validateSSOUrl(ssoUri), "Invalid SSO url");
@@ -166,7 +210,7 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
             serverSocket.getLocalPort(), serverSocket.getSoTimeout());
         socket = serverSocket.accept();
       } catch (SocketTimeoutException timeoutException) {
-        throw new HiveJdbcBrowserException("Timed out while waiting for server response",
+        throw new HiveJdbcBrowserException(TIMEOUT_ERROR_MSG,
             timeoutException);
       } catch (IOException e) {
         throw new HiveJdbcBrowserException(

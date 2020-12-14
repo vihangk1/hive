@@ -20,14 +20,10 @@ package org.apache.hive.jdbc.saml;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlButtonInput;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import java.io.IOException;
-import java.util.Iterator;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 
 /**
@@ -50,7 +46,7 @@ public class TestSimpleSAMLBrowserClient extends HiveJdbcBrowserClient {
   protected void openBrowserWindow() throws HiveJdbcBrowserException {
     // if user and password are null, we fallback to real browser for interactive mode
     if (username == null && password == null) {
-      super.doBrowserSSO();
+      super.openBrowserWindow();
       return;
     }
     try (WebClient webClient = new WebClient()) {

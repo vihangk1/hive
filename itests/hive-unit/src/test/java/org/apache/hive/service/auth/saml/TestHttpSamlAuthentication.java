@@ -18,11 +18,15 @@
 
 package org.apache.hive.service.auth.saml;
 
+import static org.apache.hive.jdbc.Utils.JdbcConnectionParams.AUTH_BROWSER_RESPONSE_PORT;
+import static org.apache.hive.jdbc.Utils.JdbcConnectionParams.AUTH_BROWSER_RESPONSE_TIMEOUT_SECS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import java.io.File;
@@ -31,14 +35,24 @@ import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.jdbc.miniHS2.MiniHS2;
+import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClientFactory;
@@ -50,13 +64,33 @@ import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 
+/**
+ * End to end tests for the SAML based SSO authentication. The test instantiated a SAML
+ * 2.0 compliant IDP provider (SimpleSAMLPHP) in a docker container. The container is
+ * configured such that is it IDP service is run on a random port which is available. See
+ * {@link #setupIDP(boolean, String)} for details.
+ * <p>
+ * The HS2 is configured with the IDP's metadata file which is derived from a template.
+ * The metadata file contains the IDP's public certificate. The template should be
+ * post-processed to replace the port number where the service is running.
+ * <p>
+ * The test uses TestContainers library for managing the life-cycle of the IDP container.
+ * It using HTMLUnit to simulate the browser interaction (provide user/password) of the
+ * end user.
+ */
 public class TestHttpSamlAuthentication {
 
+  //user credentials. These much match with the authsources.php of the simpleSAMLPHP
+  //IDP and the auth mode must be USER_PASS_MODE
   private static final String USER1 = "user1";
   private static final String USER1_PASSWORD = "user1pass";
   private static final String USER2 = "user2";
   private static final String USER2_PASSWORD = "user2pass";
+  private static final String USER3 = "user3";
+  private static final String USER3_PASSWORD = "user3pass";
+  private static final String IDP_GROUP_ATTRIBUTE_NAME = "eduPersonAffiliation";
   private static MiniHS2 miniHS2;
+  // needs user/password to login to the IDP.
   private static final String USER_PASS_MODE = "example-userpass";
 
   public static GenericContainer genericContainer;
@@ -108,10 +142,24 @@ public class TestHttpSamlAuthentication {
   }
 
   private void setupIDP(boolean useSignedAssertions, String authMode) throws Exception {
+    setupIDP(useSignedAssertions, authMode, null);
+  }
+
+  private void setupIDP(boolean useSignedAssertions, String authMode, List<String> groups) throws Exception {
     Map<String, String> configOverlay = new HashMap<>();
     configOverlay.put(ConfVars.HIVE_SERVER2_SAML_CALLBACK_URL.varname,
         "http://localhost:" + miniHS2.getHttpPort()
             + "/sso/saml?client_name=HiveSaml2Client");
+    if (groups != null) {
+      configOverlay.put(ConfVars.HIVE_SERVER2_SAML_GROUP_ATTRIBUTE_NAME.varname,
+          IDP_GROUP_ATTRIBUTE_NAME);
+      configOverlay.put(ConfVars.HIVE_SERVER2_SAML_GROUP_FILTER.varname,
+          Joiner.on(',').join(groups));
+    } else {
+      // reset the configs since the previous test may have set them.
+      configOverlay.put(ConfVars.HIVE_SERVER2_SAML_GROUP_ATTRIBUTE_NAME.varname, "");
+      configOverlay.put(ConfVars.HIVE_SERVER2_SAML_GROUP_FILTER.varname, "");
+    }
     miniHS2.start(configOverlay);
     Map<String, String> idpEnv = getIdpEnv(useSignedAssertions, authMode);
     genericContainer = new GenericContainer<>(
@@ -152,13 +200,26 @@ public class TestHttpSamlAuthentication {
   }
 
   private static String getSamlJdbcConnectionUrl() throws Exception {
-    return miniHS2.getHttpJdbcURL() + "auth=browser;browserResponseTimeout=0";
+    return miniHS2.getHttpJdbcURL() + "auth=browser;";
+  }
+
+  private static String getSamlJdbcConnectionUrl(int timeoutInSecs) throws Exception {
+    return miniHS2.getHttpJdbcURL() + "auth=browser;" + AUTH_BROWSER_RESPONSE_TIMEOUT_SECS
+        + "=" + timeoutInSecs;
+  }
+
+  private static String getSamlJdbcConnectionUrl(int timeoutInSecs, int responsePort)
+      throws Exception {
+    return miniHS2.getHttpJdbcURL() + "auth=browser;" + AUTH_BROWSER_RESPONSE_TIMEOUT_SECS
+        + "=" + timeoutInSecs + ";" + AUTH_BROWSER_RESPONSE_PORT + "=" + responsePort;
   }
 
   private static class TestHiveJdbcBrowserClientFactory implements
       IJdbcBrowserClientFactory {
+
     private String user;
     private String password;
+
     TestHiveJdbcBrowserClientFactory(String user, String password) {
       this.user = user;
       this.password = password;
@@ -176,6 +237,7 @@ public class TestHttpSamlAuthentication {
    * Test HiveConnection which injects a HTMLUnit based browser client.
    */
   private static class TestHiveConnection extends HiveConnection {
+
     public TestHiveConnection(String uri, Properties info) throws SQLException {
       super(uri, info);
     }
@@ -183,6 +245,32 @@ public class TestHttpSamlAuthentication {
     public TestHiveConnection(String uri, Properties info, String testUser,
         String testPass) throws SQLException {
       super(uri, info, new TestHiveJdbcBrowserClientFactory(testUser, testPass));
+    }
+  }
+
+  /**
+   * Util class to issue multiple connection requests concurrently.
+   */
+  private static class TestHiveConnectionCallable implements Callable<Void> {
+
+    private final String user, password;
+    private final int iterations;
+
+    TestHiveConnectionCallable(String user, String password, int iterations) {
+      this.user = user;
+      this.password = password;
+      this.iterations = iterations;
+    }
+
+    @Override
+    public Void call() throws Exception {
+      for (int i = 0; i < iterations; i++) {
+        try (TestHiveConnection connection = new TestHiveConnection(
+            getSamlJdbcConnectionUrl(), new Properties(), user, password)) {
+          assertLoggedInUser(connection, user);
+        }
+      }
+      return null;
     }
   }
 
@@ -195,6 +283,9 @@ public class TestHttpSamlAuthentication {
     }
   }
 
+  /**
+   * Tests basic SSO connection using a user/password.
+   */
   @Test
   public void testBasicConnection() throws Exception {
     setupIDP(true, USER_PASS_MODE);
@@ -208,7 +299,114 @@ public class TestHttpSamlAuthentication {
     }
   }
 
-  private void assertLoggedInUser(HiveConnection connection, String expectedUser)
+  /**
+   * Tests multiple concurrent SSO connections. Make sure that the logged in user is same
+   * as the one which is provided in the credentials.
+   */
+  @Test
+  public void testConcurrentConnections() throws Exception {
+    setupIDP(true, USER_PASS_MODE);
+    ExecutorService executorService = Executors.newFixedThreadPool(3);
+    List<Future<Void>> futures = new ArrayList<>();
+    futures.add(executorService
+        .submit(new TestHiveConnectionCallable(USER1, USER1_PASSWORD, 11)));
+    futures.add(executorService
+        .submit(new TestHiveConnectionCallable(USER2, USER2_PASSWORD, 17)));
+    futures.add(executorService
+        .submit(new TestHiveConnectionCallable(USER3, USER3_PASSWORD, 13)));
+    for (Future<Void> f : futures) {
+      f.get();
+    }
+  }
+
+  /**
+   * Test makes sure that the if the user doesn't provide the right credentials the
+   * connection timesout after the given timeout value.
+   */
+  @Test(expected = SQLException.class)
+  public void testConnectionTimeout() throws Exception {
+    setupIDP(true, USER_PASS_MODE);
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(2), new Properties(), USER1, USER2_PASSWORD)) {
+      fail(USER1 + " was logged in even with incorrect password");
+    } catch (SQLException e) {
+      assertTrue("Unexpected error message", e.getMessage().contains(
+          HiveJdbcBrowserClient.TIMEOUT_ERROR_MSG));
+      throw e;
+    }
+  }
+
+  /**
+   * Test makes sure that if a saml response port is provided on the URL, the browser
+   * client opens the given port. We retry one more time in case of failure since the
+   * the finding of free port has race conditions (port used immediately later by someone
+   * else).
+   */
+  @Test
+  public void testSamlResponsePort() throws Exception {
+    setupIDP(true, USER_PASS_MODE);
+    for (int i=0; i<2; i++) {
+      int samlResponsePort = MetaStoreTestUtils.findFreePort();
+      try (TestHiveConnection connection = new TestHiveConnection(
+          getSamlJdbcConnectionUrl(30, samlResponsePort), new Properties(), USER1,
+          USER1_PASSWORD)) {
+        assertLoggedInUser(connection, USER1);
+        assertEquals(samlResponsePort,
+            connection.getBrowserClient().getPort().intValue());
+        break;
+      }
+    }
+  }
+
+  /**
+   * Test exercises group name filtering for users. Only users who belong for a given
+   * groups should be able to log in. user1 belongs to group1, user2 to group2 and user3
+   * to group1 and group2.
+   */
+  @Test
+  public void testGroupNameFiltering() throws Exception {
+    setupIDP(true, USER_PASS_MODE, Arrays.asList("group1"));
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER1, USER1_PASSWORD)) {
+      assertLoggedInUser(connection, USER1);
+    }
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER3, USER3_PASSWORD)) {
+      assertLoggedInUser(connection, USER3);
+    }
+    //user2 does not belong to group1 and hence should not be allowed.
+    Exception e1 = null;
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER2, USER2_PASSWORD)) {
+      fail(USER2 +" does not belong to group1 but could still log in.");
+    } catch (SQLException e) {
+      e1 = e;
+    }
+    assertNotNull("Exception was expected but was not received", e1);
+  }
+
+  /**
+   * Tests group name filtering with multiple group names are configured on the HS2 side.
+   */
+  @Test
+  public void testGroupNameFiltering2() throws Exception {
+    setupIDP(true, USER_PASS_MODE, Arrays.asList("group1", "group2"));
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER1, USER1_PASSWORD)) {
+      assertLoggedInUser(connection, USER1);
+    }
+
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER2, USER2_PASSWORD)) {
+      assertLoggedInUser(connection, USER2);
+    }
+    try (TestHiveConnection connection = new TestHiveConnection(
+        getSamlJdbcConnectionUrl(), new Properties(), USER3, USER3_PASSWORD)) {
+      assertLoggedInUser(connection, USER3);
+    }
+  }
+
+  private static void assertLoggedInUser(HiveConnection connection, String expectedUser)
       throws SQLException {
     Statement stmt = connection.createStatement();
     ResultSet resultSet = stmt.executeQuery("select logged_in_user()");

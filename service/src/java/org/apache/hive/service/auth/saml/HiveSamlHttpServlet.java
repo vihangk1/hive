@@ -55,7 +55,7 @@ public class HiveSamlHttpServlet extends HttpServlet {
       return;
     }
     try {
-      LOG.debug("RelayState port is " + port);
+      LOG.debug("RelayState = {}. Driver side port on localhost = {}", relayState, port);
       nameId = HiveSaml2Client.get(conf).validate(request, response);
     } catch (HttpSamlAuthenticationException e) {
       if (e instanceof HttpSamlNoGroupsMatchedException) {
@@ -63,7 +63,6 @@ public class HiveSamlHttpServlet extends HttpServlet {
       } else {
         LOG.error("SAML response could not be validated", e);
       }
-      //TODO(Vihang) do we need a https://localhost here?
       generateFormData(response, "http://localhost:" + port, null, false,
           "SAML assertion could not be validated. Check server logs for more details.");
       return;
@@ -71,7 +70,6 @@ public class HiveSamlHttpServlet extends HttpServlet {
     Preconditions.checkState(nameId != null);
     LOG.debug(
         "Successfully validated saml response. Forwarding the token to port " + port);
-    //TODO(Vihang) do we need a https://localhost here?
     generateFormData(response, "http://localhost:" + port,
         tokenGenerator.get(nameId, relayState), true, "");
   }

@@ -986,6 +986,11 @@ public class HiveConnection implements java.sql.Connection {
     }
   }
 
+  @VisibleForTesting
+  public IJdbcBrowserClient getBrowserClient() {
+    return browserClient;
+  }
+
   private void openSession(TOpenSessionReq openReq) throws TException, SQLException {
     TOpenSessionResp openResp = client.OpenSession(openReq);
 
