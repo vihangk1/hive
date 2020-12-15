@@ -318,9 +318,9 @@ public class ThriftHttpServlet extends TServlet {
     if (token == null) {
       throw new HttpSamlRedirectException("No token found");
     }
-    String codeVerifier = request.getHeader(HiveSamlUtils.SSO_CLIENT_IDENTIFIER);
-    if (codeVerifier == null) {
-      throw new HttpSamlAuthenticationException("Code verifier not found");
+    String clientIdentifier = request.getHeader(HiveSamlUtils.SSO_CLIENT_IDENTIFIER);
+    if (clientIdentifier == null) {
+      throw new HttpSamlAuthenticationException("Client identifier not found");
     }
     String user = HiveSamlAuthTokenGenerator.get(hiveConf).validate(token);
     // token is valid; now confirm if the code verifier matches with the relay state.
@@ -328,7 +328,7 @@ public class ThriftHttpServlet extends TServlet {
     if (HiveSamlAuthTokenGenerator.parse(token, keyValues)) {
       String relayStateKey = keyValues.get(HiveSamlAuthTokenGenerator.RELAY_STATE);
       if (!HiveSamlRelayStateStore.get()
-          .validateCodeVerifier(relayStateKey, codeVerifier)) {
+          .validateCodeVerifier(relayStateKey, clientIdentifier)) {
         throw new HttpSamlAuthenticationException("Code verifier could not be validated");
       }
     }

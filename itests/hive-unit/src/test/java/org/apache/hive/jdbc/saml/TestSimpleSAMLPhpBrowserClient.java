@@ -25,21 +25,27 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import java.io.IOException;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HTMLUnit based {@link IJdbcBrowserClient} for testing purposes.
  */
-public class TestSimpleSAMLBrowserClient extends HiveJdbcBrowserClient {
+public class TestSimpleSAMLPhpBrowserClient extends HiveJdbcBrowserClient {
 
   private final String username;
   private final String password;
+  private final long tokenDelayMs;
+  private static final Logger LOG = LoggerFactory
+      .getLogger(TestSimpleSAMLPhpBrowserClient.class);
 
-  public TestSimpleSAMLBrowserClient(JdbcConnectionParams connectionParams,
-      String username, String password)
+  public TestSimpleSAMLPhpBrowserClient(JdbcConnectionParams connectionParams,
+      String username, String password, long tokenDelayMs)
       throws HiveJdbcBrowserException {
     super(connectionParams);
     this.username = username;
     this.password = password;
+    this.tokenDelayMs = tokenDelayMs;
   }
 
   @Override
@@ -64,5 +70,18 @@ public class TestSimpleSAMLBrowserClient extends HiveJdbcBrowserClient {
     } catch (IOException e) {
       throw new HiveJdbcBrowserException(e);
     }
+  }
+
+  @Override
+  public HiveJdbcBrowserServerResponse getServerResponse() {
+    if (tokenDelayMs > 0) {
+      LOG.debug("Adding a delay of {} msec", tokenDelayMs);
+      try {
+        Thread.sleep(tokenDelayMs);
+      } catch (InterruptedException e) {
+        //ignored
+      }
+    }
+    return super.getServerResponse();
   }
 }

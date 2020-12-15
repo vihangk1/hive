@@ -31,6 +31,7 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,15 +49,15 @@ import java.util.concurrent.Future;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
-import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.jdbc.miniHS2.MiniHS2;
 import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
+import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserServerResponse;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClientFactory;
-import org.apache.hive.jdbc.saml.TestSimpleSAMLBrowserClient;
+import org.apache.hive.jdbc.saml.TestSimpleSAMLPhpBrowserClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -142,10 +143,11 @@ public class TestHttpSamlAuthentication {
   }
 
   private void setupIDP(boolean useSignedAssertions, String authMode) throws Exception {
-    setupIDP(useSignedAssertions, authMode, null);
+    setupIDP(useSignedAssertions, authMode, null, null);
   }
 
-  private void setupIDP(boolean useSignedAssertions, String authMode, List<String> groups) throws Exception {
+  private void setupIDP(boolean useSignedAssertions, String authMode, List<String> groups,
+      String tokenExpirySecs) throws Exception {
     Map<String, String> configOverlay = new HashMap<>();
     configOverlay.put(ConfVars.HIVE_SERVER2_SAML_CALLBACK_URL.varname,
         "http://localhost:" + miniHS2.getHttpPort()
@@ -159,6 +161,13 @@ public class TestHttpSamlAuthentication {
       // reset the configs since the previous test may have set them.
       configOverlay.put(ConfVars.HIVE_SERVER2_SAML_GROUP_ATTRIBUTE_NAME.varname, "");
       configOverlay.put(ConfVars.HIVE_SERVER2_SAML_GROUP_FILTER.varname, "");
+    }
+    if (tokenExpirySecs != null) {
+      configOverlay.put(ConfVars.HIVE_SERVER2_SAML_CALLBACK_TOKEN_TTL.varname,
+          tokenExpirySecs);
+    } else {
+      configOverlay.put(ConfVars.HIVE_SERVER2_SAML_CALLBACK_TOKEN_TTL.varname,
+          ConfVars.HIVE_SERVER2_SAML_CALLBACK_TOKEN_TTL.defaultStrVal);
     }
     miniHS2.start(configOverlay);
     Map<String, String> idpEnv = getIdpEnv(useSignedAssertions, authMode);
@@ -204,32 +213,36 @@ public class TestHttpSamlAuthentication {
   }
 
   private static String getSamlJdbcConnectionUrl(int timeoutInSecs) throws Exception {
-    return miniHS2.getHttpJdbcURL() + "auth=browser;" + AUTH_BROWSER_RESPONSE_TIMEOUT_SECS
+    return getSamlJdbcConnectionUrl() + AUTH_BROWSER_RESPONSE_TIMEOUT_SECS
         + "=" + timeoutInSecs;
   }
 
   private static String getSamlJdbcConnectionUrl(int timeoutInSecs, int responsePort)
       throws Exception {
-    return miniHS2.getHttpJdbcURL() + "auth=browser;" + AUTH_BROWSER_RESPONSE_TIMEOUT_SECS
-        + "=" + timeoutInSecs + ";" + AUTH_BROWSER_RESPONSE_PORT + "=" + responsePort;
+    return getSamlJdbcConnectionUrl(timeoutInSecs) + ";" + AUTH_BROWSER_RESPONSE_PORT
+        + "=" + responsePort;
   }
 
   private static class TestHiveJdbcBrowserClientFactory implements
       IJdbcBrowserClientFactory {
 
-    private String user;
-    private String password;
+    private final String user;
+    private final String password;
+    // tokenDelayMs introduces a delay in browser client before it sends it to the server
+    // as the bearer token. Used for testing the expiry of the token.
+    private final long tokenDelayMs;
 
-    TestHiveJdbcBrowserClientFactory(String user, String password) {
+    TestHiveJdbcBrowserClientFactory(String user, String password, long tokenDelayMs) {
       this.user = user;
       this.password = password;
+      this.tokenDelayMs = tokenDelayMs;
     }
 
     @Override
     public IJdbcBrowserClient create(JdbcConnectionParams connectionParams)
         throws HiveJdbcBrowserException {
-      return new TestSimpleSAMLBrowserClient(connectionParams, user
-          , password);
+      return new TestSimpleSAMLPhpBrowserClient(connectionParams, user
+          , password, tokenDelayMs);
     }
   }
 
@@ -238,13 +251,14 @@ public class TestHttpSamlAuthentication {
    */
   private static class TestHiveConnection extends HiveConnection {
 
-    public TestHiveConnection(String uri, Properties info) throws SQLException {
-      super(uri, info);
+    public TestHiveConnection(String uri, Properties info, String testUser,
+        String testPass, long tokenDelayMs) throws SQLException {
+      super(uri, info, new TestHiveJdbcBrowserClientFactory(testUser, testPass, tokenDelayMs));
     }
 
     public TestHiveConnection(String uri, Properties info, String testUser,
         String testPass) throws SQLException {
-      super(uri, info, new TestHiveJdbcBrowserClientFactory(testUser, testPass));
+      super(uri, info, new TestHiveJdbcBrowserClientFactory(testUser, testPass, 0L));
     }
   }
 
@@ -365,7 +379,7 @@ public class TestHttpSamlAuthentication {
    */
   @Test
   public void testGroupNameFiltering() throws Exception {
-    setupIDP(true, USER_PASS_MODE, Arrays.asList("group1"));
+    setupIDP(true, USER_PASS_MODE, Arrays.asList("group1"), null);
     try (TestHiveConnection connection = new TestHiveConnection(
         getSamlJdbcConnectionUrl(), new Properties(), USER1, USER1_PASSWORD)) {
       assertLoggedInUser(connection, USER1);
@@ -390,7 +404,7 @@ public class TestHttpSamlAuthentication {
    */
   @Test
   public void testGroupNameFiltering2() throws Exception {
-    setupIDP(true, USER_PASS_MODE, Arrays.asList("group1", "group2"));
+    setupIDP(true, USER_PASS_MODE, Arrays.asList("group1", "group2"), null);
     try (TestHiveConnection connection = new TestHiveConnection(
         getSamlJdbcConnectionUrl(), new Properties(), USER1, USER1_PASSWORD)) {
       assertLoggedInUser(connection, USER1);
@@ -403,6 +417,43 @@ public class TestHttpSamlAuthentication {
     try (TestHiveConnection connection = new TestHiveConnection(
         getSamlJdbcConnectionUrl(), new Properties(), USER3, USER3_PASSWORD)) {
       assertLoggedInUser(connection, USER3);
+    }
+  }
+
+  /**
+   * Test makes sure that the token received in the server response is not valid
+   * after it is expired.
+   */
+  @Test(expected = SQLException.class)
+  public void testTokenTimeout() throws Exception {
+    // we set up the HS2 so that the token will expire after 5 seconds
+    setupIDP(true, USER_PASS_MODE, null, "3s");
+    // we add a token delay of 7 seconds
+    try (HiveConnection connection = new TestHiveConnection(getSamlJdbcConnectionUrl(),
+        new Properties(), USER1, USER1_PASSWORD, 7000)) {
+      fail(USER1 + " logged in even after token expiry");
+    }
+  }
+
+  /**
+   * Test make sure that a token which is issued for a different connection cannot be
+   * reused.
+   */
+  @Test(expected = SQLException.class)
+  public void testTokenReuse() throws Exception {
+    setupIDP(true, USER_PASS_MODE, null, null);
+    String token = null;
+    try (HiveConnection connection = new TestHiveConnection(getSamlJdbcConnectionUrl(),
+        new Properties(), USER1, USER1_PASSWORD)) {
+      token = connection.getBrowserClient().getServerResponse().getToken();
+    }
+    assertNotNull(token);
+    //inject the token using http.header url param
+    String bearerToken = "Bearer%20" + token;
+    String jdbcUrl =
+        getSamlJdbcConnectionUrl(10) + ";http.header.Authorization=" + bearerToken;
+    try (HiveConnection connection = new HiveConnection(jdbcUrl, new Properties())) {
+      fail("User should not be able to login just using the token");
     }
   }
 

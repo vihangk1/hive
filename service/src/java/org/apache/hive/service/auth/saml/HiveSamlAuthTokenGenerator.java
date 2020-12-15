@@ -18,6 +18,7 @@
 
 package org.apache.hive.service.auth.saml;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -62,13 +63,26 @@ public class HiveSamlAuthTokenGenerator implements AuthTokenGenerator {
         TimeUnit.MILLISECONDS);
   }
 
+  @VisibleForTesting
+  synchronized static void shutdown() {
+    INSTANCE = null;
+  }
+
   @Override
   public String get(String username, String relayStateKey) {
     String id = String.valueOf(rand.nextLong());
     String time = String.valueOf(System.currentTimeMillis());
     LOG.debug("Generating token for user {} with id {} and time {}", username, id, time);
     String tokenStr = getTokenStr(username, id, time, relayStateKey);
-    return sign(tokenStr);
+    return encode(sign(tokenStr));
+  }
+
+  private String encode(String token) {
+    return Base64.getEncoder().encodeToString(token.getBytes());
+  }
+
+  private String decode(String encodedToken) {
+    return new String(Base64.getDecoder().decode(encodedToken));
   }
 
   private String getTokenStr(String username, String id, String timestamp,
@@ -100,7 +114,8 @@ public class HiveSamlAuthTokenGenerator implements AuthTokenGenerator {
   }
 
   @Override
-  public String validate(String token) throws HttpSamlAuthenticationException {
+  public String validate(String encodedToken) throws HttpSamlAuthenticationException {
+    String token = decode(encodedToken);
     Map<String, String> keyValue = new HashMap<>();
     if (!parse(token, keyValue)) {
       throw new HttpSamlAuthenticationException("Invalid token");
@@ -119,6 +134,9 @@ public class HiveSamlAuthTokenGenerator implements AuthTokenGenerator {
   }
 
   private boolean isExpired(long currentTime, long tokenTime) {
+    LOG.debug("Checking if the token is expired or not. "
+            + "CurrentTime = {}, tokenExpiryTime = {} TTL = {}", currentTime, tokenTime,
+        ttlMs);
     if (currentTime >= tokenTime) {
       return (currentTime - tokenTime) > ttlMs;
     }
