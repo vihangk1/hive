@@ -31,7 +31,6 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -55,9 +54,8 @@ import org.apache.hive.jdbc.miniHS2.MiniHS2;
 import org.apache.hive.jdbc.saml.HiveJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserException;
-import org.apache.hive.jdbc.saml.IJdbcBrowserClient.HiveJdbcBrowserServerResponse;
 import org.apache.hive.jdbc.saml.IJdbcBrowserClientFactory;
-import org.apache.hive.jdbc.saml.TestSimpleSAMLPhpBrowserClient;
+import org.apache.hive.jdbc.saml.SimpleSAMLPhpTestBrowserClient;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -241,7 +239,7 @@ public class TestHttpSamlAuthentication {
     @Override
     public IJdbcBrowserClient create(JdbcConnectionParams connectionParams)
         throws HiveJdbcBrowserException {
-      return new TestSimpleSAMLPhpBrowserClient(connectionParams, user
+      return new SimpleSAMLPhpTestBrowserClient(connectionParams, user
           , password, tokenDelayMs);
     }
   }

@@ -31,15 +31,15 @@ import org.slf4j.LoggerFactory;
 /**
  * HTMLUnit based {@link IJdbcBrowserClient} for testing purposes.
  */
-public class TestSimpleSAMLPhpBrowserClient extends HiveJdbcBrowserClient {
+public class SimpleSAMLPhpTestBrowserClient extends HiveJdbcBrowserClient {
 
   private final String username;
   private final String password;
   private final long tokenDelayMs;
   private static final Logger LOG = LoggerFactory
-      .getLogger(TestSimpleSAMLPhpBrowserClient.class);
+      .getLogger(SimpleSAMLPhpTestBrowserClient.class);
 
-  public TestSimpleSAMLPhpBrowserClient(JdbcConnectionParams connectionParams,
+  public SimpleSAMLPhpTestBrowserClient(JdbcConnectionParams connectionParams,
       String username, String password, long tokenDelayMs)
       throws HiveJdbcBrowserException {
     super(connectionParams);

@@ -35,6 +35,7 @@ public class HiveSamlHttpServlet extends HttpServlet {
       .getLogger(HiveSamlHttpServlet.class);
   private final HiveConf conf;
   private final AuthTokenGenerator tokenGenerator;
+  private static final String LOOP_BACK_INTERFACE = "127.0.0.1";
 
   public HiveSamlHttpServlet(HiveConf conf) {
     this.conf = Preconditions.checkNotNull(conf);
@@ -63,14 +64,14 @@ public class HiveSamlHttpServlet extends HttpServlet {
       } else {
         LOG.error("SAML response could not be validated", e);
       }
-      generateFormData(response, "http://localhost:" + port, null, false,
+      generateFormData(response, HiveSamlUtils.getLoopBackAddress(port), null, false,
           "SAML assertion could not be validated. Check server logs for more details.");
       return;
     }
     Preconditions.checkState(nameId != null);
     LOG.debug(
         "Successfully validated saml response. Forwarding the token to port " + port);
-    generateFormData(response, "http://localhost:" + port,
+    generateFormData(response, HiveSamlUtils.getLoopBackAddress(port),
         tokenGenerator.get(nameId, relayState), true, "");
   }
 

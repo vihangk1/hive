@@ -46,6 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
+import org.apache.hive.service.auth.saml.HiveSamlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class HiveJdbcBrowserClient implements IJdbcBrowserClient {
             String.valueOf(DEFAULT_SOCKET_TIMEOUT_SECS)));
     try {
       serverSocket = new ServerSocket(port, 0,
-          InetAddress.getByName("localhost"));
+          InetAddress.getByName(HiveSamlUtils.LOOP_BACK_INTERFACE));
       LOG.debug("Browser response timeout is set to {} seconds", timeout);
       serverSocket.setSoTimeout(timeout * 1000);
     } catch (IOException e) {

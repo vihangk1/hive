@@ -19,6 +19,7 @@
 package org.apache.hive.service.auth.saml;
 
 import com.google.common.base.Preconditions;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -66,5 +67,10 @@ public class HiveSamlUtils {
       throw new Exception("Invalid callback url configuration: "
           + ConfVars.HIVE_SERVER2_SAML_CALLBACK_URL.varname + " = " + callbackUrl);
     }
+  }
+
+  public static final String LOOP_BACK_INTERFACE = "127.0.0.1";
+  public static String getLoopBackAddress(int port) {
+    return String.format("http://%s:%s",LOOP_BACK_INTERFACE, port);
   }
 }
