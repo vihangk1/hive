@@ -92,7 +92,7 @@ public class TestHttpSamlAuthentication {
   // needs user/password to login to the IDP.
   private static final String USER_PASS_MODE = "example-userpass";
 
-  public static GenericContainer genericContainer;
+  public static GenericContainer idpContainer;
   private static final File tmpDir = Files.createTempDir();
   private static final File idpMetadataFile = new File(tmpDir, "idp-metadata.xml");
 
@@ -124,16 +124,16 @@ public class TestHttpSamlAuthentication {
     if (tmpDir.exists()) {
       tmpDir.delete();
     }
-    if (genericContainer != null && genericContainer.isRunning()) {
-      genericContainer.stop();
+    if (idpContainer != null && idpContainer.isRunning()) {
+      idpContainer.stop();
     }
   }
 
   @After
   public void cleanUpIdpEnv() {
-    if (genericContainer != null) {
-      genericContainer.stop();
-      genericContainer = null;
+    if (idpContainer != null) {
+      idpContainer.stop();
+      idpContainer = null;
     }
     if (miniHS2 != null) {
       miniHS2.stop();
@@ -169,12 +169,12 @@ public class TestHttpSamlAuthentication {
     }
     miniHS2.start(configOverlay);
     Map<String, String> idpEnv = getIdpEnv(useSignedAssertions, authMode);
-    genericContainer = new GenericContainer<>(
-        DockerImageName.parse("test-saml-idp:1.0"))
+    idpContainer = new GenericContainer<>(
+        DockerImageName.parse("vihangk1/docker-test-saml-idp"))
         .withExposedPorts(8080, 8443)
         .withEnv(idpEnv);
-    genericContainer.start();
-    Integer ssoPort = genericContainer.getMappedPort(8080);
+    idpContainer.start();
+    Integer ssoPort = idpContainer.getMappedPort(8080);
     writeIdpMetadataFile(ssoPort, idpMetadataFile);
   }
 
